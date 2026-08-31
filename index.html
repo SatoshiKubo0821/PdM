@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PdMスキルレーダー｜35項目セルフ診断</title>
+<meta name="description" content="8カテゴリ・49項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
+
+<!-- favicon: レーダーチャートをモチーフにしたオリジナルの図形（外部ファイル不要のインラインSVG） -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23101C36%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2212%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22%20opacity%3D%220.7%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%236FA0FF%22%20opacity%3D%220.5%22/%3E%3Ccircle%20cx%3D%2242%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23C0812C%22/%3E%3C/svg%3E">
+
+<!-- OGP（SNS・チャットでシェアされた際の見え方）。og:image は独自ドメインでの公開後、画像を用意してURLを差し替えてください -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="PdMスキルレーダー｜35項目セルフ診断">
+<meta property="og:description" content="8カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
+<meta property="og:site_name" content="PdMスキルレーダー">
+<!-- <meta property="og:image" content="https://あなたのドメイン/ogp.png"> -->
+<!-- <meta property="og:url" content="https://あなたのドメイン/"> -->
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PdMスキルレーダー｜35項目セルフ診断">
+<meta name="twitter:description" content="8カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F4F6FA;
+    --paper: #FFFFFF;
+    --ink: #131A2B;
+    --ink-soft: #5A6478;
+    --line: #DFE4EE;
+
+    /* key color: dark navy, with a lighter blue for gradients */
+    --navy-950: #0B1220;
+    --navy-900: #101C36;
+    --navy-800: #16294C;
+    --blue-500: #2E5FD9;
+    --blue-300: #6FA0FF;
+    --blue-100: #D7E4FF;
+
+    --gold: #C0812C;
+    --gold-soft: #F3E3C8;
+    --good: #2E8F6C;
+    --bad: #C4562E;
+    --radius: 4px;
+
+    --grad-main: linear-gradient(135deg, var(--navy-900) 0%, var(--blue-500) 100%);
+    --grad-soft: linear-gradient(135deg, rgba(46,95,217,.12) 0%, rgba(111,160,255,.05) 100%);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans JP", sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:780px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+  }
+  h1,h2,h3{
+    font-family:"Zen Kaku Gothic New", sans-serif;
+    margin:0;
+    color:var(--navy-900);
+  }
+  .eyebrow{
+    font-size:13px;
+    color:var(--ink-soft);
+    letter-spacing:.02em;
+    margin-bottom:10px;
+  }
+  .eyebrow b{color:var(--blue-500);}
+
+  /* ---------- Intro ---------- */
+  .hero-title{
+    font-size:38px;
+    font-weight:900;
+    line-height:1.35;
+    letter-spacing:-.01em;
+  }
+  .hero-lead{
+    margin-top:18px;
+    font-size:16px;
+    color:var(--ink-soft);
+    max-width:58ch;
+  }
+  .hero-visual{
+    margin:36px 0 8px;
+    display:flex;
+    justify-content:center;
+  }
+  .cat-list{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:2px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .cat-list div{
+    background:var(--paper);
+    padding:14px 16px;
+    font-size:14px;
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .cat-list span{color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+  .start-row{
+    margin-top:40px;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  button.primary, a.primary{
+    background:var(--grad-main);
+    color:#fff;
+    border:none;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:14px 28px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:transform .12s ease, filter .12s ease;
+    box-shadow:0 8px 20px -8px rgba(16,28,54,.55);
+    display:inline-block;
+    text-decoration:none;
+    box-sizing:border-box;
+  }
+  button.primary:hover, a.primary:hover{filter:brightness(1.08);}
+  button.primary:active, a.primary:active{transform:scale(.98);}
+  button.ghost{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:"Noto Sans JP",sans-serif;
+    font-size:14px;
+    padding:13px 22px;
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  button.ghost:hover{border-color:var(--blue-500); color:var(--blue-500);}
+  .resume-note{font-size:13px;color:var(--ink-soft);}
+
+  /* ---------- Assessment ---------- */
+  .progress-rail{
+    display:flex;
+    gap:4px;
+    margin-bottom:10px;
+  }
+  .progress-rail div{
+    flex:1;
+    height:5px;
+    background:var(--line);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .progress-rail div i{
+    display:block;
+    height:100%;
+    width:0%;
+    background:var(--grad-main);
+    transition:width .25s ease;
+  }
+  .progress-pct{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-bottom:24px;
+  }
+  .cat-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .cat-badge{
+    width:40px; height:40px;
+    border-radius:50%;
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:900;
+    font-size:16px;
+    flex-shrink:0;
+  }
+  .cat-index{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    color:var(--gold);
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:.03em;
+  }
+  .cat-title{
+    font-size:26px;
+    font-weight:900;
+  }
+  .cat-sub{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin-top:6px;
+    max-width:58ch;
+  }
+  .legend-bar{
+    margin-top:12px;
+    padding:10px 14px;
+    background:var(--grad-soft);
+    border:1px solid var(--blue-100);
+    border-radius:var(--radius);
+    font-size:12px;
+    color:var(--navy-800);
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 14px;
+  }
+  .skill-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:20px 22px;
+    margin-top:18px;
+    border-radius:var(--radius);
+    transition:border-color .15s ease;
+  }
+  .skill-card:has(.scale button.on){border-color:var(--blue-300);}
+  .skill-name{
+    font-weight:700;
+    font-size:15px;
+  }
+  .skill-desc{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    margin-top:4px;
+    max-width:58ch;
+  }
+  .scale{
+    margin-top:14px;
+    display:flex;
+    gap:6px;
+  }
+  .scale button{
+    flex:1;
+    padding:10px 4px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink-soft);
+    font-size:12.5px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    text-align:center;
+    transition:all .12s ease;
+  }
+  .scale button:hover{border-color:var(--blue-500);}
+  .scale button.on{
+    background:var(--grad-main);
+    border-color:var(--navy-900);
+    color:#fff;
+  }
+  .nav-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:36px;
+  }
+  .nav-hint{font-size:13px;color:var(--ink-soft);}
+
+  /* ---------- MBTI screen ---------- */
+  .mbti-card-groups{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .mbti-group-label{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:700;
+    font-size:13px;
+    margin-bottom:10px;
+    letter-spacing:.02em;
+  }
+  .mbti-card-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+  }
+  .mbti-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding:16px 8px 14px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    border-radius:8px;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .mbti-card:hover{transform:translateY(-2px); box-shadow:0 8px 18px -10px rgba(16,28,54,.35); border-color:var(--blue-300);}
+  .mbti-card.on{
+    background:var(--card-grad, var(--grad-main));
+    border-color:transparent;
+    box-shadow:0 10px 22px -10px rgba(16,28,54,.5);
+  }
+  .mbti-card.on .mbti-card-icon{color:#fff;}
+  .mbti-card.on .mbti-card-code{color:#fff;}
+  .mbti-card.on .mbti-card-nick{color:rgba(255,255,255,.85);}
+  .mbti-card-icon{color:var(--navy-800); display:flex; align-items:center; justify-content:center; height:24px;}
+  .mbti-card-code{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700; font-size:13.5px; color:var(--ink);}
+  .mbti-card-nick{font-size:11px; color:var(--ink-soft);}
+  .mbti-card.on .mbti-card-nick{opacity:.9;}
+  .mbti-card.unknown{
+    align-self:flex-start;
+    flex-direction:row;
+    gap:10px;
+    padding:12px 20px;
+    width:fit-content;
+  }
+  .mbti-card.unknown .mbti-card-icon{
+    width:22px; height:22px; border-radius:50%;
+    background:var(--line); color:var(--ink-soft);
+    font-size:12px; font-weight:700;
+  }
+  .mbti-card.unknown.on{background:var(--navy-800);}
+
+  .mbti-preview{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 20px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    min-height:56px;
+    margin-top:22px;
+  }
+  .mbti-icon{
+    width:48px; height:48px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    color:#fff;
+    box-shadow:0 6px 16px -6px rgba(16,28,54,.5);
+  }
+  .mbti-preview-text{font-size:13px; color:var(--ink-soft); line-height:1.6;}
+  .mbti-preview-text b{display:block; font-size:15px; color:var(--ink); font-family:"Zen Kaku Gothic New",sans-serif; margin-bottom:2px;}
+
+  /* 語学力・資格 入力フォーム */
+  .profile-form{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    max-width:480px;
+  }
+  .profile-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .profile-input{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    font-size:15px;
+    font-family:"Noto Sans JP",sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+  }
+  .profile-input:focus{outline:2px solid var(--blue-300); border-color:var(--blue-500);}
+  .profile-textarea{resize:vertical; font-family:inherit;}
+
+  @media (max-width:600px){
+    .mbti-card-grid{grid-template-columns:repeat(2,1fr);}
+  }
+
+  /* ---------- Results ---------- */
+  .score-hero{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    margin-top:18px;
+    padding:26px 28px;
+    border-radius:8px;
+    background:var(--grad-main);
+    color:#fff;
+    flex-wrap:wrap;
+  }
+  .score-num{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:60px;
+    font-weight:900;
+    line-height:1;
+  }
+  .score-den{font-size:14px; opacity:.75; margin-top:4px;}
+  .score-tags{display:flex; flex-direction:column; gap:8px;}
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(255,255,255,.14);
+    color:#fff;
+    font-size:13px;
+    font-weight:600;
+    padding:6px 14px;
+    border-radius:20px;
+    width:fit-content;
+  }
+  .tag.gold{background:var(--gold-soft); color:#7A4E14;}
+
+  /* 結果ページ専用：大きく美しいMBTIエンブレム */
+  .mbti-emblem-block{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    margin-top:20px;
+    padding:20px 24px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+  }
+  .mbti-emblem{
+    position:relative;
+    width:104px; height:104px;
+    border-radius:50%;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff;
+    box-shadow:0 12px 26px -10px rgba(16,28,54,.35);
+  }
+  .mbti-emblem::before{
+    content:"";
+    position:absolute;
+    inset:-4px;
+    border-radius:50%;
+    border:2px solid currentColor;
+    opacity:.55;
+  }
+  .mbti-emblem svg{width:60px; height:60px; position:relative; z-index:1;}
+  .mbti-emblem-text{}
+  .mbti-emblem-text .code{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:20px; color:var(--navy-900);}
+  .mbti-emblem-text .nick{font-size:13px; color:var(--ink-soft); margin-top:2px;}
+  .mbti-emblem-text .grp{display:inline-block; margin-top:6px; font-size:11px; padding:2px 10px; border-radius:10px; background:var(--bg); color:var(--ink-soft);}
+
+  /* 偏差値・年収などの指標タイル */
+  .metric-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:16px;
+  }
+  .metric-tile{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:18px 20px;
+  }
+  .metric-label{font-size:12px; color:var(--ink-soft); font-weight:600;}
+  .metric-value{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:32px;
+    font-weight:900;
+    margin-top:4px;
+    background:var(--grad-main);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .metric-value.salary{font-size:22px;}
+  .metric-note{font-size:12px; color:var(--ink-soft); margin-top:6px; line-height:1.6;}
+
+  /* 求人カード */
+  .job-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+    margin-top:10px;
+    display:block;
+    text-decoration:none;
+    color:inherit;
+    transition:border-color .12s ease, transform .12s ease;
+  }
+  .job-card:hover{border-color:var(--blue-300); transform:translateY(-1px);}
+  .job-company{font-size:12.5px; color:var(--ink-soft);}
+  .job-title{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700; font-size:14.5px; margin-top:2px;}
+  .job-meta{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; align-items:center;}
+  .job-salary{font-size:13px; color:var(--navy-900); font-weight:700;}
+  .job-source{font-size:11px; color:var(--ink-soft); background:var(--bg); padding:2px 9px; border-radius:10px;}
+
+  /* SWOT 四象限 */
+  .swot-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:2px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    margin-top:16px;
+  }
+  .swot-quad{background:var(--paper); padding:18px 20px;}
+  .swot-quad.s{border-top:3px solid var(--good);}
+  .swot-quad.w{border-top:3px solid var(--bad);}
+  .swot-quad.o{border-top:3px solid var(--blue-500);}
+  .swot-quad.t{border-top:3px solid var(--gold);}
+  .swot-head{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:900;
+    font-size:12.5px;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--ink-soft);
+  }
+  .swot-head .letter{
+    width:22px; height:22px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff;
+    font-size:12px;
+    flex-shrink:0;
+  }
+  .swot-quad.s .letter{background:var(--good);}
+  .swot-quad.w .letter{background:var(--bad);}
+  .swot-quad.o .letter{background:var(--blue-500);}
+  .swot-quad.t .letter{background:var(--gold);}
+  .swot-item{margin-bottom:12px;}
+  .swot-item:last-child{margin-bottom:0;}
+  .swot-item b{font-size:13px; display:block; font-family:"Zen Kaku Gothic New",sans-serif;}
+  .swot-item span{font-size:12px; color:var(--ink-soft); line-height:1.6;}
+
+  @media (max-width:600px){
+    .swot-grid{grid-template-columns:1fr;}
+  }
+
+  .cta-card{
+    margin-top:28px;
+    padding:24px 26px;
+    border-radius:8px;
+    background:var(--grad-main);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .cta-text h4{margin:0 0 4px; font-size:16px; font-family:"Zen Kaku Gothic New",sans-serif; color:#fff;}
+  .cta-text p{margin:0; font-size:13px; opacity:.85;}
+  .cta-btn{
+    background:#fff;
+    color:var(--navy-900) !important;
+    white-space:nowrap;
+    box-shadow:none;
+  }
+  .cta-btn:hover{background:#EFF2F1; filter:none;}
+  @media (max-width:600px){
+    .cta-card{flex-direction:column; align-items:flex-start;}
+  }
+
+  /* キャリアパス */
+  .career-main{
+    display:flex;
+    align-items:flex-end;
+    gap:16px;
+    margin-top:24px;
+    padding:0 8px;
+  }
+  .career-step{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    position:relative;
+  }
+  .career-step .bar{
+    width:100%;
+    max-width:120px;
+    border-radius:8px 8px 0 0;
+    background:var(--grad-main);
+    opacity:.55;
+  }
+  .career-step.current .bar{opacity:1; box-shadow:0 -4px 0 0 var(--gold) inset;}
+  .career-step .now-badge{
+    position:absolute;
+    top:-24px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--gold);
+    background:var(--gold-soft);
+    padding:2px 10px;
+    border-radius:10px;
+  }
+  .career-step .label{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700; font-size:14px; text-align:center;}
+  .career-step .years{font-size:11px; color:var(--ink-soft);}
+  .career-step .salary{font-size:12.5px; color:var(--navy-900); font-weight:700;}
+
+  .career-branch-label{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:28px;
+    position:relative;
+  }
+  .career-branches{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+  .career-branch{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-top:3px solid var(--gold);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .career-branch h5{margin:0 0 4px; font-family:"Zen Kaku Gothic New",sans-serif; font-size:14px;}
+  .career-branch .salary{font-size:13px; color:var(--navy-900); font-weight:700; margin-bottom:6px; display:block;}
+  .career-branch p{margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.6;}
+
+  /* 語学力・資格カード */
+  .lang-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+    margin-top:14px;
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .lang-item b{display:block; font-size:12px; color:var(--ink-soft); font-weight:600;}
+  .lang-item span{font-size:14px; color:var(--ink);}
+
+  @media (max-width:600px){
+    .career-branches{grid-template-columns:1fr;}
+    .career-main{gap:8px;}
+    .career-step .label{font-size:12px;}
+  }
+
+  @media (max-width:600px){
+    .metric-grid{grid-template-columns:1fr;}
+    .mbti-emblem-block{flex-direction:column; align-items:flex-start; text-align:left;}
+  }
+
+  .radar-block{
+    display:flex;
+    justify-content:center;
+    margin:36px 0 8px;
+  }
+  .result-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:2px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:8px;
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .result-grid > div{
+    background:var(--paper);
+    padding:14px 16px;
+  }
+  .result-row-name{font-size:13.5px; display:flex; justify-content:space-between;}
+  .result-row-name b{font-variant-numeric:tabular-nums; color:var(--navy-900);}
+  .bar-track{
+    margin-top:8px;
+    height:7px;
+    background:var(--bg);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .bar-fill{height:100%; background:var(--grad-main); border-radius:4px;}
+
+  .section-label{
+    margin-top:52px;
+    font-size:13px;
+    letter-spacing:.02em;
+    color:var(--gold);
+    font-weight:700;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .insight{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-left:3px solid var(--blue-500);
+    padding:16px 18px;
+    margin-top:14px;
+    border-radius:0 var(--radius) var(--radius) 0;
+  }
+  .insight.weak{border-left-color:var(--bad);}
+  .insight.strong{border-left-color:var(--good);}
+  .insight.fusion{border-left-color:var(--gold); background:var(--grad-soft);}
+  .insight.neutral{border-left-color:var(--line);}
+  .insight h4{
+    margin:0 0 6px;
+    font-size:15px;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .insight h4 b{color:var(--navy-900); font-variant-numeric:tabular-nums;}
+  .insight p{margin:0; font-size:13.5px; color:var(--ink-soft);}
+  .insight p + p{margin-top:8px;}
+
+  .pill-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .pill{
+    font-size:12.5px;
+    padding:6px 12px;
+    border-radius:20px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  .pill b{color:var(--navy-900);}
+  .pill.strong{border-color:var(--good); color:var(--good);}
+  .pill.weak{border-color:var(--bad); color:var(--bad);}
+
+  .two-col{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:14px;
+  }
+  .task-list{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .task-list.good{border-left:3px solid var(--good);}
+  .task-list.bad{border-left:3px solid var(--bad);}
+  .task-list h4{
+    margin:0 0 10px;
+    font-size:14px;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+  .task-list ul{margin:0; padding-left:18px;}
+  .task-list li{font-size:13px; color:var(--ink-soft); margin-bottom:6px;}
+
+  .matrix-row{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-top:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .matrix-row.strong{border-left:3px solid var(--good);}
+  .matrix-row.weak{border-left:3px solid var(--bad);}
+  .matrix-row.fusion{border-left:3px solid var(--gold);}
+  .matrix-row.neutral{border-left:3px solid var(--line);}
+  .matrix-left{flex:1; min-width:180px;}
+  .matrix-cat{font-size:14px; font-weight:700; font-family:"Zen Kaku Gothic New",sans-serif;}
+  .matrix-tag{
+    display:inline-block;
+    margin-top:4px;
+    font-size:11.5px;
+    padding:3px 9px;
+    border-radius:12px;
+    background:var(--bg);
+    color:var(--ink-soft);
+  }
+  .matrix-score{font-size:20px; font-weight:900; color:var(--navy-900); font-variant-numeric:tabular-nums;}
+  .matrix-note{flex:2; min-width:220px; font-size:12.5px; color:var(--ink-soft);}
+
+  footer.note{
+    margin-top:56px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    border-top:1px solid var(--line);
+    padding-top:18px;
+  }
+  footer.note a{color:var(--blue-500);}
+
+  @media (max-width:600px){
+    .hero-title{font-size:28px;}
+    .cat-list{grid-template-columns:1fr;}
+    .result-grid{grid-template-columns:1fr;}
+    .scale{flex-wrap:wrap;}
+    .scale button{flex:1 1 30%;}
+    .score-hero{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<!-- ============================================================
+     Supabase連携
+     1. Supabaseプロジェクトを作成し、supabase_schema.sql を SQL Editor で実行
+     2. Authentication → Providers で Anonymous Sign-Ins と Email を有効化
+     3. Project Settings → API から Project URL と anon(publishable) key を取得し、
+        下記の SUPABASE_URL / SUPABASE_ANON_KEY を書き換える
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = "https://YOUR-PROJECT-ID.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLISHABLE-KEY";
+  const supabaseClient = (SUPABASE_URL.includes("YOUR-PROJECT-ID"))
+    ? null
+    : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script>
+/* ---------------- Data: 8カテゴリ × 35スキル ---------------- */
+const CATEGORIES = [
+  { key:"strategy", name:"事業戦略", sub:"プロダクトの向かう先と向かい方を定義し、チームを前進させる力",
+    skills:[
+      ["プロダクトビジョン策定","顧客・社会・事業の視点から、プロダクトが目指す世界観を言語化できる"],
+      ["短期ロードマップ作成","四半期〜1年単位で、事業目標と開発リソースを踏まえた優先順位付きの計画を描ける"],
+      ["中長期ロードマップ作成","3〜5年先を見据え、ビジョンと市場ニーズから成長のステップを設計できる"],
+      ["プロダクト戦略","ビジョン実現に向けて、市場・顧客への向き合い方と事業成長の道筋を描ける"],
+      ["マーケティング戦略立案","ターゲット設定やメッセージ、チャネル選びを含む市場投入の意思決定ができる"],
+      ["KPI管理","施策がKPIに与える影響を設計し、効果を検証できる"],
+      ["プライシング戦略","提供価値と市場競争環境に応じた価格設計・改定ができる"],
+      ["パートナーシップ・アライアンス戦略","他社との提携によって事業成長を加速する戦略を描ける"],
+    ]},
+  { key:"research", name:"リサーチ", sub:"顧客にとっての価値と市場からの需要を見極める力",
+    skills:[
+      ["競合調査","市場の競合を把握し、差別化ポイントを見出せる"],
+      ["市場調査","内外環境を分析し、戦略の方向性に説得力を持たせられる"],
+      ["定量分析","利用データや事業指標から仮説を立て、次の一手を計画できる"],
+      ["ユーザーリサーチ","定性インタビューを通じて、ユーザーの課題や価値を発見できる"],
+      ["ユーザー検証","成長に必要な仮説を立て、検証の設計・実行ができる"],
+      ["TAM/SAM/SOM算出","市場規模を定量的に算出し、事業機会の大きさを説明できる"],
+      ["業界動向・トレンド分析","業界レポートや外部環境の変化を継続的にキャッチアップし、戦略に反映できる"],
+    ]},
+  { key:"direction", name:"ディレクション", sub:"チームで開発を進めるための、ステークホルダーとの調整力",
+    skills:[
+      ["施策優先度管理","スコアリングや進捗を踏まえ、関係者と合意しながら優先順位を決められる"],
+      ["スケジュール見積もり","開発チームと連携し、無理のないスケジュールを見積もれる"],
+      ["リソース調整","デザイナーやエンジニアの配置・稼働を最適化できる"],
+      ["開発ディレクション","要件を的確に伝え、開発の進行を管理できる"],
+      ["UIデザインのディレクション","デザインチームに要件を伝え、進行と品質を管理できる"],
+    ]},
+  { key:"requirement", name:"要件定義", sub:"何のために何をやるのか、チームと認識をそろえる力",
+    skills:[
+      ["ユーザー価値定義","誰をどんな状態にしたいか、提供価値を言語化できる"],
+      ["要求への落とし込み","ユーザーストーリーをもとに、実装すべき要求を定義できる"],
+      ["プロダクト要件定義の作成","要求を実装要件に落とし込み、エンジニア・デザイナーと合意形成できる"],
+      ["フィジビリティ確認","関係者と連携し、施策や機能の実現可能性を見極められる"],
+    ]},
+  { key:"design", name:"詳細設計", sub:"施策の詳細を設計し、関係者に正しく伝える力",
+    skills:[
+      ["仕様詳細のドキュメント化","後から見返せる分かりやすい仕様書を作成し、認識をそろえられる"],
+      ["プロトタイプ作成","開発前にイメージを共有するプロトタイプを素早く作れる"],
+      ["ユーザー体験設計","施策や機能が生む一連の体験を可視化・言語化できる"],
+      ["影響範囲の確認","技術的制約や他領域への影響を踏まえ、要件を調整できる"],
+      ["技術アーキテクチャの理解","システム構成や技術的制約を理解し、開発チームと対等に議論できる"],
+    ]},
+  { key:"release", name:"リリース", sub:"エンジニアやPRチームと協力し、問題なく世に出す力",
+    skills:[
+      ["リリース戦略設計","関連チームを巻き込み、必要なタスクとPRを設計・実行できる"],
+      ["ABテスト","効果検証のための設計と分析を通じて、最適な施策を判断できる"],
+      ["QA対応","実装が仕様通りかを確認し、問題があれば修正を依頼できる"],
+      ["リリースタスクマネジメント","リリースに必要なタスクを洗い出し、滞りなく進行できる"],
+      ["テスト計画・品質基準の設計","リリース前に必要なテスト範囲と品質基準を設計できる"],
+    ]},
+  { key:"communication", name:"コミュニケーション", sub:"ステークホルダーと適切な関係を築く対人力",
+    skills:[
+      ["フィードバックの受け取りと提供","フィードバックを活かしてアウトプットを磨き、建設的に伝えられる"],
+      ["プレゼンテーション","提案や依頼を通じて、意思決定・合意形成を導ける"],
+      ["チーム内コミュニケーション","チームの協働を促す雰囲気や場をつくれる"],
+    ]},
+  { key:"consulting", name:"コンサルティング", sub:"プロダクト開発を組織に根づかせる、伴走の力",
+    skills:[
+      ["ドキュメンテーション","取り組みのプロセスを言語化し、他者が実践できる形で残せる"],
+      ["ネゴシエーション","期待値のズレを調整し、合意形成を導ける"],
+      ["ファシリテーション","相手がスキルを習得するプロセスを設計し、導ける"],
+      ["プロジェクトの要件設計、管理","目標と期限に向けてスケジュールとプロセスを描き、リードできる"],
+      ["販売チャネル戦略","直販・代理店・オンラインなど、適切な販売チャネルを設計できる"],
+      ["コンテンツ・ブランディング戦略","コンテンツマーケティングやブランディングを通じて認知・信頼を構築できる"],
+    ]},
+  { key:"success", name:"カスタマーサクセス", sub:"導入後の顧客に価値を実感し続けてもらう力",
+    skills:[
+      ["オンボーディング設計","新規顧客がスムーズに価値を実感できる導入プロセスを設計できる"],
+      ["チャーン分析・防止","解約要因を分析し、防止策を企画・実行できる"],
+      ["アップセル・クロスセル戦略","既存顧客の利用拡大に向けた施策を設計できる"],
+    ]},
+  { key:"global", name:"グローバル", sub:"language and cross-border execution power — 語学力を武器に海外展開を推進する力",
+    skills:[
+      ["英語での開発チーム牽引","英語を用いて、海外拠点や多国籍のエンジニア・デザイナーを含む開発チームを牽引できる"],
+      ["英語でのグローバルGTM展開","英語を用いて、海外市場向けのGo-to-Market戦略を立案・実行できる"],
+      ["各国に応じたGTM戦略の実行","国や地域ごとの商習慣・文化の違いを踏まえ、ローカライズしたGTM戦略を実行できる"],
+    ]},
+];
+
+/* 35項目を「テックドリブン／BizDev／PMM／共通」の4系統に分類 */
+const CLUSTER_OF = {
+  "プロダクトビジョン策定":"bizdev",
+  "短期ロードマップ作成":"bizdev",
+  "中長期ロードマップ作成":"bizdev",
+  "プロダクト戦略":"bizdev",
+  "マーケティング戦略立案":"pmm",
+  "KPI管理":"bizdev",
+  "競合調査":"bizdev",
+  "市場調査":"bizdev",
+  "定量分析":"bizdev",
+  "ユーザーリサーチ":"pmm",
+  "ユーザー検証":"pmm",
+  "施策優先度管理":"bizdev",
+  "スケジュール見積もり":"common",
+  "リソース調整":"common",
+  "開発ディレクション":"tech",
+  "UIデザインのディレクション":"tech",
+  "ユーザー価値定義":"common",
+  "要求への落とし込み":"tech",
+  "プロダクト要件定義の作成":"tech",
+  "フィジビリティ確認":"tech",
+  "仕様詳細のドキュメント化":"tech",
+  "プロトタイプ作成":"tech",
+  "ユーザー体験設計":"tech",
+  "影響範囲の確認":"tech",
+  "リリース戦略設計":"tech",
+  "ABテスト":"tech",
+  "QA対応":"tech",
+  "リリースタスクマネジメント":"tech",
+  "フィードバックの受け取りと提供":"common",
+  "プレゼンテーション":"pmm",
+  "チーム内コミュニケーション":"common",
+  "ドキュメンテーション":"common",
+  "ネゴシエーション":"bizdev",
+  "ファシリテーション":"pmm",
+  "プロジェクトの要件設計、管理":"bizdev",
+  "英語での開発チーム牽引":"tech",
+  "英語でのグローバルGTM展開":"pmm",
+  "各国に応じたGTM戦略の実行":"pmm",
+  "プライシング戦略":"bizdev",
+  "パートナーシップ・アライアンス戦略":"bizdev",
+  "TAM/SAM/SOM算出":"bizdev",
+  "業界動向・トレンド分析":"bizdev",
+  "技術アーキテクチャの理解":"tech",
+  "テスト計画・品質基準の設計":"tech",
+  "販売チャネル戦略":"pmm",
+  "コンテンツ・ブランディング戦略":"pmm",
+  "オンボーディング設計":"pmm",
+  "チャーン分析・防止":"pmm",
+  "アップセル・クロスセル戦略":"bizdev",
+};
+
+const PDM_TYPES = {
+  tech:    { label:"テックドリブンPdM",  desc:"要件定義・詳細設計・リリースなど、開発チームと並走して形にする力に強みがあります。エンジニアリングへの理解を武器に、実装まで見通した意思決定ができるタイプです。" },
+  bizdev:  { label:"BizDevPdM",         desc:"事業戦略・市場調査・優先度判断など、事業成長の道筋を描く力に強みがあります。KPIや市場環境を踏まえ、プロダクトを事業として前に進めるタイプです。" },
+  pmm:     { label:"PMM系PdM",          desc:"マーケティング戦略やユーザー理解、対外的な発信力に強みがあります。市場への届け方（GTM）や顧客への価値の伝え方をリードするタイプです。" },
+  general: { label:"総合型PdM",         desc:"特定領域に偏らず、事業・開発・マーケティングの各領域をバランスよくカバーできています。オールラウンダーとして、専門性の高いメンバーをまとめる役割にも向いています。" },
+};
+
+/* チームフィット：スキルタイプ別に補完し合える相手 */
+const TEAM_FIT_BY_TYPE = {
+  tech:   "戦略や優先順位を描く「BizDevPdM」、市場への届け方を担う「PMM系PdM」と組むと、実装力を事業成果につなげやすくなります。",
+  bizdev: "実装可否や技術的な制約を見極める「テックドリブンPdM」、市場への発信を担う「PMM系PdM」と組むと、絵に描いた餅で終わらせずに済みます。",
+  pmm:    "実現可能性を地に足つけて判断する「テックドリブンPdM」、事業指標との整合を取る「BizDevPdM」と組むと、発信力を事業成果に変換しやすくなります。",
+  general:"特定領域を極めた「テックドリブンPdM」「BizDevPdM」「PMM系PdM」のいずれとも組みやすく、専門性の異なるメンバー同士をつなぐハブとして機能しやすいタイプです。",
+};
+
+const LEVELS = [
+  {v:1, label:"経験無し"},
+  {v:2, label:"業務経験あり"},
+  {v:3, label:"実務レベル"},
+  {v:4, label:"上級実務"},
+  {v:5, label:"組織牽引"},
+];
+const LEVEL_LEGEND = ["1=経験無し","2=業務経験あり（メイン業務としては未実施）","3=実務レベル","4=上級実務レベル・メンバーへの教育が可能","5=組織を牽引できる"];
+
+const SENIORITY = {
+  junior: { label:"ジュニア", desc:"各カテゴリの基礎を固めていくフェーズです。まずは実務を一人で回せる「3」レベルを、幅広い項目で目指しましょう。" },
+  middle: { label:"ミドル", desc:"実務を一人で回せる力がついてきたフェーズです。得意領域をさらに伸ばしつつ、苦手カテゴリの底上げを進めると次のレベルが見えてきます。" },
+  senior: { label:"シニア〜CPO", desc:"上級実務としてメンバーを育成し、組織を牽引できる水準に到達しています。他部門・経営を巻き込んだ意思決定でさらに価値を発揮できるフェーズです。" },
+};
+function determineSeniority(avg){
+  if(avg < 3) return SENIORITY.junior;
+  if(avg < 4) return SENIORITY.middle;
+  return SENIORITY.senior;
+}
+
+/* ---------------- PdM偏差値 ----------------
+   35項目の自己評価平均を、簡易的な偏差値（平均50・標準偏差10）に変換したもの。
+   国内PdM人口全体の統計調査ではなく、本ツール上でのセルフチェックを目安化した参考値。 */
+function calcHensachi(avg){
+  const assumedMean = 2.8, assumedSD = 0.7;
+  const raw = 50 + 10 * (avg - assumedMean) / assumedSD;
+  return Math.max(28, Math.min(82, Math.round(raw)));
+}
+function hensachiComment(h){
+  if(h >= 70) return "トップクラス。社内でも希少な即戦力〜牽引役の水準です。";
+  if(h >= 60) return "優秀水準。多くの現場で頼れる存在として活躍できます。";
+  if(h >= 50) return "平均以上。実務を安定して回せる水準に達しています。";
+  if(h >= 40) return "平均的〜成長中。経験を積むほど大きく伸びる時期です。";
+  return "これから力をつけていくフェーズ。基礎固めが最優先です。";
+}
+
+/* ---------------- TOEICスコアのコメント ---------------- */
+function toeicComment(score){
+  if(score==null) return null;
+  if(score>=900) return "国際会議や込み入った商談でも通用する、ネイティブに近い上級レベルです。";
+  if(score>=800) return "海外拠点との折衝や英語でのプレゼンも問題なくこなせる、ビジネス上級レベルです。";
+  if(score>=700) return "日常的なビジネスコミュニケーションが可能な、実務レベルです。";
+  if(score>=600) return "基本的な読み書きは可能な、基礎ビジネスレベルです。";
+  return "これから伸ばしていける、学習中フェーズです。";
+}
+
+/* ---------------- キャリアパス ----------------
+   ミドル→シニアPdMのその先に広がる選択肢（CPO／ITコンサル／フリーランス／起業）を、
+   各種転職メディアの年収データをもとにした目安つきで整理したもの。 */
+const CAREER_MAIN = [
+  { key:"junior", label:"ジュニアPdM", salary:"400万〜650万円", years:"〜2年目安", height:56 },
+  { key:"middle", label:"ミドルPdM",  salary:"650万〜1,000万円", years:"3〜5年目安", height:100 },
+  { key:"senior", label:"シニアPdM",  salary:"1,000万〜1,600万円", years:"5〜8年目安", height:150 },
+];
+const CAREER_BRANCHES = [
+  { label:"CPO／VPoP", salary:"1,500万〜3,000万円", desc:"プロダクト組織全体の意思決定に責任を持つ、事業側トップのポジション。ストックオプション等で上振れするケースも。" },
+  { label:"ITコンサルタント", salary:"1,000万〜1,800万円", desc:"複数クライアントのプロダクト戦略・DX推進を支援する立場。PdM経験を横展開しやすいキャリアです。" },
+  { label:"フリーランスPdM", salary:"800万〜1,500万円（案件により変動大）", desc:"複数社と契約し、稼働量やプロジェクトを自分でコントロールする働き方。" },
+  { label:"起業・独立", salary:"変動大（0円〜青天井）", desc:"自らプロダクトを立ち上げ、事業オーナーとしてリスクを取りながら成長を追う道。" },
+];
+function buildCareerPath(seniorityKey){
+  return {
+    main: CAREER_MAIN.map(s=>({...s, current: s.key===seniorityKey})),
+    branches: CAREER_BRANCHES,
+  };
+}
+
+/* ---------------- 想定年収幅 ----------------
+   Geekly・ロバートハーフ・厚生労働省統計・各種転職メディアが公開する
+   PdM／PMMの年収データ（2026年時点の一般的な相場感）をもとにした目安レンジ。
+   個別の企業・地域・業界によって大きく変動するため、あくまで参考値。 */
+const SALARY_BANDS = {
+  junior: { range:"400万円〜650万円", note:"未経験〜浅い実務経験のクラス。20代PdMの平均的な年収帯とほぼ重なります。" },
+  middle: { range:"650万円〜1,000万円", note:"実務を一人で回せるクラス。国内PdM全体の平均〜中央値（650万〜700万円台）はこの帯に集中しています。" },
+  senior: { range:"1,000万円〜1,600万円", note:"組織を牽引するシニア〜CPOクラス。メガベンチャーのハイクラス求人や、事業責任者・CxO候補ポジションではこの上限を超えるケースもあります。" },
+};
+
+/* ---------------- 公開求人（実在の求人情報をもとに作成） ----------------
+   企業名・職種・出典・URLは実際の公開求人ページ／求人検索結果に基づく。
+   給与や募集状況は変動・終了している可能性があるため、必ず出典元で最新情報を確認すること。 */
+const JOBS = [
+  { company:"ラクスル株式会社", title:"テクニカルプロダクトマネージャー", type:"tech", level:"senior",
+    salary:"1,150万円〜1,549万円", source:"ミドルの転職", url:"https://mid-tenshoku.com/itengineer/productmanager/" },
+  { company:"株式会社estie", title:"プロダクトマネージャー（未経験枠）", type:"general", level:"junior",
+    salary:"求人ページで要確認", source:"Indeed", url:"https://jp.indeed.com/q-pdm-%E6%9C%AA%E7%B5%8C%E9%A8%93-l-%E6%9D%B1%E4%BA%AC%E9%83%BD-%E6%B1%82%E4%BA%BA.html" },
+  { company:"SBプレイヤーズ株式会社", title:"【オッズ・パーク】PdM（プロダクトマネージャー）", type:"general", level:"junior",
+    salary:"求人ページで要確認", source:"Indeed", url:"https://jp.indeed.com/q-pdm-%E6%9C%AA%E7%B5%8C%E9%A8%93-l-%E6%9D%B1%E4%BA%AC%E9%83%BD-%E6%B1%82%E4%BA%BA.html" },
+  { company:"オムロン株式会社", title:"人的資本・健康経営分析サービス 企画/責任者候補（BizDev）", type:"bizdev", level:"middle",
+    salary:"求人ページで要確認", source:"リクルートエージェント", url:"https://www.r-agent.com/job_search/kw/%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%A3%E3%83%BC/" },
+  { company:"株式会社マツリカ", title:"プロダクトマネージャー（Mazrica／DealPods）", type:"bizdev", level:"middle",
+    salary:"求人ページで要確認", source:"ミドルの転職", url:"https://mid-tenshoku.com/itengineer/productmanager/tokyo/" },
+  { company:"AMBI掲載企業", title:"事業責任者・CxO候補クラスのプロダクトマネージャー（ポテンシャル採用枠）", type:"bizdev", level:"senior",
+    salary:"1,300万円〜1,549万円", source:"AMBI", url:"https://en-ambi.com/itengineer/productmanager/potential/" },
+  { company:"株式会社マネーフォワード", title:"プロダクトマネージャー（マネーフォワードクラウド／HR領域）", type:"general", level:"middle",
+    salary:"求人ページで要確認", source:"Indeed", url:"https://jp.indeed.com/q-%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88-%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%A3%E3%83%BC-product-manager-l-%E6%9D%B1%E4%BA%AC%E9%83%BD-%E6%B1%82%E4%BA%BA.html" },
+  { company:"株式会社ラクス", title:"プロダクトマーケティングマネージャー（PMM）【楽楽精算】", type:"pmm", level:"middle",
+    salary:"求人ページで要確認", source:"ラクス採用ページ", url:"https://hrmos.co/pages/rakus/jobs/mktg85" },
+  { company:"株式会社ラクス", title:"プロダクトマーケティングマネージャー（PMM）【楽楽シリーズ】", type:"pmm", level:"middle",
+    salary:"求人ページで要確認", source:"ラクス採用ページ", url:"https://hrmos.co/pages/rakus/jobs/mktg-100" },
+];
+
+function matchJobs(pdmTypeKey, seniorityKey){
+  const scored = JOBS.map(job=>{
+    let score = 0;
+    if(job.type === pdmTypeKey) score += 2;
+    else if(job.type === "general") score += 1;
+    if(job.level === seniorityKey) score += 2;
+    return { job, score };
+  });
+  return scored.sort((a,b)=>b.score-a.score).slice(0,4).map(s=>s.job);
+}
+
+/* ---------------- MBTI ---------------- */
+/* グループごとにキーカラーを設定（4分類：アナリスト／ディプロマット／センチネル／エクスプローラー） */
+const MBTI_GROUPS = {
+  NT: { name:"アナリスト", color:"#6C4AB6", grad:"linear-gradient(135deg,#7C5AC9,#4E3487)" },
+  NF: { name:"ディプロマット", color:"#2E8F6C", grad:"linear-gradient(135deg,#3EAE86,#1E6E52)" },
+  SJ: { name:"センチネル", color:"#2E5FD9", grad:"linear-gradient(135deg,#4E7DEF,#16294C)" },
+  SP: { name:"エクスプローラー", color:"#D98F3B", grad:"linear-gradient(135deg,#EFA85B,#B06B1E)" },
+};
+function mbtiGroupOf(code){
+  if(code.includes("N") && code.includes("T")) return "NT";
+  if(code.includes("N") && code.includes("F")) return "NF";
+  if(code.includes("S") && code.includes("J")) return "SJ";
+  return "SP";
+}
+
+/* 通称（一般によく知られる性格類型の呼び名。既存アイコンの模写ではなく、
+   その呼び名が持つ概念だけを継承してゼロから描き起こしたオリジナルの図形アイコン） */
+const MBTI_NICKNAME = {
+  INTJ:"建築家", INTP:"論理学者", ENTJ:"指揮官", ENTP:"討論者",
+  INFJ:"提唱者", INFP:"仲介者", ENFJ:"主人公", ENFP:"広報運動家",
+  ISTJ:"管理者", ISFJ:"擁護者", ESTJ:"幹部", ESFJ:"領事官",
+  ISTP:"巨匠", ISFP:"冒険家", ESTP:"起業家", ESFP:"エンターテイナー",
+};
+
+/* アイコンは「顔・髪・服装のある人物イラスト＋概念を表す持ち物」で構成した完全オリジナルの図形。
+   参考画像のような特定のキャラクターイラストは一切模写せず、
+   建築＝設計図、討論＝吹き出し、といった概念だけを独自の持ち物モチーフとして描き起こしている。
+   服の色は4グループ（アナリスト／ディプロマット／センチネル／エクスプローラー）のキーカラーで塗り分ける。 */
+function personCharacterSvg(clothColor, propMarkup){
+  return `
+    <path d="M6.3 21.2c0-5.1 2.4-8.3 5.7-8.3s5.7 3.2 5.7 8.3z" fill="${clothColor}"/>
+    <path d="M8.6 14.3c-1.1 1.3-1.6 3-1.7 4.9l1.7.4c0-1.5.4-3 1.2-4.1z" fill="${clothColor}"/>
+    <path d="M15.4 14.3c1.1 1.1 1.7 2.4 1.9 4l-1.7.5c-.1-1.2-.6-2.3-1.4-3.2z" fill="${clothColor}"/>
+    <rect x="9.6" y="20.4" width="2" height="1.3" rx=".3" fill="#2B2B2B"/>
+    <rect x="12.4" y="20.4" width="2" height="1.3" rx=".3" fill="#2B2B2B"/>
+    <circle cx="12" cy="6.6" r="3.1" fill="#F2C9A0"/>
+    <path d="M8.9 6a3.15 3.15 0 016.2 0c.1-.5.1-1 0-1.4a3.1 3.1 0 00-6.2 0c-.1.4-.1.9 0 1.4z" fill="#3B2E2A"/>
+    <circle cx="10.8" cy="6.7" r=".32" fill="#2B2B2B"/>
+    <circle cx="13.2" cy="6.7" r=".32" fill="#2B2B2B"/>
+    <path d="M10.9 7.7c.7.5 1.5.5 2.2 0" stroke="#2B2B2B" stroke-width=".35" fill="none" stroke-linecap="round"/>
+    ${propMarkup}
+  `;
+}
+/* 各タイプが手に持つ、概念を表す小さな持ち物（吹き出し・盾・コンパスなど）。手の位置(15.5〜19, 12〜17)付近に配置。 */
+const MBTI_PROP = {
+  INTJ: `<path d="M15.8 13l2.6 2v3h-1.6v-1.6h-1.6v1.6h-1.6v-3z" fill="currentColor" opacity=".95"/>`,
+  INTP: `<circle cx="17.2" cy="13.6" r="1.5" fill="none" stroke="currentColor" stroke-width="1"/><line x1="18.2" y1="14.6" x2="19.3" y2="15.7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>`,
+  ENTJ: `<path d="M17 11.4v6.2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><path d="M17 11.7h2.6l-.9 1.2.9 1.2H17z" fill="currentColor"/>`,
+  ENTP: `<rect x="15.4" y="11.6" width="3.8" height="2.5" rx=".8" fill="currentColor"/><rect x="17" y="14.2" width="3.8" height="2.5" rx=".8" fill="currentColor" opacity=".75"/>`,
+  INFJ: `<path d="M17.5 11c.8.9 1 1.6 1 2.1a1 1 0 11-2 0c0-.5.2-1.2 1-2.1z" fill="currentColor"/>`,
+  INFP: `<path d="M18.6 12.2c1.4.4 1.4 2.5 0 3-1.4-.5-1.4-2.6 0-3z" fill="currentColor"/>`,
+  ENFJ: `<circle cx="16.6" cy="12.4" r="1.2" fill="currentColor"/><circle cx="19" cy="12.4" r="1.2" fill="currentColor" opacity=".75"/>`,
+  ENFP: `<path d="M15.6 13l3-1.2v3.6l-3-1.2z" fill="currentColor"/><path d="M19 12.4a1.7 1.7 0 010 2.6" fill="none" stroke="currentColor" stroke-width=".9"/>`,
+  ISTJ: `<rect x="16.4" y="11" width="3.2" height="4.5" rx=".5" fill="none" stroke="currentColor" stroke-width=".9"/><line x1="17" y1="12.3" x2="19" y2="12.3" stroke="currentColor" stroke-width=".7"/><line x1="17" y1="13.5" x2="19" y2="13.5" stroke="currentColor" stroke-width=".7"/>`,
+  ISFJ: `<path d="M17.6 11l1.9.8v1.9c0 1.6-.9 2.6-1.9 3-1-.4-1.9-1.4-1.9-3v-1.9z" fill="currentColor"/>`,
+  ESTJ: `<rect x="15.6" y="14.2" width="1.1" height="2.3" fill="currentColor"/><rect x="17.1" y="12.8" width="1.1" height="3.7" fill="currentColor"/><rect x="18.6" y="11.4" width="1.1" height="5.1" fill="currentColor"/>`,
+  ESFJ: `<circle cx="17.6" cy="12.3" r="1.5" fill="currentColor"/><path d="M16.5 13.5l-.7 2.2 1.8-.9 1.8.9-.7-2.2" fill="currentColor"/>`,
+  ISTP: `<path d="M19.4 11.2a1.9 1.9 0 00-2.5 2.5l-2.3 2.3.8.8 2.3-2.3a1.9 1.9 0 002.5-2.5l-1 1-.8-.8z" fill="currentColor"/>`,
+  ISFP: `<path d="M15.4 15.8l1.4-2.6.8 1.4 1.2-2.1 1.6 3.3z" fill="currentColor"/>`,
+  ESTP: `<path d="M18.3 10.8l-1.7 3h1.2l-.8 2.6 2.3-3.4h-1.2z" fill="currentColor"/>`,
+  ESFP: `<path d="M17.6 10.6l.7 1.6 1.8.2-1.4 1.2.4 1.8-1.5-.9-1.5.9.4-1.8-1.4-1.2 1.8-.2z" fill="currentColor"/>`,
+};
+const MBTI_ICON_PATH = {};
+const MBTI_META = {};
+Object.keys(MBTI_PROP).forEach(code=>{
+  const g = mbtiGroupOf(code);
+  const clothColor = MBTI_GROUPS[g].color;
+  MBTI_ICON_PATH[code] = personCharacterSvg(clothColor, MBTI_PROP[code]);
+  MBTI_META[code] = {
+    group: g,
+    color: MBTI_GROUPS[g].color,
+    grad: MBTI_GROUPS[g].grad,
+    groupName: MBTI_GROUPS[g].name,
+    nickname: MBTI_NICKNAME[code],
+    iconPath: MBTI_ICON_PATH[code],
+  };
+});
+function mbtiIconSvg(meta, size){
+  size = size || 22;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24">${meta.iconPath}</svg>`;
+}
+
+const MBTI_TYPES_BY_GROUP = [
+  ["NT", ["INTJ","INTP","ENTJ","ENTP"]],
+  ["NF", ["INFJ","INFP","ENFJ","ENFP"]],
+  ["SJ", ["ISTJ","ISFJ","ESTJ","ESFJ"]],
+  ["SP", ["ISTP","ISFP","ESTP","ESFP"]],
+];
+
+const MBTI_BLURB = {
+  INTJ:"独自の戦略ビジョンを描き、長期的な視点で一貫した意思決定ができるタイプ。構想の完成度にこだわる分、初速より精度を重視しがちです。",
+  INTP:"物事の仕組みを深く理解し、複雑な課題を構造化するのが得意なタイプ。意思決定のスピードより、論理の一貫性を優先しやすい傾向があります。",
+  ENTJ:"大局的な方針を打ち出し、チームを力強く牽引するリーダー気質。事業成長やロードマップ策定で強みを発揮しやすいタイプです。",
+  ENTP:"新しいアイデアを次々と発想し、議論を通じて戦略をブラッシュアップするのが得意。実行フェーズは推進役との連携が力になります。",
+  INFJ:"顧客やチームの潜在的なニーズを深く読み取り、長期的な価値提案を描くのが得意なタイプです。",
+  INFP:"「誰のために何を届けたいか」という価値観を軸に意思決定するタイプ。ユーザー起点のプロダクト作りで強みを発揮しやすい傾向があります。",
+  ENFJ:"チームやステークホルダーの合意形成を丁寧に進め、周囲を巻き込みながら前進させるのが得意なタイプです。",
+  ENFP:"発想力とコミュニケーション力で周囲を巻き込み、新しい方向性を提示するのが得意。運用面は仕組み化でカバーすると安定しやすい傾向があります。",
+  ISTJ:"手順や仕様を正確に管理し、着実にプロジェクトを進行させる堅実さが強みのタイプです。",
+  ISFJ:"メンバーや顧客の状況を丁寧に汲み取り、地に足のついた計画を支えるのが得意なタイプです。",
+  ESTJ:"明確な基準とスケジュールでチームを管理し、リリースまで着実に導くのが得意なタイプです。",
+  ESFJ:"チーム内の連携や雰囲気づくりに長け、円滑なコミュニケーションでプロジェクトを支えるタイプです。",
+  ISTP:"データや仕組みを実践的に検証し、必要な打ち手を淡々と実行するのが得意なタイプです。",
+  ISFP:"現場の感覚を大事にしながら、柔軟にプロダクトを調整していくタイプです。",
+  ESTP:"スピード感を持って意思決定し、状況に応じて臨機応変に動けるのが強みのタイプです。",
+  ESFP:"周囲を巻き込むエネルギーと柔軟性で、変化の多いプロジェクトを前に進めるのが得意なタイプです。",
+};
+
+const AXIS_FRAGMENT = {
+  E:"会議やステークホルダーとの対話の中で考えをまとめ、周囲を巻き込みながら前に進めるタイプです。",
+  I:"一人でじっくり考えを練り上げてから発信するタイプです。準備された言葉には説得力があります。",
+  S:"現状のデータや実例をもとに、地に足のついた判断を積み重ねる傾向があります。",
+  N:"パターンや将来像から発想し、まだ形になっていない可能性に目を向ける傾向があります。",
+  T:"意思決定では、感情よりも論理と一貫性を優先しやすいタイプです。",
+  F:"意思決定では、関係者の納得感や価値観との整合性を重視しやすいタイプです。",
+  J:"計画を立てて着実に進めることを好み、締切や合意事項をきっちり守る傾向があります。",
+  P:"状況の変化に応じて柔軟に対応し、計画よりも臨機応変さを大事にする傾向があります。",
+};
+const AXIS_OPPOSITE = {E:"I",I:"E",S:"N",N:"S",T:"F",F:"T",J:"P",P:"J"};
+const AXIS_NAME = {E:"外向", I:"内向", S:"現実", N:"直感", T:"思考", F:"感情", J:"計画", P:"柔軟"};
+
+/* MBTIの軸から見た相性（対極タイプと組むと補い合いやすい、という一般的な考え方の紹介） */
+function mbtiTeamFit(mbti){
+  if(!mbti) return null;
+  const letters = mbti.split("");
+  const opp = letters.map(l=>AXIS_OPPOSITE[l]);
+  const lines = letters.map((l,i)=>{
+    return `${AXIS_NAME[l]}型のあなたは、${AXIS_NAME[opp[i]]}型（${l}に対して${opp[i]}）のメンバーと組むと、ものの見方の違いが補い合いになりやすい軸です。`;
+  });
+  return lines;
+}
+
+/* ---------------- MBTI属性プロファイル（深掘り分析の素材） ----------------
+   公開されている性格タイプ論の一般的な傾向を、日常のPdM業務に翻訳した独自のタグ・記述。
+   属性タグ／得意な業務／苦手な業務／任せると強い仕事／意思決定・コミュニケーション・消耗しやすい環境 を保持する。 */
+const MBTI_PROFILE = {
+  INTJ:{ tags:["長期視点","独立志向","高い基準","効率重視","仮説構築力","対立を恐れない"],
+    goodAt:["複雑な情報を体系立てて戦略に落とし込む","前例のない0→1の構想を一人で練り上げる","根拠に基づいた意思決定を淡々と下す","非効率な仕組みを見抜き改善案を設計する"],
+    weakAt:["進捗の細かい報告や雑談ベースの共有","感情的な対立が起きた場の仲裁","決まった手順への忠実な繰り返し作業","検証されていない思いつきへの即応"],
+    entrust:["中長期のプロダクト戦略・ロードマップ策定","複雑な技術的意思決定を伴う大型施策の設計","既存の仕組みを抜本的に見直すプロジェクト"],
+    decision:"データと論理的な一貫性を重視し、感情に流されず淡々と判断します。",
+    communication:"必要なことを簡潔に伝える文章型。無駄な社交辞令は好みません。",
+    drain:"目的の見えない会議や、根拠のない思いつきに付き合わされる状況で消耗しやすいタイプです。" },
+  INTP:{ tags:["探究心","論理分析","仕組み理解","柔軟な発想","マイペース","完璧主義的側面"],
+    goodAt:["複雑な仕様や技術的な仕組みを深く理解する","前提を疑い抜け漏れのないロジックを組み立てる","新しい技術やフレームワークを独学で吸収する","曖昧な問題を構造化して整理する"],
+    weakAt:["期限に追われるスピード重視の意思決定","感情面のケアが必要なメンバーサポート","完成度より前進を優先する場面での見切り発車","定型的な進捗管理や事務作業の継続"],
+    entrust:["技術的に難易度の高い要件の整理・仕様設計","既存の前提を疑う必要がある課題の再定義","新しい手法やツールの検証・導入検討"],
+    decision:"論理の一貫性を最優先し、結論を急がず納得いくまで考え抜きます。",
+    communication:"正確さを重視した理詰めの説明を好み、雑談は最小限で済ませたいタイプです。",
+    drain:"根拠のないまま急かされたり、感情的な議論に引きずり込まれる状況が苦手です。" },
+  ENTJ:{ tags:["リーダーシップ","決断力","目標志向","効率重視","率直な物言い","競争心"],
+    goodAt:["大きな方針を打ち出しチームを一気に前進させる","複数の選択肢から素早く優先順位を決める","抵抗があっても必要な変革を推し進める","数字や成果で組織を牽引する"],
+    weakAt:["結論を急がず全員の感情に配慮するプロセス","細部の作業を自分で丁寧に詰める工程","反対意見にじっくり耳を傾ける場面","成果が出るまで待つ我慢強さ"],
+    entrust:["事業成長を大きく左右する意思決定・大型プロジェクトのリード","停滞している組織やプロジェクトの立て直し","対外的な交渉や強気の意思決定が必要な局面"],
+    decision:"目標達成に直結するかを基準に、スピーディーに決断します。",
+    communication:"率直でストレートな物言いを好み、遠回しな表現は苦手です。",
+    drain:"非効率な会議や、決められないままダラダラ議論が続く状況に強いストレスを感じます。" },
+  ENTP:{ tags:["発想力","議論好き","好奇心","即興力","飽きっぽさ","前例への懐疑"],
+    goodAt:["ブレインストーミングで次々とアイデアを出す","議論を通じて戦略やアイデアを磨き上げる","前例のない課題に臨機応変に対応する","人を巻き込みながら新しい方向性を提示する"],
+    weakAt:["決めたことをコツコツ最後までやり切る継続作業","細かいルールやフォーマットへの忠実な対応","単調な繰り返し業務","一度決めた計画を変えずに進め続けること"],
+    entrust:["新規事業や新機能の構想・アイデア発散フェーズ","停滞した議論を活性化させるファシリテーション","前例のない課題への仮説立案"],
+    decision:"面白そうか、可能性が広がるかを重視し、直感的に判断することが多いタイプです。",
+    communication:"議論を楽しむタイプで、あえて反対意見をぶつけて思考を深めることもあります。",
+    drain:"同じ作業の繰り返しや、変化のない環境が続くと退屈し、モチベーションが下がりやすいタイプです。" },
+  INFJ:{ tags:["洞察力","理想主義","共感力","内省的","静かな情熱","完璧主義的側面"],
+    goodAt:["顧客やメンバーの言葉にならないニーズを読み取る","長期的な価値やビジョンを言語化する","一対一の対話で深い信頼関係を築く","複雑な人間関係の機微を踏まえた調整"],
+    weakAt:["大人数の前での即興的なプレゼン","対立を表面化させる強い交渉","スピード重視で細部を省く判断","自分の考えをオープンな場で率直に主張すること"],
+    entrust:["ユーザーの深いインサイトを踏まえたプロダクト企画","少人数でのステークホルダーとの信頼関係構築","長期的な価値提案・ビジョンの言語化"],
+    decision:"自分の価値観と関係者への影響の両方を静かに吟味してから判断します。",
+    communication:"聞き役に回ることが多く、信頼できる相手には深い話をするタイプです。",
+    drain:"表面的な人間関係や、価値観に反する意思決定を求められる状況で消耗しやすいタイプです。" },
+  INFP:{ tags:["価値観重視","理想主義","共感力","独自の世界観","内省的","柔軟"],
+    goodAt:["ユーザー起点で誰のために何を届けるかを突き詰める","個々のメンバーの価値観や強みを丁寧に汲み取る","独自の視点からプロダクトの意義を語る","じっくり考えてから納得感のある提案をする"],
+    weakAt:["数字だけで機械的に優先順位を決める場面","短時間で結論を出すスピード重視の意思決定","対立が続く交渉ごと","定型業務の淡々とした繰り返し"],
+    entrust:["プロダクトの存在意義やユーザー価値の言語化","少人数チームでの丁寧な合意形成","理念やブランドに関わる企画"],
+    decision:"自分や関係者の価値観との整合性を重視し、腹落ちしてから動くタイプです。",
+    communication:"率直な対立より、丁寧な言葉選びで気持ちを伝えることを好みます。",
+    drain:"価値観に反する指示や、殺伐とした競争環境で消耗しやすいタイプです。" },
+  ENFJ:{ tags:["共感力","巻き込み力","面倒見の良さ","理想主義","高い対人感度","責任感"],
+    goodAt:["チームやステークホルダー間の合意形成をリードする","メンバー一人ひとりの強みを見出し育てる","対話を通じて相手のモチベーションを引き出す","場の空気を読んで適切なフォローを入れる"],
+    weakAt:["冷徹に数字だけで判断を下す場面","対人関係を犠牲にしてでも結論を急ぐこと","自分の意見より周囲への配慮を優先しすぎること","一人で黙々と進める分析作業"],
+    entrust:["部門横断のプロジェクトでの合意形成・巻き込み","新任メンバーのオンボーディングや育成","クライアントとの継続的な関係構築"],
+    decision:"関係者全員が納得できるかを重視し、対話を重ねてから判断します。",
+    communication:"相手の状況に合わせて言葉を選び、モチベーションを高める伝え方が得意です。",
+    drain:"人間関係の対立や、誰かを傷つけかねない決断を迫られる状況にストレスを感じやすいタイプです。" },
+  ENFP:{ tags:["発想力","巻き込み力","好奇心","情熱家","柔軟","飽きっぽさ"],
+    goodAt:["新しいアイデアで周囲を巻き込み熱量を生み出す","人と人をつなぎ化学反応を起こす","変化の多い状況に柔軟に対応する","相手の可能性を見出し後押しする"],
+    weakAt:["地道なルーティン作業の継続","細部まで抜け漏れなく詰める事務処理","一つのことに長期間集中し続けること","決まった手順を変えずに守り続けること"],
+    entrust:["新規施策の立ち上げや社内外への発信・広報活動","チームの士気を高めるキックオフ・啓蒙活動","多様なステークホルダーを巻き込む初期フェーズの推進"],
+    decision:"可能性やワクワク感を大事にし、直感的に判断してから周囲を巻き込みます。",
+    communication:"エネルギッシュで表現力豊か、雑談からアイデアが生まれるタイプです。",
+    drain:"単調な環境や、自由度の低い管理体制の下では息苦しさを感じやすいタイプです。" },
+  ISTJ:{ tags:["堅実","責任感","規律遵守","現実的","忍耐強さ","変化への慎重さ"],
+    goodAt:["手順や仕様を正確に守りながら業務を遂行する","地道な進捗管理やスケジュール遵守","リスクを事前に洗い出し着実に対応する","一度決めたルールを最後まで守り抜く"],
+    weakAt:["前例のない曖昧な状況での即興対応","頻繁に方針が変わる環境での柔軟な適応","抽象的なビジョンをゼロから描く作業","感情面のケアを優先した意思決定"],
+    entrust:["品質管理やリリースプロセスの整備・運用","決まったルールや基準の遵守が求められる業務","長期にわたる地道なプロジェクト管理"],
+    decision:"過去の実績や既存のルールに基づき、現実的で堅実な判断を下します。",
+    communication:"事実に基づいた簡潔な報告を好み、感情的な表現は控えめです。",
+    drain:"方針が二転三転したり、根拠のないまま進め方を変えられる状況にストレスを感じます。" },
+  ISFJ:{ tags:["献身的","気配り","責任感","現実的","縁の下の力持ち","変化への慎重さ"],
+    goodAt:["メンバーや顧客の状況を丁寧に汲み取り支える","地道な実務をコツコツと確実にこなす","過去の経験を踏まえた現実的な計画を立てる","チームの縁の下で調整役を担う"],
+    weakAt:["自分の意見を強く主張する交渉","前例のない大胆な変革を主導すること","対立を厭わず厳しいフィードバックを伝えること","スピード重視で細部を省略する判断"],
+    entrust:["顧客サポートに近いプロダクト改善や品質担保","チームの継続的な運用・サポート業務","既存顧客との関係維持に関わる施策"],
+    decision:"関係者への影響と過去の実績を踏まえ、着実で安全な選択をします。",
+    communication:"聞き上手で、相手の状況に配慮した穏やかな伝え方をします。",
+    drain:"強い対立や、根拠のない急な方針転換が続く環境で疲弊しやすいタイプです。" },
+  ESTJ:{ tags:["統率力","効率重視","現実的","規律遵守","率直","責任感"],
+    goodAt:["明確な基準とスケジュールでチームを管理する","決めたことを着実に実行させる","リソースを効率よく配分し成果に結びつける","問題が起きたら素早く現実的な対応をとる"],
+    weakAt:["抽象的で答えのない議論を延々と続けること","全員の感情に配慮しながら合意形成すること","前例のない曖昧な状況への対応","頻繁な方針転換への柔軟な追従"],
+    entrust:["リリース管理やプロジェクトの運行管理","複数チームを跨いだ進行管理・統率","明確な基準に基づく品質・プロセス管理"],
+    decision:"実績とルールに基づき、現実的かつスピーディーに判断します。",
+    communication:"率直で要点を絞った伝え方を好み、曖昧な表現は避けます。",
+    drain:"非効率な進め方や、決められないまま時間だけが過ぎる状況に強いストレスを感じます。" },
+  ESFJ:{ tags:["協調性","面倒見の良さ","責任感","現実的","気配り","規律遵守"],
+    goodAt:["チーム内の連携や雰囲気づくりをリードする","メンバーの状況に気を配りながら調整する","決まった役割の中で確実に成果を出す","顧客や関係者との関係を丁寧に維持する"],
+    weakAt:["対立を厭わない厳しい交渉","前例のない大胆な意思決定","一人で黙々と進める抽象的な分析","全体最適のために一部の関係者を後回しにする判断"],
+    entrust:["チームビルディングや社内外の関係構築","顧客対応を含む継続的なプロジェクト運営","既存の仕組みを丁寧に運用・改善する業務"],
+    decision:"関係者の納得感と、これまでのやり方との整合性を重視します。",
+    communication:"気配りのある丁寧な伝え方で、場の雰囲気を大切にします。",
+    drain:"人間関係の対立や、誰かに悪く思われる可能性のある決断にストレスを感じやすいタイプです。" },
+  ISTP:{ tags:["実践的","冷静","論理分析","独立志向","即応力","寡黙"],
+    goodAt:["仕組みやデータを実践的に検証し原因を突き止める","緊急時に冷静かつ迅速に対応する","手を動かしながら試行錯誤して解決策を見つける","必要最低限のリソースで成果を出す"],
+    weakAt:["長期的なビジョンを言語化して発信すること","感情面のケアが必要な対人調整","定例会議での積極的な発言","曖昧なまま進める長期プロジェクトの管理"],
+    entrust:["障害対応やトラブルシューティングの現場対応","データやログをもとにした原因分析","実装可否を見極める技術的な検証"],
+    decision:"実際に動かして確かめた結果を重視し、理屈より実証を優先します。",
+    communication:"必要なことだけを簡潔に話す、寡黙で実務的なタイプです。",
+    drain:"抽象的な精神論や、根拠のない長時間の会議に強いストレスを感じます。" },
+  ISFP:{ tags:["柔軟","現場感覚","美意識","協調的","マイペース","対立回避"],
+    goodAt:["現場の感覚を踏まえてプロダクトを柔軟に調整する","細やかな配慮でユーザー体験を磨く","変化に合わせて自然体で対応する","対立を避けながら現実的な落としどころを探る"],
+    weakAt:["強いリーダーシップで周囲を引っ張ること","長期的な戦略を体系立てて描くこと","厳しいフィードバックをはっきり伝えること","決まった計画に縛られ続けること"],
+    entrust:["ユーザー体験や細部のクオリティにこだわる改善業務","現場に寄り添った柔軟な運用対応","対立を避けたい局面での穏便な調整"],
+    decision:"その場の状況や自分の感覚を大事にしながら、柔軟に判断します。",
+    communication:"控えめですが、信頼できる相手には率直に気持ちを伝えます。",
+    drain:"強制的なルールや、対立が絶えない環境で息苦しさを感じやすいタイプです。" },
+  ESTP:{ tags:["行動力","即応力","現実的","社交的","スリル志向","規則への抵抗"],
+    goodAt:["スピード感を持って現場の判断を下す","状況の変化に臨機応変に対応する","人を巻き込みながら勢いよく物事を進める","トラブルが起きても動じず対処する"],
+    weakAt:["長期的な計画をじっくり練り上げること","細部まで抜け漏れなく詰める事務作業","決まった手順やルールを忠実に守り続けること","一人で静かに分析する作業"],
+    entrust:["スピード重視のリリース対応や現場対応","対外的な交渉やその場の判断力が問われる場面","変化の激しいプロジェクトの推進"],
+    decision:"今この瞬間の状況を踏まえ、スピーディーに現実的な判断をします。",
+    communication:"率直でテンポの良い会話を好み、駆け引きも厭わないタイプです。",
+    drain:"変化のない単調な環境や、細かいルールに縛られる状況で退屈しやすいタイプです。" },
+  ESFP:{ tags:["社交的","巻き込み力","行動力","楽観的","現実的","即興力"],
+    goodAt:["場を盛り上げチームの雰囲気を明るくする","変化の多いプロジェクトを柔軟に進める","人との対話からアイデアや解決策を引き出す","その場の空気を読んで即興的に対応する"],
+    weakAt:["一人で黙々と進める長期的な分析作業","抽象的な戦略を体系立てて描くこと","厳しい指摘を淡々と伝えること","地道なルーティン業務を継続すること"],
+    entrust:["社内外への発信やイベント・キックオフの盛り上げ役","変化の多い現場でのその場対応","チームの雰囲気づくりやモチベーション管理"],
+    decision:"周囲の反応や、その場の空気を踏まえて現実的に判断します。",
+    communication:"明るく親しみやすい話し方で、場の空気を和ませるのが得意です。",
+    drain:"孤立した単調な作業や、堅苦しいルールに縛られる環境でストレスを感じやすいタイプです。" },
+};
+
+/* ---------------- スキル×性格 深掘りマトリクス ----------------
+   各カテゴリが「どの2文字（異なる軸から1文字ずつ）と親和性が高いか」を定義。
+   ユーザーのMBTIがこの2文字を含むかどうかで affinity を -2/0/+2 の3段階に判定し、
+   実際のカテゴリ平均スコアと掛け合わせて「資質と実績の一致／乖離」を分析する。
+   ※ 一般的な性格傾向論を業務文脈に翻訳した簡易モデルであり、断定的な適性診断ではない。 */
+const CATEGORY_AFFINITY_LETTERS = {
+  strategy:      ["N","J"],
+  research:      ["N","T"],
+  direction:     ["T","J"],
+  requirement:   ["T","S"],
+  design:        ["S","J"],
+  release:       ["J","T"],
+  communication: ["E","F"],
+  consulting:    ["F","E"],
+  global:        ["E","N"],
+  success:       ["F","S"],
+};
+
+function computeAffinity(mbti, letters){
+  return letters.reduce((score,l)=> score + (mbti.includes(l) ? 1 : -1), 0);
+}
+
+const MATRIX_LABELS = {
+  natural_strength:   { tag:"資質と実績が一致", tone:"strong",
+    text:"性格的な資質と実際のスコアが一致した強みです。あなたの「地」の強さなので、より高度な役割を任せても安定して力を発揮できるでしょう。" },
+  untapped_potential:{ tag:"伸びしろ大（隠れた適性）", tone:"fusion",
+    text:"性格的には向いているのに、実務経験がまだ追いついていない領域です。意識して機会を取りにいけば、投資対効果が最も高く伸びる可能性があります。" },
+  overcome_strength:{ tag:"努力で築いた強み", tone:"strong",
+    text:"本来は苦手になりやすい資質にもかかわらず、ここまでスコアを積み上げています。意識的な工夫や努力の跡がうかがえる、価値の高い強みです。" },
+  double_risk:{ tag:"要フォロー", tone:"weak",
+    text:"性格的にも負荷がかかりやすく、実務経験もまだ浅い領域です。一人で抱え込まず、仕組み化するか得意なメンバーに分担することを検討しましょう。" },
+  natural_fit_neutral:{ tag:"性格的に向いている", tone:"neutral",
+    text:"性格的に向いている領域です。経験を積むほど自然に伸びやすいでしょう。" },
+  challenge_in_progress:{ tag:"克服が進行中", tone:"neutral",
+    text:"性格的にはやや苦手になりやすい領域ですが、着実に経験を積んで克服が進んでいます。" },
+  neutral:{ tag:"ニュートラル", tone:"neutral",
+    text:"性格特性による強み・弱みの偏りが少なく、実務経験がそのままスコアに反映されやすい領域です。" },
+};
+
+function buildCategoryMatrix(mbti){
+  return CATEGORIES.map(cat=>{
+    const letters = CATEGORY_AFFINITY_LETTERS[cat.key];
+    const affinity = computeAffinity(mbti, letters);
+    const avg = categoryAverage(cat);
+    let labelKey;
+    if(affinity>=2){
+      labelKey = avg>=3.5 ? "natural_strength" : (avg<3 ? "untapped_potential" : "natural_fit_neutral");
+    }else if(affinity<=-2){
+      labelKey = avg>=3.5 ? "overcome_strength" : (avg<3 ? "double_risk" : "challenge_in_progress");
+    }else{
+      labelKey = "neutral";
+    }
+    return { cat, avg, affinity, ...MATRIX_LABELS[labelKey] };
+  });
+}
+
+/* 任せると強い仕事：MBTIの entrust リストと、スキル面で最も評価の高いカテゴリを組み合わせる */
+function buildEntrustRecommendation(mbti, pdmType, topCategoryName){
+  const profile = MBTI_PROFILE[mbti];
+  const combined = `${pdmType.label}としての強みと組み合わせると、特に「${topCategoryName}」に関わる場面で任せると力を発揮しやすいでしょう。`;
+  return { entrust: profile.entrust, combined };
+}
+
+/* ---------------- SWOT分析 ----------------
+   S/W はスキル診断のカテゴリスコアから、O/T はMBTI×スキルの掛け合わせマトリクスから構成する。
+   MBTI未選択時はO/Tを簡易フォールバックで表示する。 */
+function buildSwot(strengthCats, growthCats, matrix){
+  const S = strengthCats.length ? strengthCats.slice(0,3).map(c=>({
+    title:c.name,
+    desc:`平均${categoryAverage(c).toFixed(1)}。チームの中でも牽引役になれる領域です。`
+  })) : [{title:"該当なし", desc:`現時点で平均3.5以上のカテゴリはありません。まずはどれか1カテゴリを3.5以上に伸ばすことを目標にしましょう。`}];
+
+  const W = growthCats.length ? growthCats.slice(0,3).map(c=>({
+    title:c.name,
+    desc:`平均${categoryAverage(c).toFixed(1)}。${ADVICE[c.key]}`
+  })) : [{title:"弱みなし", desc:"全カテゴリが平均3.5以上です。この診断上、明確な弱みは見当たりません。"}];
+
+  let O, T;
+  if(matrix){
+    const opp = matrix.filter(r=>r.tag==="伸びしろ大（隠れた適性）");
+    const thr = matrix.filter(r=>r.tag==="要フォロー");
+    O = opp.length ? opp.map(r=>({title:r.cat.name, desc:r.text}))
+                   : [{title:"大きな乖離なし", desc:"性格的な資質と実務スコアが大きく乖離している領域は、現時点では見当たりません。"}];
+    T = thr.length ? thr.map(r=>({title:r.cat.name, desc:r.text}))
+                   : [{title:"要注意ゾーンなし", desc:"性格・実務スコアの両方が低い領域は、現時点では見当たりません。"}];
+  }else{
+    O = [{title:"MBTIでさらに詳しく", desc:"MBTIを選択すると、性格的には向いているのに実務経験が追いついていない「隠れた適性」を具体的に表示します。"}];
+    T = growthCats.length ? growthCats.slice(0,1).map(c=>({
+      title:c.name,
+      desc:`現時点で最もスコアが低いカテゴリです（平均${categoryAverage(c).toFixed(1)}）。優先して底上げを検討しましょう。`
+    })) : [{title:"要注意ゾーンなし", desc:"全カテゴリが平均3.5以上です。"}];
+  }
+  return { S, W, O, T };
+}
+
+/* カテゴリごとのアクセントカラー（診断画面の視認性向上のため） */
+const CATEGORY_COLOR = {
+  strategy:"#16294C", research:"#1F3D74", direction:"#28519C", requirement:"#3163B0",
+  design:"#3E7FC4", release:"#4FA0B8", communication:"#6C4AB6", consulting:"#2E8F6C",
+  global:"#C0812C", success:"#3E9B7C",
+};
+
+const TOTAL_SKILLS = CATEGORIES.reduce((n,c)=>n+c.skills.length,0);
+
+/* ---------------- State ---------------- */
+let state = {
+  screen: "intro",   // intro | assess | mbti | profile | results | history | account
+  catIndex: 0,
+  answers: {},        // "catKey:skillName" -> 1..5
+  mbti: null,         // "INTJ" 等、または null（未選択／わからない）
+  profile: { toeic: null, certifications: "" },
+  userId: null,           // Supabaseの匿名/永久ユーザーID
+  userEmail: null,        // メール連携済みの場合のみ入る
+  savedThisResult: false, // 今回の診断結果をクラウドに保存済みか（二重保存防止）
+  history: [],            // クラウドから取得した過去の診断履歴
+};
+
+const STORAGE_KEY = "pdm35:latest";
+
+/* claude.aiのアーティファクト内ではwindow.storageを使い、
+   一般公開したWebページではブラウザのlocalStorageに自動フォールバックする。 */
+async function loadSaved(){
+  try{
+    if(window.storage && typeof window.storage.get === "function"){
+      const r = await window.storage.get(STORAGE_KEY, false);
+      return (r && r.value) ? JSON.parse(r.value) : null;
+    }
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ /* no saved data, or storage unavailable (e.g. private browsing) */ }
+  return null;
+}
+async function saveProgress(){
+  try{
+    const payload = JSON.stringify({answers:state.answers, mbti:state.mbti, profile:state.profile});
+    if(window.storage && typeof window.storage.set === "function"){
+      await window.storage.set(STORAGE_KEY, payload, false);
+    }else{
+      localStorage.setItem(STORAGE_KEY, payload);
+    }
+  }catch(e){ /* storage unavailable, continue silently */ }
+}
+
+/* ---------------- Helpers ---------------- */
+function answeredCount(){
+  return Object.keys(state.answers).length;
+}
+function categoryAverage(cat){
+  const vals = cat.skills.map(s => state.answers[cat.key+":"+s[0]]).filter(Boolean);
+  if(vals.length===0) return 0;
+  return vals.reduce((a,b)=>a+b,0)/vals.length;
+}
+function overallAverage(){
+  const vals = Object.values(state.answers);
+  if(vals.length===0) return 0;
+  return vals.reduce((a,b)=>a+b,0)/vals.length;
+}
+function clusterAverage(clusterKey){
+  let sum=0, n=0;
+  CATEGORIES.forEach(cat=>{
+    cat.skills.forEach(([name])=>{
+      if(CLUSTER_OF[name]===clusterKey){
+        const v = state.answers[cat.key+":"+name];
+        if(v){ sum+=v; n++; }
+      }
+    });
+  });
+  return n===0 ? 0 : sum/n;
+}
+function determinePdmType(){
+  const scores = { tech: clusterAverage("tech"), bizdev: clusterAverage("bizdev"), pmm: clusterAverage("pmm") };
+  const entries = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const [topKey, topVal] = entries[0];
+  const [, secondVal] = entries[1];
+  const isBalanced = (topVal - secondVal) < 0.5;
+  return { key: isBalanced ? "general" : topKey, scores };
+}
+function allSkillsFlat(){
+  const flat = [];
+  CATEGORIES.forEach(cat=>{
+    cat.skills.forEach(([name,desc])=>{
+      const v = state.answers[cat.key+":"+name];
+      if(v) flat.push({ name, desc, catName:cat.name, v });
+    });
+  });
+  return flat;
+}
+
+/* ---------------- Rendering ---------------- */
+const app = document.getElementById("app");
+
+function render(){
+  if(state.screen==="intro") renderIntro();
+  else if(state.screen==="assess") renderAssess();
+  else if(state.screen==="mbti") renderMbti();
+  else if(state.screen==="profile") renderProfile();
+  else if(state.screen==="history") renderHistory();
+  else if(state.screen==="account") renderAccount();
+  else renderResults();
+}
+
+/* ---------------- Supabase連携 ---------------- */
+/* 匿名セッションを自動発行し、ページを開くだけで裏側でuser_idが確保される。
+   メール連携すれば、同じuser_idのまま別端末からもログインできるようになる。 */
+async function ensureSession(){
+  if(!supabaseClient) return; // Supabase未設定の場合はローカル保存のみで動作
+  try{
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if(session && session.user){
+      state.userId = session.user.id;
+      state.userEmail = session.user.is_anonymous ? null : (session.user.email || null);
+      return;
+    }
+    const { data, error } = await supabaseClient.auth.signInAnonymously();
+    if(!error && data && data.user){
+      state.userId = data.user.id;
+    }
+  }catch(e){ /* ネットワーク不通時などは匿名IDなしで（ローカル保存のみで）継続 */ }
+}
+
+async function saveDiagnosisToCloud(payload){
+  if(!supabaseClient || !state.userId || state.savedThisResult) return;
+  try{
+    const { error } = await supabaseClient.from("diagnoses").insert({
+      user_id: state.userId,
+      answers: state.answers,
+      mbti: state.mbti && state.mbti!=="unknown" ? state.mbti : null,
+      toeic: state.profile.toeic,
+      certifications: state.profile.certifications || null,
+      overall_avg: payload.avg,
+      pdm_type: payload.pdmTypeKey,
+      seniority: payload.seniorityKey,
+      hensachi: payload.hensachi,
+    });
+    if(!error) state.savedThisResult = true;
+  }catch(e){ /* オフライン等の場合は次回の保存タイミングで再試行される */ }
+}
+
+async function fetchHistory(){
+  if(!supabaseClient || !state.userId) return [];
+  try{
+    const { data, error } = await supabaseClient
+      .from("diagnoses")
+      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti")
+      .order("created_at", { ascending:false })
+      .limit(20);
+    if(error) return [];
+    return data || [];
+  }catch(e){ return []; }
+}
+
+async function linkEmail(email){
+  if(!supabaseClient) return { ok:false, message:"Supabaseが未設定です。" };
+  try{
+    const { error } = await supabaseClient.auth.updateUser({ email });
+    if(error) return { ok:false, message:error.message };
+    return { ok:true, message:`${email} 宛に確認メールを送信しました。メール内のリンクを開くと連携が完了します。` };
+  }catch(e){
+    return { ok:false, message:"通信エラーが発生しました。時間をおいて再度お試しください。" };
+  }
+}
+
+async function renderHistory(){
+  const rows = await fetchHistory();
+  app.innerHTML = `
+    <div class="eyebrow">診断履歴</div>
+    <h1 class="hero-title" style="font-size:28px;">これまでの診断結果</h1>
+    <p class="hero-lead">
+      ${state.userEmail ? `${state.userEmail} に連携されたアカウントの履歴です。` : "この端末（匿名アカウント）に保存された履歴です。メール連携すると他の端末からも見られるようになります。"}
+    </p>
+
+    ${!supabaseClient ? `
+    <div class="insight weak"><p>Supabaseが未設定のため、履歴機能は利用できません。</p></div>
+    ` : rows.length===0 ? `
+    <div class="insight"><p>まだ保存された診断履歴がありません。診断を完了すると、ここに記録されていきます。</p></div>
+    ` : rows.map(r=>{
+      const date = new Date(r.created_at).toLocaleDateString("ja-JP", {year:"numeric", month:"short", day:"numeric"});
+      const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
+      const seniorityLabel = SENIORITY[r.seniority] ? SENIORITY[r.seniority].label : r.seniority;
+      return `
+      <div class="insight">
+        <h4>${date} <b>${Number(r.overall_avg).toFixed(1)}</b></h4>
+        <p>${typeLabel}／${seniorityLabel}／偏差値${r.hensachi}${r.mbti ? "／"+r.mbti : ""}</p>
+      </div>`;
+    }).join("")}
+
+    <div class="start-row" style="margin-top:32px;">
+      <button class="ghost" id="toAccountBtn">${state.userEmail ? "アカウント設定" : "メールで同期する"}</button>
+      <button class="primary" id="backHomeBtn">診断トップに戻る</button>
+    </div>
+  `;
+  document.getElementById("toAccountBtn").onclick = ()=>{ state.screen="account"; render(); window.scrollTo(0,0); };
+  document.getElementById("backHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
+}
+
+function renderAccount(){
+  app.innerHTML = `
+    <div class="eyebrow">アカウント連携</div>
+    <h1 class="hero-title" style="font-size:28px;">メールアドレスで同期する</h1>
+    <p class="hero-lead">
+      ${state.userEmail
+        ? `現在 <b>${state.userEmail}</b> に連携済みです。他の端末でも同じメールアドレスでログイン（マジックリンク）すれば、この履歴を引き続き見られます。`
+        : "メールアドレスを登録すると、今の匿名アカウントがそのまま永久アカウントに切り替わります（履歴はそのまま引き継がれます）。他の端末からも同じメールでログインできるようになります。"}
+    </p>
+
+    ${!supabaseClient ? `
+    <div class="insight weak"><p>Supabaseが未設定のため、アカウント連携は利用できません。</p></div>
+    ` : !state.userEmail ? `
+    <div class="profile-form">
+      <label class="profile-label" for="emailInput">メールアドレス</label>
+      <input type="email" id="emailInput" class="profile-input" placeholder="you@example.com">
+      <button class="primary" id="linkEmailBtn" style="margin-top:14px; width:fit-content;">確認メールを送る</button>
+      <div id="linkMsg" style="font-size:13px; color:var(--ink-soft); margin-top:12px;"></div>
+    </div>` : ""}
+
+    <div class="start-row" style="margin-top:32px;">
+      <button class="ghost" id="backHistoryBtn">履歴に戻る</button>
+    </div>
+  `;
+  document.getElementById("backHistoryBtn").onclick = ()=>{ state.screen="history"; render(); window.scrollTo(0,0); };
+  const linkBtn = document.getElementById("linkEmailBtn");
+  if(linkBtn){
+    linkBtn.onclick = async ()=>{
+      const email = document.getElementById("emailInput").value.trim();
+      const msg = document.getElementById("linkMsg");
+      if(!email){ msg.textContent = "メールアドレスを入力してください。"; return; }
+      linkBtn.disabled = true;
+      const result = await linkEmail(email);
+      msg.textContent = result.message;
+      linkBtn.disabled = false;
+    };
+  }
+}
+
+async function renderIntro(){
+  const saved = await loadSaved();
+  const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
+
+  app.innerHTML = `
+    <div class="eyebrow">PdM 35スキル診断 <b>／</b> 出典: Goodpatch「PdMスキルマップ」</div>
+    <h1 class="hero-title">自分のPdMスキルを、<br>8つの役割・35項目で見える化する。</h1>
+    <p class="hero-lead">
+      事業戦略からコンサルティングまで、プロダクトマネージャーに求められる能力を8カテゴリ35項目に分解。
+      各項目を5段階で自己評価すると、強みと伸びしろがレーダーチャートで見えてくるほか、
+      「テックドリブンPdM」「BizDevPdM」「PMM系PdM」「総合型PdM」のどのタイプに近いか、
+      経験レベル（ジュニア〜シニア/CPO）や、性格タイプ（MBTI）を掛け合わせた総合分析も行います。所要時間は約5分です。
+    </p>
+
+    <div class="hero-visual">${previewRadarSVG()}</div>
+
+    <div class="cat-list">
+      ${CATEGORIES.map((c,i)=>`<div><span>0${i+1}</span>${c.name}<span>${c.skills.length}項目</span></div>`).join("")}
+    </div>
+
+    <div class="start-row">
+      <button class="primary" id="startBtn">${hasSaved ? "続きから診断する" : "診断をはじめる"}</button>
+      ${hasSaved ? `<button class="ghost" id="restartBtn">最初からやり直す</button>` : ""}
+      ${supabaseClient ? `<button class="ghost" id="historyBtn">診断履歴を見る</button>` : ""}
+      ${hasSaved ? `<span class="resume-note">前回の回答（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}項目）が保存されています</span>` : ""}
+    </div>
+
+    <footer class="note">
+      本診断はセルフチェック用の簡易ツールです。項目定義は
+      <a href="https://goodpatch.com/blog/2023-12-pdmskillmap" target="_blank" rel="noopener">Goodpatch Blog「PdM（プロダクトマネージャー）の『スキルマップ』を作ってみた」</a>
+      を参考に構成しています。回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
+    </footer>
+  `;
+
+  document.getElementById("startBtn").onclick = async ()=>{
+    if(hasSaved){ state.answers = saved.answers; state.mbti = saved.mbti || null; state.profile = saved.profile || { toeic:null, certifications:"" }; }
+    state.screen="assess";
+    state.catIndex = firstUnfinishedCategory();
+    render();
+  };
+  const restartBtn = document.getElementById("restartBtn");
+  if(restartBtn){
+    restartBtn.onclick = async ()=>{
+      state.answers = {};
+      state.mbti = null;
+      state.profile = { toeic:null, certifications:"" };
+      state.savedThisResult = false;
+      await saveProgress();
+      state.screen="assess";
+      state.catIndex = 0;
+      render();
+    };
+  }
+  const historyBtn = document.getElementById("historyBtn");
+  if(historyBtn){
+    historyBtn.onclick = ()=>{ state.screen="history"; render(); };
+  }
+}
+
+function firstUnfinishedCategory(){
+  for(let i=0;i<CATEGORIES.length;i++){
+    const c = CATEGORIES[i];
+    const done = c.skills.every(s => state.answers[c.key+":"+s[0]]);
+    if(!done) return i;
+  }
+  return 0;
+}
+
+function renderAssess(){
+  const cat = CATEGORIES[state.catIndex];
+  const isLast = state.catIndex === CATEGORIES.length-1;
+  const catDone = cat.skills.every(s => state.answers[cat.key+":"+s[0]]);
+  const catColor = CATEGORY_COLOR[cat.key];
+  const overallPct = Math.round(100*answeredCount()/TOTAL_SKILLS);
+
+  app.innerHTML = `
+    <div class="progress-rail">
+      ${CATEGORIES.map((c,i)=>{
+        const segColor = CATEGORY_COLOR[c.key];
+        const pct = i<state.catIndex ? 100 : (i===state.catIndex ? (100*cat.skills.filter(s=>state.answers[cat.key+":"+s[0]]).length/cat.skills.length) : 0);
+        return `<div><i style="width:${pct}%; background:${segColor};"></i></div>`;
+      }).join("")}
+    </div>
+    <div class="progress-pct">全体の進捗：${overallPct}%（${answeredCount()} / ${TOTAL_SKILLS}項目）</div>
+
+    <div class="cat-header">
+      <div class="cat-badge" style="background:${catColor};">${state.catIndex+1}</div>
+      <div>
+        <div class="cat-index" style="color:${catColor};">CATEGORY 0${state.catIndex+1} / 0${CATEGORIES.length}</div>
+        <div class="cat-title">${cat.name}</div>
+      </div>
+    </div>
+    <div class="cat-sub">${cat.sub}</div>
+    <div class="legend-bar">${LEVEL_LEGEND.map(l=>`<span>${l}</span>`).join("")}</div>
+
+    ${cat.skills.map(([name,desc])=>{
+      const key = cat.key+":"+name;
+      const val = state.answers[key];
+      return `
+      <div class="skill-card" style="border-left:3px solid ${val?catColor:'var(--line)'};">
+        <div class="skill-name">${name}</div>
+        <div class="skill-desc">${desc}</div>
+        <div class="scale" data-key="${key}">
+          ${LEVELS.map(l=>`<button data-v="${l.v}" class="${val===l.v?'on':''}" style="${val===l.v?`background:${catColor}; border-color:${catColor};`:''}">${l.v}<br>${l.label}</button>`).join("")}
+        </div>
+      </div>`;
+    }).join("")}
+
+    <div class="nav-row">
+      <button class="ghost" id="prevBtn" ${state.catIndex===0?"disabled style='opacity:.4;cursor:default;'":""}>← 前のカテゴリ</button>
+      <span class="nav-hint">${answeredCount()} / ${TOTAL_SKILLS} 項目回答済み</span>
+      <button class="primary" id="nextBtn" ${catDone?"":"disabled style='opacity:.4;cursor:default;'"} style="${catDone?`background:${catColor};`:''}">${isLast? "次へ（タイプ診断）" : "次のカテゴリへ →"}</button>
+    </div>
+  `;
+
+  app.querySelectorAll(".scale").forEach(scaleEl=>{
+    scaleEl.querySelectorAll("button").forEach(btn=>{
+      btn.onclick = async ()=>{
+        const key = scaleEl.getAttribute("data-key");
+        state.answers[key] = parseInt(btn.getAttribute("data-v"),10);
+        await saveProgress();
+        renderAssess();
+      };
+    });
+  });
+
+  const prevBtn = document.getElementById("prevBtn");
+  if(prevBtn && state.catIndex>0){
+    prevBtn.onclick = ()=>{ state.catIndex--; render(); window.scrollTo(0,0); };
+  }
+  const nextBtn = document.getElementById("nextBtn");
+  if(nextBtn && catDone){
+    nextBtn.onclick = ()=>{
+      if(isLast){ state.screen="mbti"; }
+      else { state.catIndex++; }
+      render(); window.scrollTo(0,0);
+    };
+  }
+}
+
+/* ---------------- MBTI selection screen ---------------- */
+function renderMbti(){
+  app.innerHTML = `
+    <div class="eyebrow">最後にもう一つ（任意）</div>
+    <h1 class="hero-title" style="font-size:28px;">あなたのMBTIタイプは？</h1>
+    <p class="hero-lead">
+      スキル診断の結果に、性格タイプの傾向を掛け合わせて、より立体的なPdM像を分析します。
+      わからない場合は下の「わからない／回答しない」を選んで進んでください。
+    </p>
+
+    <div class="mbti-card-groups">
+      ${MBTI_TYPES_BY_GROUP.map(([g, list])=>`
+        <div class="mbti-group-block">
+          <div class="mbti-group-label" style="color:${MBTI_GROUPS[g].color};">${MBTI_GROUPS[g].name}</div>
+          <div class="mbti-card-grid">
+            ${list.map(t=>{
+              const m = MBTI_META[t];
+              return `<button class="mbti-card ${state.mbti===t?'on':''}" data-t="${t}" style="--card-grad:${m.grad};">
+                <span class="mbti-card-code">${t}</span>
+                <span class="mbti-card-nick">${m.nickname}</span>
+              </button>`;
+            }).join("")}
+          </div>
+        </div>
+      `).join("")}
+      <button class="mbti-card unknown ${state.mbti==="unknown"?'on':''}" data-t="unknown">
+        <span class="mbti-card-code">わからない</span>
+        <span class="mbti-card-nick">回答しない</span>
+      </button>
+    </div>
+
+    <div class="mbti-preview" id="mbtiPreview"></div>
+
+    <div class="start-row" style="margin-top:28px;">
+      <button class="primary" id="toResultsBtn">次へ（語学・資格）</button>
+    </div>
+  `;
+
+  function paintPreview(){
+    const preview = document.getElementById("mbtiPreview");
+    const val = state.mbti;
+    if(!val || val==="unknown"){
+      preview.innerHTML = `<div class="mbti-preview-text"><b>未設定</b>スキル診断のみで分析します</div>`;
+      return;
+    }
+    const meta = MBTI_META[val];
+    preview.innerHTML = `<div class="mbti-preview-text"><b>${val}｜${meta.nickname}（${meta.groupName}）</b>${MBTI_BLURB[val]}</div>`;
+  }
+  paintPreview();
+
+  app.querySelectorAll(".mbti-card").forEach(btn=>{
+    btn.onclick = ()=>{
+      const v = btn.getAttribute("data-t");
+      state.mbti = v;
+      saveProgress();
+      renderMbti();
+      window.scrollTo(0,0);
+    };
+  });
+
+  document.getElementById("toResultsBtn").onclick = ()=>{
+    state.screen="profile";
+    render(); window.scrollTo(0,0);
+  };
+}
+
+/* ---------------- 語学力・資格の入力画面 ---------------- */
+function renderProfile(){
+  app.innerHTML = `
+    <div class="eyebrow">最後にもう一つ（任意）</div>
+    <h1 class="hero-title" style="font-size:28px;">語学力・保有資格を教えてください</h1>
+    <p class="hero-lead">
+      TOEICスコアや保有資格を入力すると、グローバル力の評価や結果画面での表示に反映されます。未入力のまま進んでも構いません。
+    </p>
+
+    <div class="profile-form">
+      <label class="profile-label" for="toeicInput">TOEICスコア（0〜990、任意）</label>
+      <input type="number" id="toeicInput" class="profile-input" min="0" max="990" step="5" placeholder="例：850" value="${state.profile.toeic ?? ''}">
+
+      <label class="profile-label" for="certInput" style="margin-top:18px;">保有資格・関連スキル（任意、カンマ区切り）</label>
+      <textarea id="certInput" class="profile-input profile-textarea" rows="3" placeholder="例：PMP、簿記2級、G検定、応用情報技術者">${state.profile.certifications || ''}</textarea>
+    </div>
+
+    <div class="start-row" style="margin-top:28px;">
+      <button class="primary" id="toResultsBtn">結果を見る</button>
+    </div>
+  `;
+
+  document.getElementById("toResultsBtn").onclick = async ()=>{
+    const toeicVal = document.getElementById("toeicInput").value;
+    state.profile.toeic = toeicVal === "" ? null : Math.max(0, Math.min(990, parseInt(toeicVal,10)));
+    state.profile.certifications = document.getElementById("certInput").value.trim();
+    await saveProgress();
+    state.screen="results";
+    render(); window.scrollTo(0,0);
+  };
+}
+
+/* ---------------- Radar chart (SVG, gradient fill) ---------------- */
+function radarPoints(values, cx, cy, r){
+  const n = values.length;
+  return values.map((v,i)=>{
+    const angle = (Math.PI*2*i/n) - Math.PI/2;
+    const rad = r * (v/5);
+    return [cx + rad*Math.cos(angle), cy + rad*Math.sin(angle)];
+  });
+}
+function axisPoints(n, cx, cy, r){
+  return Array.from({length:n}).map((_,i)=>{
+    const angle = (Math.PI*2*i/n) - Math.PI/2;
+    return [cx + r*Math.cos(angle), cy + r*Math.sin(angle)];
+  });
+}
+
+function previewRadarSVG(){
+  const size=260, cx=size/2, cy=size/2, r=90;
+  const demo=[3,4,3,2,3,4,3,2];
+  const pts = radarPoints(demo,cx,cy,r).map(p=>p.join(",")).join(" ");
+  const axes = axisPoints(8,cx,cy,r);
+  const rings=[0.25,0.5,0.75,1].map(f=>{
+    const rp = axisPoints(8,cx,cy,r*f).map(p=>p.join(",")).join(" ");
+    return `<polygon points="${rp}" fill="none" stroke="#DFE4EE" stroke-width="1"/>`;
+  }).join("");
+  const spokes = axes.map(p=>`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#DFE4EE" stroke-width="1"/>`).join("");
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <defs>
+      <linearGradient id="previewGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2E5FD9"/>
+        <stop offset="100%" stop-color="#101C36"/>
+      </linearGradient>
+    </defs>
+    ${rings}${spokes}
+    <polygon points="${pts}" fill="url(#previewGrad)" fill-opacity="0.22" stroke="url(#previewGrad)" stroke-width="2.5"/>
+  </svg>`;
+}
+
+function resultsRadarSVG(){
+  const size=380, cx=size/2, cy=size/2, r=128;
+  const n = CATEGORIES.length;
+  const values = CATEGORIES.map(categoryAverage);
+  const pts = radarPoints(values,cx,cy,r).map(p=>p.join(",")).join(" ");
+  const axes = axisPoints(n,cx,cy,r);
+  const rings=[0.2,0.4,0.6,0.8,1].map(f=>{
+    const rp = axisPoints(n,cx,cy,r*f).map(p=>p.join(",")).join(" ");
+    return `<polygon points="${rp}" fill="none" stroke="#DFE4EE" stroke-width="1"/>`;
+  }).join("");
+  const spokes = axes.map(p=>`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#DFE4EE" stroke-width="1"/>`).join("");
+  const labels = axes.map((p,i)=>{
+    const angle = (Math.PI*2*i/n) - Math.PI/2;
+    const lx = cx + (r+38)*Math.cos(angle);
+    const ly = cy + (r+38)*Math.sin(angle);
+    return `<text x="${lx}" y="${ly}" font-size="11.5" font-family="Noto Sans JP, sans-serif" fill="#131A2B" text-anchor="middle" dominant-baseline="middle">${CATEGORIES[i].name}</text>`;
+  }).join("");
+  const dots = radarPoints(values,cx,cy,r).map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#2E5FD9" stroke="#fff" stroke-width="1.5"/>`).join("");
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <defs>
+      <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#2E5FD9"/>
+        <stop offset="100%" stop-color="#0B1220"/>
+      </linearGradient>
+    </defs>
+    ${rings}${spokes}
+    <polygon points="${pts}" fill="url(#radarGrad)" fill-opacity="0.28" stroke="url(#radarGrad)" stroke-width="2.5"/>
+    ${dots}${labels}
+  </svg>`;
+}
+
+/* ---------------- Results screen ---------------- */
+const ADVICE = {
+  strategy: "第三者のセミナーやコーチングを通じて、事業視点でのロードマップ設計の型を学ぶと伸びやすい領域です。",
+  research: "定性・定量それぞれの調査を小さく実践し、仮説検証のサイクルを回す経験を積むと力がつきます。",
+  direction: "実際のプロジェクトで優先順位付けやリソース配分を任せてもらい、振り返りを重ねるのが近道です。",
+  requirement: "ユーザーストーリーの書き方や要件定義のフォーマットを、書籍や実務でのレビューを通じて磨けます。",
+  design: "プロトタイピングツールを使いこなし、ドキュメント化の型を先輩PdMから学ぶと効果的です。",
+  release: "QAやABテストの設計に自らアサインしてもらい、リリースの一連の流れを経験することが近道です。",
+  communication: "社内外でのプレゼン機会を増やし、フィードバックを積極的にもらう習慣が成長を後押しします。",
+  consulting: "クライアントや他部署との折衝を任せてもらい、期待値調整の場数を踏むことが有効です。",
+  global: "海外拠点とのミーティングに同席する、英語のプロダクトドキュメントを書いてみるなど、小さな実践から語学と異文化理解を積み上げると伸びやすい領域です。",
+  success: "カスタマーサクセスチームに同席し、解約理由のヒアリングやオンボーディング改善の議論に加わることで実践経験を積めます。",
+};
+
+/* ---------------- 弱み克服アクション ----------------
+   カテゴリごとに「研修・学習」「実務経験」「具体的タスク」の3方向で、
+   弱みを補うための現実的なアクションをまとめたもの。 */
+const GROWTH_REMEDY = {
+  strategy:      { training:"グロービス経営大学院のプロダクトマネジメント講座や『INSPIRED』などの書籍で学ぶ", experience:"事業計画のレビュー会議に同席し、意思決定プロセスを観察する", task:"次期ロードマップのドラフト作成を、上長のレビュー付きで担当してみる" },
+  research:      { training:"ユーザーインタビュー・定量分析の入門講座（Udemy等）を受講する", experience:"リサーチャーやデータアナリストのインタビュー同席・分析レビューに参加する", task:"小規模な機能改善で、仮説検証のミニプロジェクトを一件回してみる" },
+  direction:     { training:"アジャイル／スクラムの認定研修（CSPO等）を受講する", experience:"開発チームのスプリントプランニング・振り返りに継続的に参加する", task:"小規模施策のスケジュール見積もりとリソース配分を任せてもらう" },
+  requirement:   { training:"要求定義・要件定義の書籍やテンプレートを使って自己学習する", experience:"エンジニア・デザイナーとの要件レビュー会に同席し、フィードバックをもらう", task:"1つの機能の要件定義書を自分で書き、レビューを受けてみる" },
+  design:        { training:"Figma等のプロトタイピングツールやUXライティングの講座を受講する", experience:"デザイナーのプロトタイプレビューやユーザビリティテストに同席する", task:"小さな画面のプロトタイプを自分で作成し、チームに共有してみる" },
+  release:       { training:"QA・テスト設計の基礎講座（JSTQB等）で体系的に学ぶ", experience:"QAチームのテスト計画レビューやリリース判定会議に同席する", task:"次回リリースのテスト観点洗い出しを担当してみる" },
+  communication: { training:"プレゼンテーションやファシリテーションの社外セミナーに参加する", experience:"社内勉強会や1on1でのフィードバックのやり取りを積極的に行う", task:"次の定例会議のファシリテーションを担当してみる" },
+  consulting:    { training:"交渉術やコンサルティングスキルに関する書籍・研修を受講する", experience:"クライアントや他部署との折衝の場に同席し、進め方を観察する", task:"小規模な期待値調整や交渉を任せてもらう" },
+  success:       { training:"カスタマーサクセスの基礎講座や実務コミュニティの勉強会に参加する", experience:"CSチームのオンボーディング・チャーン分析ミーティングに同席する", task:"1顧客分のオンボーディング改善案を企画してみる" },
+  global:        { training:"ビジネス英語・TOEIC対策講座やオンライン英会話を継続する", experience:"海外拠点とのミーティングやグローバルGTM会議に同席する", task:"英語でのドキュメント作成や簡単なプレゼンを担当してみる" },
+};
+
+function renderResults(){
+  const avg = overallAverage();
+  const WEAK_THRESHOLD = 3.5;
+  const sortedCats = [...CATEGORIES].sort((a,b)=>categoryAverage(b)-categoryAverage(a));
+  const strengthCats = sortedCats.filter(c=>categoryAverage(c)>=WEAK_THRESHOLD).slice(0,4);
+  const growthCats = [...sortedCats].reverse().filter(c=>categoryAverage(c)<WEAK_THRESHOLD).slice(0,4);
+  const topCatForEntrust = strengthCats[0] || sortedCats[0];
+
+  const flatSkills = allSkillsFlat();
+  const sortedSkills = [...flatSkills].sort((a,b)=>b.v-a.v);
+  const topSkills = sortedSkills.filter(s=>s.v>=4).slice(0,5);
+  const bottomSkills = [...sortedSkills].reverse().filter(s=>s.v<WEAK_THRESHOLD).slice(0,5);
+
+  const typeResult = determinePdmType();
+  const pdmType = PDM_TYPES[typeResult.key];
+  const seniority = determineSeniority(avg);
+
+  const hasMbti = state.mbti && state.mbti!=="unknown";
+  const mbtiMeta = hasMbti ? MBTI_META[state.mbti] : null;
+  const profile = hasMbti ? MBTI_PROFILE[state.mbti] : null;
+  const matrix = hasMbti ? buildCategoryMatrix(state.mbti) : null;
+  const entrustRec = hasMbti ? buildEntrustRecommendation(state.mbti, pdmType, topCatForEntrust.name) : null;
+  const teamFitMbti = hasMbti ? mbtiTeamFit(state.mbti) : null;
+
+  const seniorityKey = avg<3 ? "junior" : (avg<4 ? "middle" : "senior");
+  const hensachi = calcHensachi(avg);
+  const salaryBand = SALARY_BANDS[seniorityKey];
+  const matchedJobs = matchJobs(typeResult.key, seniorityKey);
+  const swot = buildSwot(strengthCats, growthCats, matrix);
+  const careerPath = buildCareerPath(seniorityKey);
+  const toeicNote = toeicComment(state.profile.toeic);
+
+  saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi });
+
+  app.innerHTML = `
+    <div class="eyebrow">診断結果</div>
+    <h1 class="hero-title" style="font-size:30px;">あなたのPdMスキルレーダー</h1>
+
+    <div class="score-hero">
+      <div>
+        <div class="score-num">${avg.toFixed(1)}</div>
+        <div class="score-den">/ 5.0（35項目の平均）</div>
+      </div>
+      <div class="score-tags">
+        <span class="tag">診断タイプ：${pdmType.label}</span>
+        <span class="tag">レベル：${seniority.label}</span>
+        ${hasMbti ? `<span class="tag" style="background:${mbtiMeta.color};">${state.mbti}｜${mbtiMeta.nickname}</span>` : ""}
+      </div>
+    </div>
+
+    ${hasMbti ? `
+    <div class="mbti-emblem-block">
+      <div class="mbti-emblem" style="background:var(--bg); color:${mbtiMeta.color};">
+        <span style="color:#fff; display:flex;">${mbtiIconSvg(mbtiMeta,60)}</span>
+      </div>
+      <div class="mbti-emblem-text">
+        <div class="code">${state.mbti}</div>
+        <div class="nick">${mbtiMeta.nickname}</div>
+        <span class="grp">${mbtiMeta.groupName}</span>
+      </div>
+    </div>` : ""}
+
+    <div class="metric-grid">
+      <div class="metric-tile">
+        <div class="metric-label">PdM偏差値</div>
+        <div class="metric-value">${hensachi}</div>
+        <div class="metric-note">${hensachiComment(hensachi)}<br>※本ツール内の自己評価をもとにした簡易換算値（平均50・SD10）で、公的な統計調査による偏差値ではありません。</div>
+      </div>
+      <div class="metric-tile">
+        <div class="metric-label">想定年収幅（${seniority.label}クラス）</div>
+        <div class="metric-value salary">${salaryBand.range}</div>
+        <div class="metric-note">${salaryBand.note}<br>※公開されている転職メディアの年収データをもとにした一般的な目安で、個人の年収を保証するものではありません。</div>
+      </div>
+    </div>
+
+    ${(state.profile.toeic!=null || state.profile.certifications) ? `
+    <div class="lang-card">
+      ${state.profile.toeic!=null ? `
+      <div class="lang-item">
+        <b>TOEICスコア</b>
+        <span>${state.profile.toeic}点 ／ ${toeicNote}</span>
+      </div>` : ""}
+      ${state.profile.certifications ? `
+      <div class="lang-item">
+        <b>保有資格・関連スキル</b>
+        <span>${state.profile.certifications}</span>
+      </div>` : ""}
+    </div>` : ""}
+
+    <div class="insight strong" style="margin-top:20px;">
+      <h4>${seniority.label}</h4>
+      <p>${seniority.desc}</p>
+    </div>
+
+    <div class="insight">
+      <h4>${pdmType.label}</h4>
+      <p>${pdmType.desc}</p>
+    </div>
+
+    ${hasMbti ? `
+    <div class="section-label">MBTI属性タグ（${state.mbti}｜${mbtiMeta.nickname}）</div>
+    <div class="insight fusion">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+        <div class="mbti-icon" style="background:var(--bg); width:48px; height:48px; border:2px solid ${mbtiMeta.color};"><span style="color:#fff; display:flex;">${mbtiIconSvg(mbtiMeta,30)}</span></div>
+        <div style="font-family:'Zen Kaku Gothic New',sans-serif; font-weight:700; font-size:15px;">${state.mbti}｜${mbtiMeta.nickname}<span style="display:block; font-size:11.5px; color:var(--ink-soft); font-weight:500; font-family:'Noto Sans JP',sans-serif;">${mbtiMeta.groupName}</span></div>
+      </div>
+      <p>${MBTI_BLURB[state.mbti]}</p>
+      <div class="pill-row">
+        ${profile.tags.map(t=>`<span class="pill">${t}</span>`).join("")}
+      </div>
+    </div>
+
+    <div class="section-label">日常業務での得意・不得意</div>
+    <div class="two-col">
+      <div class="task-list good">
+        <h4>得意な業務</h4>
+        <ul>${profile.goodAt.map(t=>`<li>${t}</li>`).join("")}</ul>
+      </div>
+      <div class="task-list bad">
+        <h4>苦手な業務</h4>
+        <ul>${profile.weakAt.map(t=>`<li>${t}</li>`).join("")}</ul>
+      </div>
+    </div>
+
+    <div class="two-col" style="grid-template-columns:1fr 1fr 1fr;">
+      <div class="insight" style="margin-top:0;">
+        <h4>意思決定スタイル</h4>
+        <p>${profile.decision}</p>
+      </div>
+      <div class="insight" style="margin-top:0;">
+        <h4>コミュニケーション</h4>
+        <p>${profile.communication}</p>
+      </div>
+      <div class="insight" style="margin-top:0;">
+        <h4>消耗しやすい環境</h4>
+        <p>${profile.drain}</p>
+      </div>
+    </div>
+
+    <div class="section-label">属性タグ × スキルスコアの掛け合わせ分析</div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+      MBTIの一般的な傾向（性格的な資質）と、実際の35項目診断のスコア（実務経験）を8カテゴリごとに重ね合わせています。
+      両方が高ければ「鉄板の強み」、資質はあるのにスコアが伴っていなければ「伸びしろ大」、資質的には苦手なのにスコアが高ければ「努力で築いた強み」、
+      両方低ければ「要フォロー」として最優先の育成ポイントになります。
+    </p>
+    ${matrix.slice().sort((a,b)=>b.avg-a.avg).map(row=>`
+      <div class="matrix-row ${row.tone}">
+        <div class="matrix-left">
+          <div class="matrix-cat">${row.cat.name}</div>
+          <span class="matrix-tag">${row.tag}</span>
+        </div>
+        <div class="matrix-score">${row.avg.toFixed(1)}</div>
+        <div class="matrix-note">${row.text}</div>
+      </div>`).join("")}
+
+    <div class="section-label">この仕事を任せると強い</div>
+    <div class="insight fusion">
+      <p>${entrustRec.combined}</p>
+      <div class="pill-row">
+        ${entrustRec.entrust.map(t=>`<span class="pill">${t}</span>`).join("")}
+      </div>
+    </div>` : `
+    <div class="section-label">属性タグ × スキル分析</div>
+    <div class="insight" style="border-left-color:var(--ink-soft);">
+      <p>MBTIを選択すると、性格タイプの属性タグと35項目のスコアを掛け合わせた詳細分析（得意・不得意な日常業務、意思決定スタイル、任せると強い仕事など）が表示されます。結果画面下部の「MBTIを選び直す」からいつでも追加できます。</p>
+    </div>`}
+
+    <div class="section-label">タイプ別スコア内訳</div>
+    <div class="result-grid" style="margin-top:14px;">
+      ${[["tech","テックドリブン"],["bizdev","BizDev"],["pmm","PMM"]].map(([k,label])=>{
+        const v = typeResult.scores[k];
+        return `<div>
+          <div class="result-row-name"><span>${label}</span><b>${v.toFixed(1)}</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(v/5*100)}%; ${k===typeResult.key? '' : 'opacity:.4;'}"></div></div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="radar-block">${resultsRadarSVG()}</div>
+
+    <div class="result-grid">
+      ${CATEGORIES.map(c=>{
+        const a = categoryAverage(c);
+        return `<div>
+          <div class="result-row-name"><span>${c.name}</span><b>${a.toFixed(1)}</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(a/5*100)}%"></div></div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="section-label">強み・弱みのSWOT分析</div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+      S・Wはスキル診断のスコアから、O・TはMBTIとの掛け合わせ分析（属性タグ×スキルスコア）から構成しています。
+    </p>
+    <div class="swot-grid">
+      <div class="swot-quad s">
+        <div class="swot-head"><span class="letter">S</span>強み Strengths</div>
+        ${swot.S.map(item=>`<div class="swot-item"><b>${item.title}</b><span>${item.desc}</span></div>`).join("")}
+      </div>
+      <div class="swot-quad w">
+        <div class="swot-head"><span class="letter">W</span>弱み Weaknesses</div>
+        ${swot.W.map(item=>`<div class="swot-item"><b>${item.title}</b><span>${item.desc}</span></div>`).join("")}
+      </div>
+      <div class="swot-quad o">
+        <div class="swot-head"><span class="letter">O</span>機会 Opportunities</div>
+        ${swot.O.map(item=>`<div class="swot-item"><b>${item.title}</b><span>${item.desc}</span></div>`).join("")}
+      </div>
+      <div class="swot-quad t">
+        <div class="swot-head"><span class="letter">T</span>脅威 Threats</div>
+        ${swot.T.map(item=>`<div class="swot-item"><b>${item.title}</b><span>${item.desc}</span></div>`).join("")}
+      </div>
+    </div>
+
+    <div class="pill-row">
+      ${topSkills.map(s=>`<span class="pill strong"><b>${s.v}</b> ${s.name}</span>`).join("")}
+      ${bottomSkills.map(s=>`<span class="pill weak"><b>${s.v}</b> ${s.name}</span>`).join("")}
+    </div>
+
+    <div class="section-label">弱みを補うアクション</div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+      平均3.5未満のカテゴリごとに、研修・実務経験・具体的タスクの3方向で近道になりそうなアクションをまとめました。
+    </p>
+    ${growthCats.length ? growthCats.map(c=>{
+      const remedy = GROWTH_REMEDY[c.key];
+      return `
+      <div class="insight weak">
+        <h4>${c.name} <b>${categoryAverage(c).toFixed(1)}</b></h4>
+        <p><b style="color:var(--ink);">研修・学習：</b>${remedy.training}</p>
+        <p><b style="color:var(--ink);">実務経験：</b>${remedy.experience}</p>
+        <p><b style="color:var(--ink);">具体的タスク：</b>${remedy.task}</p>
+      </div>`;
+    }).join("") : `
+    <div class="insight strong">
+      <p>平均3.5未満のカテゴリはありません。現時点で明確な弱みはなく、得意領域をさらに伸ばすフェーズです。</p>
+    </div>`}
+
+    <div class="section-label">将来のキャリアパス</div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+      ジュニア→ミドル→シニアPdMとステップアップした先には、いくつかの分岐があります。金額は各種転職メディアの公開データをもとにした目安です。
+    </p>
+    <div class="career-main">
+      ${careerPath.main.map(s=>`
+        <div class="career-step ${s.current?'current':''}">
+          ${s.current ? `<span class="now-badge">現在地</span>` : ""}
+          <div class="bar" style="height:${s.height}px;"></div>
+          <div class="label">${s.label}</div>
+          <div class="years">${s.years}</div>
+          <div class="salary">${s.salary}</div>
+        </div>`).join("")}
+    </div>
+    <div class="career-branch-label">シニアPdMから、さらに広がる選択肢 ↓</div>
+    <div class="career-branches">
+      ${careerPath.branches.map(b=>`
+        <div class="career-branch">
+          <h5>${b.label}</h5>
+          <span class="salary">${b.salary}</span>
+          <p>${b.desc}</p>
+        </div>`).join("")}
+    </div>
+
+    <div class="section-label">気が合いやすいメンバー</div>
+    <div class="insight">
+      <h4>スキルタイプの相性</h4>
+      <p>${TEAM_FIT_BY_TYPE[typeResult.key]}</p>
+    </div>
+    ${teamFitMbti ? `
+    <div class="insight fusion">
+      <h4>性格タイプの相性（${state.mbti}）</h4>
+      ${teamFitMbti.map(line=>`<p>${line}</p>`).join("")}
+    </div>` : ""}
+
+    <div class="section-label">あなたに近い公開求人</div>
+    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+      診断タイプ（${pdmType.label}）とレベル（${seniority.label}）に近い、実在の公開求人情報から抜粋しています。
+      掲載企業・給与・募集状況は変動するため、応募の際は必ず出典元ページで最新情報をご確認ください。
+    </p>
+    ${matchedJobs.map(job=>`
+      <a class="job-card" href="${job.url}" target="_blank" rel="noopener">
+        <div class="job-company">${job.company}</div>
+        <div class="job-title">${job.title}</div>
+        <div class="job-meta">
+          <span class="job-salary">${job.salary}</span>
+          <span class="job-source">出典：${job.source}</span>
+        </div>
+      </a>`).join("")}
+
+    <div class="cta-card">
+      <div class="cta-text">
+        <h4>もっと体系的にPdMスキルを鍛えたい方へ</h4>
+        <p>「PdM登竜門」で、実践的なプロダクトマネジメントを学びませんか。</p>
+      </div>
+      <a class="primary cta-btn" href="#" id="toryumonBtn" target="_blank" rel="noopener">PdM登竜門に応募する →</a>
+    </div>
+
+    <div class="start-row" style="margin-top:44px;">
+      <button class="primary" id="retryBtn">回答を修正する</button>
+      <button class="ghost" id="mbtiEditBtn">MBTIを選び直す</button>
+      <button class="ghost" id="profileEditBtn">語学・資格を編集</button>
+      ${supabaseClient ? `<button class="ghost" id="historyBtn">診断履歴を見る</button>` : ""}
+      <button class="ghost" id="resetBtn">最初からやり直す</button>
+    </div>
+
+    <footer class="note">
+      本診断はセルフチェック用の簡易ツールです。半年に一度など定期的に見直すことで、成長やスキルの重心の変化を確認しやすくなります。
+      MBTIとの掛け合わせも、公開されている性格類型論の一般的傾向を業務文脈に翻訳した簡易的な分析であり、断定的な適性診断ではありません。
+      PdM偏差値・想定年収幅・公開求人も、いずれも参考情報であり、個人の適性や収入を保証するものではありません。
+      項目定義は<a href="https://goodpatch.com/blog/2023-12-pdmskillmap" target="_blank" rel="noopener">Goodpatch Blogの記事</a>を参考に構成しています。
+      回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
+    </footer>
+  `;
+
+  document.getElementById("retryBtn").onclick = ()=>{
+    state.screen="assess";
+    state.catIndex=0;
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("mbtiEditBtn").onclick = ()=>{
+    state.screen="mbti";
+    render(); window.scrollTo(0,0);
+  };
+  const profileEditBtn = document.getElementById("profileEditBtn");
+  if(profileEditBtn){
+    profileEditBtn.onclick = ()=>{
+      state.screen="profile";
+      render(); window.scrollTo(0,0);
+    };
+  }
+  const historyBtn = document.getElementById("historyBtn");
+  if(historyBtn){
+    historyBtn.onclick = ()=>{
+      state.screen="history";
+      render(); window.scrollTo(0,0);
+    };
+  }
+  document.getElementById("resetBtn").onclick = async ()=>{
+    state.answers = {};
+    state.mbti = null;
+    state.profile = { toeic:null, certifications:"" };
+    state.savedThisResult = false;
+    await saveProgress();
+    state.screen="intro";
+    render(); window.scrollTo(0,0);
+  };
+}
+
+(async function boot(){
+  await ensureSession();
+  render();
+})();
+</script>
+</body>
+</html>
