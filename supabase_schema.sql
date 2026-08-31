@@ -21,14 +21,17 @@ create table if not exists public.diagnoses (
 -- 2) Row Level Security（自分の行しか読み書きできないようにする）
 alter table public.diagnoses enable row level security;
 
+drop policy if exists "select own diagnoses" on public.diagnoses;
 create policy "select own diagnoses"
   on public.diagnoses for select
   using (auth.uid() = user_id);
 
+drop policy if exists "insert own diagnoses" on public.diagnoses;
 create policy "insert own diagnoses"
   on public.diagnoses for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "delete own diagnoses" on public.diagnoses;
 create policy "delete own diagnoses"
   on public.diagnoses for delete
   using (auth.uid() = user_id);
