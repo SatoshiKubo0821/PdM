@@ -1452,7 +1452,7 @@ let state = {
   catIndex: 0,
   answers: {},        // "catKey:skillName" -> 1..5
   mbti: null,         // "INTJ" 等、または null（未選択／わからない）
-  profile: { toeic: null, certifications: "" },
+  profile: { toeic: null, certifications: "", nickname: "", experienceYears: null },
   userId: null,           // Supabaseの匿名/永久ユーザーID
   userEmail: null,        // メール連携済みの場合のみ入る
   savedThisResult: false, // 今回の診断結果をクラウドに保存済みか（二重保存防止）
@@ -1571,6 +1571,8 @@ async function saveDiagnosisToCloud(payload){
       mbti: state.mbti && state.mbti!=="unknown" ? state.mbti : null,
       toeic: state.profile.toeic,
       certifications: state.profile.certifications || null,
+      nickname: state.profile.nickname || null,
+      experience_years: state.profile.experienceYears,
       overall_avg: payload.avg,
       pdm_type: payload.pdmTypeKey,
       seniority: payload.seniorityKey,
@@ -1585,7 +1587,7 @@ async function fetchHistory(){
   try{
     const { data, error } = await supabaseClient
       .from("diagnoses")
-      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti")
+      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years")
       .order("created_at", { ascending:false })
       .limit(20);
     if(error) return [];
@@ -1623,8 +1625,8 @@ async function renderHistory(){
       const seniorityLabel = SENIORITY[r.seniority] ? SENIORITY[r.seniority].label : r.seniority;
       return `
       <div class="insight">
-        <h4>${date} <b>${Number(r.overall_avg).toFixed(1)}</b></h4>
-        <p>${typeLabel}／${seniorityLabel}／偏差値${r.hensachi}${r.mbti ? "／"+r.mbti : ""}</p>
+        <h4>${date}${r.nickname ? `｜${r.nickname}さん` : ""} <b>${Number(r.overall_avg).toFixed(1)}</b></h4>
+        <p>${typeLabel}／${seniorityLabel}／偏差値${r.hensachi}${r.mbti ? "／"+r.mbti : ""}${r.experience_years!=null ? `／経験${r.experience_years}年` : ""}</p>
       </div>`;
     }).join("")}
 
@@ -1692,6 +1694,14 @@ async function renderIntro(){
 
     <div class="hero-visual">${previewRadarSVG()}</div>
 
+    <div class="profile-form" style="max-width:520px;">
+      <label class="profile-label" for="nicknameInput">ニックネーム（任意）</label>
+      <input type="text" id="nicknameInput" class="profile-input" placeholder="例：たなか" maxlength="30" value="${state.profile.nickname || ''}">
+
+      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdM経験年数（任意）</label>
+      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="0.5" placeholder="例：3" value="${state.profile.experienceYears ?? ''}">
+    </div>
+
     <div class="cat-list">
       ${CATEGORIES.map((c,i)=>`<div><span>0${i+1}</span>${c.name}<span>${c.skills.length}項目</span></div>`).join("")}
     </div>
@@ -1710,8 +1720,17 @@ async function renderIntro(){
     </footer>
   `;
 
+  function captureIntroProfile(){
+    const nickname = document.getElementById("nicknameInput").value.trim();
+    const expVal = document.getElementById("expYearsInput").value;
+    state.profile.nickname = nickname;
+    state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseFloat(expVal)));
+  }
+
   document.getElementById("startBtn").onclick = async ()=>{
-    if(hasSaved){ state.answers = saved.answers; state.mbti = saved.mbti || null; state.profile = saved.profile || { toeic:null, certifications:"" }; }
+    if(hasSaved){ state.answers = saved.answers; state.mbti = saved.mbti || null; state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null }; }
+    captureIntroProfile();
+    await saveProgress();
     state.screen="assess";
     state.catIndex = firstUnfinishedCategory();
     render();
@@ -1721,7 +1740,9 @@ async function renderIntro(){
     restartBtn.onclick = async ()=>{
       state.answers = {};
       state.mbti = null;
-      state.profile = { toeic:null, certifications:"" };
+      captureIntroProfile();
+      state.profile.toeic = null;
+      state.profile.certifications = "";
       state.savedThisResult = false;
       await saveProgress();
       state.screen="assess";
@@ -2049,7 +2070,8 @@ function renderResults(){
 
   app.innerHTML = `
     <div class="eyebrow">診断結果</div>
-    <h1 class="hero-title" style="font-size:30px;">あなたのPdMスキルレーダー</h1>
+    <h1 class="hero-title" style="font-size:30px;">${state.profile.nickname ? `${state.profile.nickname}さんの` : "あなたの"}PdMスキルレーダー</h1>
+    ${state.profile.experienceYears!=null ? `<p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">PdM経験年数：${state.profile.experienceYears}年</p>` : ""}
 
     <div class="score-hero">
       <div>
@@ -2350,7 +2372,7 @@ function renderResults(){
   document.getElementById("resetBtn").onclick = async ()=>{
     state.answers = {};
     state.mbti = null;
-    state.profile = { toeic:null, certifications:"" };
+    state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null };
     state.savedThisResult = false;
     await saveProgress();
     state.screen="intro";

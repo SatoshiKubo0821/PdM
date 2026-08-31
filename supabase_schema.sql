@@ -12,11 +12,17 @@ create table if not exists public.diagnoses (
   mbti text,                       -- 選択されたMBTI（任意）
   toeic int,                       -- TOEICスコア（任意）
   certifications text,             -- 保有資格（任意）
+  nickname text,                   -- ニックネーム（任意）
+  experience_years numeric(4,1),   -- PdM経験年数（任意）
   overall_avg numeric(4,2) not null,
   pdm_type text not null,          -- tech / bizdev / pmm / general
   seniority text not null,         -- junior / middle / senior
   hensachi int not null
 );
+
+-- 既存プロジェクト用：すでにテーブルがある場合でも安全に追加カラムを反映する
+alter table public.diagnoses add column if not exists nickname text;
+alter table public.diagnoses add column if not exists experience_years numeric(4,1);
 
 -- 2) Row Level Security（自分の行しか読み書きできないようにする）
 alter table public.diagnoses enable row level security;
