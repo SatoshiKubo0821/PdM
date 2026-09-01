@@ -1726,7 +1726,7 @@ async function renderIntro(){
       <input type="text" id="nicknameInput" class="profile-input" placeholder="例：たなか" maxlength="30" value="${state.profile.nickname || ''}">
 
       <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdM経験年数（任意）</label>
-      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="0.5" placeholder="例：3" value="${state.profile.experienceYears ?? ''}">
+      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="例：3" value="${state.profile.experienceYears ?? ''}">
     </div>
 
     <div class="cat-list">
@@ -1751,7 +1751,7 @@ async function renderIntro(){
     const nickname = document.getElementById("nicknameInput").value.trim();
     const expVal = document.getElementById("expYearsInput").value;
     state.profile.nickname = nickname;
-    state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseFloat(expVal)));
+    state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseInt(expVal,10)));
   }
 
   document.getElementById("startBtn").onclick = async ()=>{
