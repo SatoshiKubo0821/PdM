@@ -133,7 +133,7 @@
   </div>
 
   <div class="cta-row">
-    <a class="btn primary" href="./index.html#apply" id="ctaApplyBtn">この領域を学ぶ相談をする →</a>
+    <a class="btn primary" href="./apply.html" id="ctaApplyBtn">この領域を学ぶ相談をする →</a>
     <a class="btn outline" href="./index.html">まずは無料でPdMスキルを診断する</a>
   </div>
 
@@ -319,7 +319,7 @@
     const ctxParams = new URLSearchParams();
     ["pdmType","seniority","hensachi"].forEach(k=>{ if(p.has(k)) ctxParams.set(k, p.get(k)); });
     if([...ctxParams.keys()].length){
-      document.getElementById("ctaApplyBtn").href = "./index.html?" + ctxParams.toString() + "#apply";
+      document.getElementById("ctaApplyBtn").href = "./apply.html?" + ctxParams.toString();
     }
   })();
 </script>

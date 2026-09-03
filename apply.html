@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>応募フォーム｜PdM登竜門</title>
+<meta name="description" content="PdM登竜門への応募フォームです。お名前・ご連絡先をお送りいただくと、担当者よりご案内します。">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%232952E3%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222.5%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23FF8A3D%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2952E3; --blue-dark:#16244D; --blue-soft:#EDF1FE;
+    --orange:#FF8A3D; --orange-soft:#FFEDDD;
+    --ink:#16213D; --ink-soft:#5D6B8A; --line:#E3E8F5; --bad:#E14B4B;
+    --paper:#FFFFFF; --bg:#F7F9FE;
+    --grad-blue: linear-gradient(135deg, var(--blue) 0%, #4A6CF0 60%, #6E8CF5 100%);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans JP", sans-serif; line-height:1.75; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:"Zen Kaku Gothic New", sans-serif; margin:0; color:var(--ink);}
+  .wrap{max-width:640px; margin:0 auto; padding:0 24px;}
+  a{color:var(--blue);}
+
+  .site-header-tory{background:var(--blue); position:sticky; top:0; z-index:40;}
+  .topbar{padding:16px 0; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:8px; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:17px; color:#fff; text-decoration:none;}
+  .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--orange);}
+  .back-link{color:rgba(255,255,255,.85); font-size:13.5px; font-weight:600; text-decoration:none;}
+  .back-link:hover{color:#fff;}
+
+  .eyebrow-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--blue-soft); color:var(--blue); font-weight:800; font-size:12.5px;
+    letter-spacing:.04em; padding:6px 14px; border-radius:20px; font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+  .page-title{font-size:28px; font-weight:900; margin-top:16px;}
+  .page-lead{font-size:14.5px; color:var(--ink-soft); margin-top:14px;}
+
+  .context-card{
+    background:var(--grad-blue); color:#fff; border-radius:16px; padding:18px 22px; margin-top:24px; font-size:13.5px;
+  }
+
+  .apply-form{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:32px 28px; margin-top:28px;
+    box-shadow:0 20px 40px -30px rgba(22,33,77,.25);
+  }
+  .form-label{display:block; font-size:13px; font-weight:700; margin-bottom:8px; color:var(--ink);}
+  .form-label .req{color:var(--bad); margin-left:2px;}
+  .form-input{
+    width:100%; border:1.5px solid var(--line); border-radius:10px; padding:12px 14px; font-size:14px;
+    font-family:"Noto Sans JP",sans-serif; color:var(--ink); margin-bottom:20px;
+  }
+  select.form-input{background:#fff;}
+  textarea.form-input{resize:vertical; font-family:inherit;}
+  .form-input:focus{outline:none; border-color:var(--blue);}
+  .form-msg{font-size:13px; min-height:18px; margin-bottom:8px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:800;
+    padding:15px 30px; border-radius:100px; font-size:15px; border:none; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn.primary{background:var(--blue); color:#fff; box-shadow:0 10px 24px -8px rgba(41,82,227,.5); width:100%; justify-content:center;}
+  .btn.outline{background:#fff; color:var(--ink); border:1.5px solid var(--line);}
+  .btn:disabled{opacity:.6; cursor:default; transform:none;}
+  .form-actions{display:flex; flex-direction:column; gap:12px; margin-top:8px;}
+
+  .thanks-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:40px 32px; margin-top:28px; text-align:center;
+  }
+  .thanks-icon{
+    width:56px; height:56px; border-radius:50%; background:#E4F5EE; color:#2E8F6C;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+  }
+
+  footer{padding:40px 0 60px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
+  footer a{color:var(--blue);}
+</style>
+</head>
+<body>
+
+<header class="site-header-tory">
+  <div class="wrap topbar">
+    <a class="brand" href="./toryumon.html"><span class="dot"></span>PdM登竜門</a>
+    <a class="back-link" href="./toryumon.html">← 登竜門トップに戻る</a>
+  </div>
+</header>
+
+<div class="wrap" id="app" style="padding-top:40px; padding-bottom:40px;">
+  <span class="eyebrow-pill">APPLY</span>
+  <h1 class="page-title">PdM登竜門に応募する</h1>
+  <p class="page-lead">実践的なプロダクトマネジメントを体系的に学べる「PdM登竜門」への応募フォームです。いただいた情報をもとに、担当者よりご案内をお送りします。</p>
+
+  <div id="contextArea"></div>
+
+  <div class="apply-form" id="formArea">
+    <label class="form-label" for="applyName">お名前<span class="req">*</span></label>
+    <input type="text" id="applyName" class="form-input" placeholder="山田 太郎">
+
+    <label class="form-label" for="applyEmail">メールアドレス<span class="req">*</span></label>
+    <input type="email" id="applyEmail" class="form-input" placeholder="you@example.com">
+
+    <label class="form-label" for="applyPhone">電話番号（任意）</label>
+    <input type="tel" id="applyPhone" class="form-input" placeholder="090-xxxx-xxxx">
+
+    <label class="form-label" for="applyCompany">現在の会社名（任意）</label>
+    <input type="text" id="applyCompany" class="form-input" placeholder="例：株式会社〇〇">
+
+    <label class="form-label" for="applyRole">現在の役職・職種（任意）</label>
+    <input type="text" id="applyRole" class="form-input" placeholder="例：プロダクトマネージャー">
+
+    <label class="form-label" for="applyIntent">転職意欲<span class="req">*</span></label>
+    <select id="applyIntent" class="form-input">
+      <option value="">選択してください</option>
+      <option value="今すぐ転職したい">今すぐ転職したい</option>
+      <option value="良い求人があれば検討したい">良い求人があれば検討したい</option>
+      <option value="情報収集段階">情報収集段階</option>
+      <option value="転職は考えていない">転職は考えていない</option>
+    </select>
+
+    <label class="form-label" for="applyMessage">ご相談内容・興味のある分野（任意）</label>
+    <textarea id="applyMessage" class="form-input" rows="4" placeholder="例：BizDev領域を体系的に学びたい、転職も視野に相談したい　など"></textarea>
+
+    <div class="form-msg" id="applyMsg"></div>
+
+    <div class="form-actions">
+      <button class="btn primary" id="applySubmitBtn">応募する</button>
+      <a class="btn outline" href="./toryumon.html" style="text-align:center; justify-content:center;">登竜門トップに戻る</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="./index.html">PdMスキル診断はこちら</a> ／
+    <a href="./privacy.html">プライバシーポリシー</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = "https://qdwiaedhairoythkqxoh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkd2lhZWRoYWlyb3l0aGtxeG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTY3NDUsImV4cCI6MjEwMzczMjc0NX0.zMy2DCPil6T59RgSddJmKkELkh5mZpMRrKvufzXP51A";
+  const supabaseClient = (SUPABASE_URL.includes("YOUR-PROJECT-ID"))
+    ? null
+    : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // 診断結果ページ・登竜門から渡された文脈（pdmType/seniority/hensachi）を読み取り、表示・送信に使う
+  const PDM_TYPE_LABELS = { tech:"テックドリブンPdM", bizdev:"BizDevPdM", pmm:"PMM系PdM", general:"総合型PdM" };
+  const SENIORITY_LABELS = { junior:"ジュニア", middle:"ミドル", senior:"シニア〜CPO" };
+
+  const params = new URLSearchParams(window.location.search);
+  const ctx = {
+    pdmType: params.get("pdmType") || null,
+    seniority: params.get("seniority") || null,
+    hensachi: params.get("hensachi") ? parseInt(params.get("hensachi"), 10) : null,
+  };
+  if(ctx.pdmType || ctx.seniority || ctx.hensachi){
+    const typeLabel = PDM_TYPE_LABELS[ctx.pdmType] || ctx.pdmType || "";
+    const seniorityLabel = SENIORITY_LABELS[ctx.seniority] || ctx.seniority || "";
+    document.getElementById("contextArea").innerHTML = `
+      <div class="context-card">
+        あなたの診断結果（${typeLabel}${seniorityLabel ? "／"+seniorityLabel : ""}${ctx.hensachi ? "／偏差値"+ctx.hensachi : ""}）を参考情報として添えて送信します。
+      </div>`;
+  }
+
+  async function submitApplication(fields){
+    if(!supabaseClient) return { ok:false, message:"現在フォームを受け付けられません。時間をおいて再度お試しください。" };
+    try{
+      const { error } = await supabaseClient.from("applications").insert({
+        user_id: null,
+        name: fields.name,
+        email: fields.email,
+        phone: fields.phone || null,
+        message: fields.message || null,
+        company_name: fields.companyName || null,
+        current_role: fields.currentRole || null,
+        job_change_intent: fields.jobChangeIntent || null,
+        referred_pdm_type: ctx.pdmType || null,
+        referred_seniority: ctx.seniority || null,
+        referred_hensachi: ctx.hensachi ?? null,
+      });
+      if(error) return { ok:false, message:"送信に失敗しました。時間をおいて再度お試しください。" };
+      return { ok:true };
+    }catch(e){
+      return { ok:false, message:"通信エラーが発生しました。時間をおいて再度お試しください。" };
+    }
+  }
+
+  function renderThanks(){
+    document.getElementById("formArea").outerHTML = `
+      <div class="thanks-card">
+        <div class="thanks-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+        <h2 style="font-size:19px;">応募ありがとうございました</h2>
+        <p style="color:var(--ink-soft); font-size:13.5px; margin-top:10px;">応募内容を受け付けました。担当者よりメールにてご連絡しますので、しばらくお待ちください。</p>
+        <a class="btn primary" href="./toryumon.html" style="margin-top:20px; display:inline-flex;">登竜門トップに戻る</a>
+      </div>`;
+  }
+
+  document.getElementById("applySubmitBtn").onclick = async ()=>{
+    const name = document.getElementById("applyName").value.trim();
+    const email = document.getElementById("applyEmail").value.trim();
+    const phone = document.getElementById("applyPhone").value.trim();
+    const companyName = document.getElementById("applyCompany").value.trim();
+    const currentRole = document.getElementById("applyRole").value.trim();
+    const jobChangeIntent = document.getElementById("applyIntent").value;
+    const message = document.getElementById("applyMessage").value.trim();
+    const msgEl = document.getElementById("applyMsg");
+    const btn = document.getElementById("applySubmitBtn");
+
+    if(!name || !email){
+      msgEl.style.color = "var(--bad)";
+      msgEl.textContent = "お名前とメールアドレスは必須です。";
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailPattern.test(email)){
+      msgEl.style.color = "var(--bad)";
+      msgEl.textContent = "メールアドレスの形式が正しくありません。";
+      return;
+    }
+    if(!jobChangeIntent){
+      msgEl.style.color = "var(--bad)";
+      msgEl.textContent = "転職意欲を選択してください。";
+      return;
+    }
+
+    btn.disabled = true;
+    msgEl.style.color = "var(--ink-soft)";
+    msgEl.textContent = "送信中…";
+
+    const result = await submitApplication({ name, email, phone, companyName, currentRole, jobChangeIntent, message });
+    if(result.ok){
+      renderThanks();
+    }else{
+      msgEl.style.color = "var(--bad)";
+      msgEl.textContent = result.message;
+      btn.disabled = false;
+    }
+  };
+</script>
+
+</body>
+</html>
