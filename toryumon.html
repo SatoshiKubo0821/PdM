@@ -196,6 +196,36 @@
   footer{padding:40px 0 60px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
   footer a{color:var(--blue);}
 
+  /* ---------- Course band (通常講座・特別講座) ---------- */
+  .course-band{
+    background:var(--grad-blue); color:#fff; border-radius:28px; padding:52px 44px;
+    display:grid; grid-template-columns:0.85fr 1.15fr; gap:40px; align-items:center;
+    position:relative; overflow:hidden;
+  }
+  .course-band-left h2{color:#fff; font-size:26px; font-weight:900; margin-top:16px; line-height:1.45;}
+  .course-band-left p{color:rgba(255,255,255,.85); font-size:13.5px; margin-top:14px; max-width:40ch;}
+  .course-band-cta{display:flex; flex-direction:column; gap:12px; margin-top:26px; max-width:280px;}
+  .course-pill-btn{
+    background:#fff; color:var(--blue); border:none; border-radius:100px; padding:14px 22px;
+    font-weight:800; font-family:"Zen Kaku Gothic New",sans-serif; font-size:13.5px;
+    display:flex; align-items:center; justify-content:space-between; text-decoration:none; cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .course-pill-btn:hover{transform:translateY(-2px);}
+  .course-cards{display:grid; grid-template-columns:1fr; gap:14px;}
+  .course-cards.grid2{grid-template-columns:repeat(2,1fr);}
+  .course-card{
+    background:#fff; border-radius:16px; padding:22px 20px; color:var(--ink);
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .course-card-icon{
+    width:44px; height:44px; border-radius:12px; background:var(--blue-soft);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .course-card-icon svg{width:22px; height:22px;}
+  .course-card h3{font-size:14.5px; color:var(--blue);}
+  .course-card p{font-size:12px; color:var(--ink-soft); margin-top:6px;}
+
   /* ---------- Resource download CTA ---------- */
   .resource-cta-card{
     background:var(--paper); border:1px solid var(--line); border-radius:20px;
@@ -283,6 +313,8 @@
     .resource-cta-card{flex-direction:column; align-items:flex-start;}
     .video-anim-logo{font-size:24px;}
     .instructor-grid{grid-template-columns:repeat(2,1fr);}
+    .course-band{grid-template-columns:1fr; padding:32px 24px;}
+    .course-cards.grid2{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -420,6 +452,84 @@
       <a class="module-card" href="./module.html?m=consulting" style="--accent:#2E8F6C;"><div class="module-badge" style="background:#2E8F6C;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8 12l3 3 5-6"/><circle cx="12" cy="12" r="9"/></svg></div><div><h3>コンサルティング <span class="module-num">08</span></h3><p>プロダクト開発を組織に根づかせる、伴走の力を学びます。</p><span class="module-link">詳しく見る →</span></div></a>
       <a class="module-card" href="./module.html?m=success" style="--accent:#3E9B7C;"><div class="module-badge" style="background:#3E9B7C;"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 21C7 18 4 14 4 9.5A6.5 6.5 0 0117 9.5C17 14 12 21 12 21z"/></svg></div><div><h3>カスタマーサクセス <span class="module-num">09</span></h3><p>導入後の顧客に価値を実感し続けてもらう力を、実例をもとに習得します。</p><span class="module-link">詳しく見る →</span></div></a>
       <a class="module-card" href="./module.html?m=global" style="--accent:#FF8A3D;"><div class="module-badge" style="background:#FF8A3D;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg></div><div><h3>グローバル <span class="module-num">10</span></h3><p>語学力を武器に、海外展開を推進する力を実践的なケースで鍛えます。</p><span class="module-link">詳しく見る →</span></div></a>
+    </div>
+  </div>
+</section>
+
+<section id="courses">
+  <div class="wrap">
+    <div class="course-band">
+      <div class="course-band-left">
+        <span class="eyebrow-pill on-dark">STANDARD COURSES</span>
+        <h2>まずはここから、<br>通常講座</h2>
+        <p>基礎から実務まで、PdMとしての土台をしっかり固めたい方向けの講座です。会社員として働く方はもちろん、フリーランス・独立を目指す方向けのコースもご用意しています。</p>
+        <div class="course-band-cta">
+          <button class="course-pill-btn" id="courseResourceBtn">資料ダウンロード <span>→</span></button>
+          <a class="course-pill-btn" href="./index.html#apply">無料相談・応募する <span>→</span></a>
+        </div>
+      </div>
+      <div class="course-cards">
+        <div class="course-card">
+          <div class="course-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 8l10 5 10-5-10-5z"/><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/></svg></div>
+          <div>
+            <h3>PdM基礎講座</h3>
+            <p>事業戦略からグローバル展開まで、10領域49スキルを一通り学ぶ、登竜門のベースとなる講座です。</p>
+          </div>
+        </div>
+        <div class="course-card">
+          <div class="course-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+          <div>
+            <h3>フリーランス・独立起業PdM講座</h3>
+            <p>案件獲得の営業術、契約・請求実務、複数クライアントとの稼働調整まで、独立後に必要な実務をカバーします。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="course-band" style="background:linear-gradient(135deg,#16244D 0%,#3B2E87 60%,#6E8CF5 100%);">
+      <div class="course-band-left">
+        <span class="eyebrow-pill on-dark">SPECIAL COURSES</span>
+        <h2>さらに専門性を高める、<br>特別講座</h2>
+        <p>基礎を身につけた方向けに、より専門性の高いテーマに特化した特別講座をご用意しています。目指すキャリアに合わせて選択できます。</p>
+        <div class="course-band-cta">
+          <button class="course-pill-btn" id="courseResourceBtn2">資料ダウンロード <span>→</span></button>
+          <a class="course-pill-btn" href="./index.html#apply">無料相談・応募する <span>→</span></a>
+        </div>
+      </div>
+      <div class="course-cards grid2">
+        <div class="course-card">
+          <div class="course-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg></div>
+          <div>
+            <h3>AI駆動開発PdM講座</h3>
+            <p>生成AIを活用した開発プロセスやプロンプト設計を理解し、AI時代のプロダクト開発をリードする力を養います。</p>
+          </div>
+        </div>
+        <div class="course-card">
+          <div class="course-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10M9 20V4M15 20v-7M21 20v-4"/></svg></div>
+          <div>
+            <h3>ファイナンスPdM講座</h3>
+            <p>事業計画・資金調達・財務諸表の読み方など、ファイナンス視点でプロダクト戦略を語れる力を身につけます。</p>
+          </div>
+        </div>
+        <div class="course-card">
+          <div class="course-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0113.7-5.7L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 01-13.7 5.7L4 16"/><path d="M4 20v-4h4"/></svg></div>
+          <div>
+            <h3>スクラムマスター型PdM講座</h3>
+            <p>アジャイル・スクラムの実践的なファシリテーションを学び、チームの自律性を引き出すPdM像を目指します。</p>
+          </div>
+        </div>
+        <div class="course-card">
+          <div class="course-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5V13M12 13L5 16.7M12 13l7 3.7"/></svg></div>
+          <div>
+            <h3>CPO向けプロダクト組織構築講座</h3>
+            <p>PdM組織の設計・採用・育成から、経営陣との連携まで。CPOとして組織を率いるための力を学びます。</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -624,6 +734,8 @@
   }
 
   document.getElementById("openResourceModalBtn").onclick = ()=> openLeadModal("resource_download");
+  document.getElementById("courseResourceBtn").onclick = ()=> openLeadModal("resource_download");
+  document.getElementById("courseResourceBtn2").onclick = ()=> openLeadModal("resource_download");
   document.getElementById("openVideoModalBtn").onclick = ()=> openLeadModal("video_view");
   document.getElementById("modalCloseBtn").onclick = closeLeadModal;
   document.getElementById("leadModalOverlay").addEventListener("click", (e)=>{
