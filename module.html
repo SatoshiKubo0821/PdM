@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">スキルセット詳細｜PdM登竜門</title>
+<meta name="description" id="pageDesc" content="PdM登竜門で学べるスキルセットの詳細ページです。">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%232952E3%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222.5%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23FF8A3D%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2952E3; --blue-dark:#16244D; --blue-soft:#EDF1FE;
+    --orange:#FF8A3D; --orange-soft:#FFEDDD;
+    --ink:#16213D; --ink-soft:#5D6B8A; --line:#E3E8F5;
+    --paper:#FFFFFF; --bg:#F7F9FE;
+    --grad-blue: linear-gradient(135deg, var(--blue) 0%, #4A6CF0 60%, #6E8CF5 100%);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans JP", sans-serif; line-height:1.75; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:"Zen Kaku Gothic New", sans-serif; margin:0; color:var(--ink);}
+  .wrap{max-width:820px; margin:0 auto; padding:0 24px;}
+  a{color:var(--blue);}
+
+  .topbar{padding:20px 0; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:8px; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:17px; color:var(--ink); text-decoration:none;}
+  .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--orange);}
+  .back-link{color:var(--ink-soft); font-size:13.5px; font-weight:600; text-decoration:none;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:800;
+    padding:16px 32px; border-radius:100px; font-size:15px;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn.primary{background:var(--blue); color:#fff; box-shadow:0 10px 24px -8px rgba(41,82,227,.55);}
+  .btn.outline{background:#fff; color:var(--ink); border:1.5px solid var(--line);}
+
+  .eyebrow-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--blue-soft); color:var(--blue); font-weight:800; font-size:12.5px;
+    letter-spacing:.04em; padding:6px 14px; border-radius:20px; font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+
+  .module-hero{padding:32px 0 40px; display:flex; align-items:center; gap:22px;}
+  .module-hero-icon{
+    flex-shrink:0; width:76px; height:76px; border-radius:20px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 16px 32px -14px rgba(22,33,77,.35);
+  }
+  .module-hero-icon svg{width:36px; height:36px;}
+  .module-hero h1{font-size:28px; font-weight:900; margin-top:4px;}
+  .module-hero-num{font-size:12.5px; color:var(--ink-soft); font-weight:700; letter-spacing:.05em;}
+
+  .module-lead{font-size:15px; color:var(--ink-soft); margin:24px 0 40px; max-width:64ch;}
+
+  .section-label{
+    font-size:13px; font-weight:800; color:var(--orange); letter-spacing:.04em;
+    margin-bottom:16px; font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+
+  .subskill-list{display:flex; flex-direction:column; gap:12px; margin-bottom:48px;}
+  .subskill-item{
+    background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px;
+    display:flex; gap:14px; align-items:flex-start;
+  }
+  .subskill-check{
+    flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--blue-soft); color:var(--blue);
+    display:flex; align-items:center; justify-content:center; margin-top:2px;
+  }
+  .subskill-check svg{width:14px; height:14px;}
+  .subskill-item h4{font-size:14.5px; font-family:"Zen Kaku Gothic New",sans-serif; margin:0;}
+  .subskill-item p{font-size:13px; color:var(--ink-soft); margin:4px 0 0;}
+
+  .outcome-card{
+    background:var(--grad-blue); color:#fff; border-radius:20px; padding:32px 30px; margin-bottom:48px;
+  }
+  .outcome-card h2{color:#fff; font-size:19px;}
+  .outcome-card p{font-size:14px; color:rgba(255,255,255,.85); margin-top:10px;}
+
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:64px;}
+
+  .other-modules{margin-bottom:60px;}
+  .other-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .other-item{
+    text-decoration:none; text-align:center; padding:14px 8px; border-radius:12px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink-soft); font-size:11.5px; font-weight:600;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .other-item:hover{border-color:var(--blue); color:var(--blue);}
+  .other-item .other-badge{
+    width:32px; height:32px; border-radius:9px; margin:0 auto 8px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .other-item .other-badge svg{width:16px; height:16px;}
+
+  footer{padding:40px 0 60px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
+  footer a{color:var(--blue);}
+
+  @media (max-width:640px){
+    .module-hero{flex-direction:column; align-items:flex-start; text-align:left;}
+    .other-grid{grid-template-columns:repeat(3,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap topbar">
+  <a class="brand" href="./toryumon.html"><span class="dot"></span>PdM登竜門</a>
+  <a class="back-link" href="./toryumon.html#curriculum">← カリキュラム一覧に戻る</a>
+</div>
+
+<div class="wrap">
+  <div class="module-hero">
+    <div class="module-hero-icon" id="heroIcon"></div>
+    <div>
+      <div class="module-hero-num" id="heroNum"></div>
+      <h1 id="heroTitle"></h1>
+    </div>
+  </div>
+
+  <p class="module-lead" id="heroLead"></p>
+
+  <div class="section-label">このスキルセットで学ぶこと</div>
+  <div class="subskill-list" id="subskillList"></div>
+
+  <div class="outcome-card">
+    <span class="eyebrow-pill" style="background:rgba(255,255,255,.18); color:#fff;">OUTCOME</span>
+    <h2 style="margin-top:14px;">受講後にできるようになること</h2>
+    <p id="outcomeText"></p>
+  </div>
+
+  <div class="cta-row">
+    <a class="btn primary" href="./index.html#apply" id="ctaApplyBtn">この領域を学ぶ相談をする →</a>
+    <a class="btn outline" href="./index.html">まずは無料でPdMスキルを診断する</a>
+  </div>
+
+  <div class="other-modules">
+    <div class="section-label">他のスキルセットも見る</div>
+    <div class="other-grid" id="otherGrid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    本ページはPdMスキルレーダーと連携した学習プログラムのご案内です。
+    <a href="./privacy.html">プライバシーポリシー</a>
+  </div>
+</footer>
+
+<script>
+  const MODULES = {
+    strategy: {
+      num:"01", name:"事業戦略", color:"#16294C",
+      lead:"プロダクトの向かう先と向かい方を定義し、チームを前進させる力を養います。ビジョン策定からKPI管理、価格戦略まで、事業を動かす意思決定の型を身につけます。",
+      icon:'<path d="M6 3v18H4V3h2zm1 1h11l-2.5 3.5L18 11H7V4z" fill="#fff"/>',
+      outcome:"顧客・事業双方の視点からプロダクトビジョンを描き、短期〜中長期のロードマップに落とし込めるようになります。価格戦略やアライアンス戦略まで、事業成長の道筋を自分の言葉で語れるようになります。",
+      subs:[
+        ["プロダクトビジョン策定","顧客・社会・事業の視点から、プロダクトが目指す世界観を言語化できる"],
+        ["短期ロードマップ作成","四半期〜1年単位で、事業目標と開発リソースを踏まえた優先順位付きの計画を描ける"],
+        ["中長期ロードマップ作成","3〜5年先を見据え、ビジョンと市場ニーズから成長のステップを設計できる"],
+        ["プロダクト戦略","ビジョン実現に向けて、市場・顧客への向き合い方と事業成長の道筋を描ける"],
+        ["マーケティング戦略立案","ターゲット設定やメッセージ、チャネル選びを含む市場投入の意思決定ができる"],
+        ["KPI管理","施策がKPIに与える影響を設計し、効果を検証できる"],
+        ["プライシング戦略","提供価値と市場競争環境に応じた価格設計・改定ができる"],
+        ["パートナーシップ・アライアンス戦略","他社との提携によって事業成長を加速する戦略を描ける"],
+      ]
+    },
+    research: {
+      num:"02", name:"リサーチ", color:"#1F3D74",
+      lead:"顧客にとっての価値と市場からの需要を見極める、調査・分析の技術を学びます。定性・定量の両輪で、意思決定の裏付けを取れるようになります。",
+      icon:'<circle cx="10" cy="10" r="6" fill="none" stroke="#fff" stroke-width="2"/><path d="M15 15l6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+      outcome:"競合・市場調査から定量分析、ユーザーインタビューまで一通り実施できるようになり、施策の意思決定に説得力のある根拠を持たせられるようになります。",
+      subs:[
+        ["競合調査","市場の競合を把握し、差別化ポイントを見出せる"],
+        ["市場調査","内外環境を分析し、戦略の方向性に説得力を持たせられる"],
+        ["定量分析","利用データや事業指標から仮説を立て、次の一手を計画できる"],
+        ["ユーザーリサーチ","定性インタビューを通じて、ユーザーの課題や価値を発見できる"],
+        ["ユーザー検証","成長に必要な仮説を立て、検証の設計・実行ができる"],
+        ["TAM/SAM/SOM算出","市場規模を定量的に算出し、事業機会の大きさを説明できる"],
+        ["業界動向・トレンド分析","業界レポートや外部環境の変化を継続的にキャッチアップし、戦略に反映できる"],
+      ]
+    },
+    direction: {
+      num:"03", name:"ディレクション", color:"#28519C",
+      lead:"チームで開発を進めるための、ステークホルダーとの調整力を鍛えます。非エンジニアでも、開発チームと対等に対話できる力が身につきます。",
+      icon:'<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M14.5 9.5L10 14l1.5-4.5L16 8z" fill="#fff"/>',
+      outcome:"施策の優先順位づけからスケジュール見積もり、リソース調整、開発・デザインチームへのディレクションまで、開発を前に進める実務を一人で回せるようになります。",
+      subs:[
+        ["施策優先度管理","スコアリングや進捗を踏まえ、関係者と合意しながら優先順位を決められる"],
+        ["スケジュール見積もり","開発チームと連携し、無理のないスケジュールを見積もれる"],
+        ["リソース調整","デザイナーやエンジニアの配置・稼働を最適化できる"],
+        ["開発ディレクション","要件を的確に伝え、開発の進行を管理できる"],
+        ["UIデザインのディレクション","デザインチームに要件を伝え、進行と品質を管理できる"],
+      ]
+    },
+    requirement: {
+      num:"04", name:"要件定義", color:"#3163B0",
+      lead:"何のために何をやるのか、チームと認識をそろえる力を身につけます。技術的な知識がなくても書ける、要件定義の型を学びます。",
+      icon:'<rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+      outcome:"ユーザー価値の定義から要求への落とし込み、実現可能性の確認まで、エンジニア・デザイナーと合意形成しながら要件をまとめられるようになります。",
+      subs:[
+        ["ユーザー価値定義","誰をどんな状態にしたいか、提供価値を言語化できる"],
+        ["要求への落とし込み","ユーザーストーリーをもとに、実装すべき要求を定義できる"],
+        ["プロダクト要件定義の作成","要求を実装要件に落とし込み、エンジニア・デザイナーと合意形成できる"],
+        ["フィジビリティ確認","関係者と連携し、施策や機能の実現可能性を見極められる"],
+      ]
+    },
+    design: {
+      num:"05", name:"詳細設計", color:"#3E7FC4",
+      lead:"施策の詳細を設計し、関係者に正しく伝える力を実践課題で磨きます。技術アーキテクチャの基礎理解も、非エンジニア向けにやさしく学べます。",
+      icon:'<path d="M4 20l3-1 10-10-2-2L5 17l-1 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6l2 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+      outcome:"仕様書やプロトタイプを自分の手で作成し、ユーザー体験を設計しながら、技術的な制約もある程度踏まえて要件を調整できるようになります。",
+      subs:[
+        ["仕様詳細のドキュメント化","後から見返せる分かりやすい仕様書を作成し、認識をそろえられる"],
+        ["プロトタイプ作成","開発前にイメージを共有するプロトタイプを素早く作れる"],
+        ["ユーザー体験設計","施策や機能が生む一連の体験を可視化・言語化できる"],
+        ["影響範囲の確認","技術的制約や他領域への影響を踏まえ、要件を調整できる"],
+        ["技術アーキテクチャの理解","システム構成や技術的制約を理解し、開発チームと対等に議論できる"],
+      ]
+    },
+    release: {
+      num:"06", name:"リリース", color:"#4FA0B8",
+      lead:"エンジニアやPRチームと協力し、問題なく世に出す力を養成します。QAやABテストなど、品質を担保しながらリリースを進める実務を学びます。",
+      icon:'<path d="M13 2c3 3 4 6 3 10l-3 3-3-3c-1-4 0-7 3-10z" fill="#fff"/><circle cx="13" cy="9" r="1.6" fill="#4FA0B8"/><path d="M8 15l-3 5 5-3z" fill="#fff"/>',
+      outcome:"リリース戦略の設計からタスク管理、QA対応、ABテストの実施まで、プロダクトを安全に世に送り出す一連のプロセスを回せるようになります。",
+      subs:[
+        ["リリース戦略設計","関連チームを巻き込み、必要なタスクとPRを設計・実行できる"],
+        ["ABテスト","効果検証のための設計と分析を通じて、最適な施策を判断できる"],
+        ["QA対応","実装が仕様通りかを確認し、問題があれば修正を依頼できる"],
+        ["リリースタスクマネジメント","リリースに必要なタスクを洗い出し、滞りなく進行できる"],
+        ["テスト計画・品質基準の設計","リリース前に必要なテスト範囲と品質基準を設計できる"],
+      ]
+    },
+    communication: {
+      num:"07", name:"コミュニケーション", color:"#6C4AB6",
+      lead:"ステークホルダーと適切な関係を築く対人力を、ロールプレイ形式で鍛えます。技術背景がなくても信頼されるコミュニケーションの取り方を学びます。",
+      icon:'<path d="M4 4h13v9H8l-4 4V4z" fill="#fff"/>',
+      outcome:"フィードバックを建設的に受け渡しできるようになり、プレゼンテーションを通じて意思決定を導き、チームの協働を促す場をつくれるようになります。",
+      subs:[
+        ["フィードバックの受け取りと提供","フィードバックを活かしてアウトプットを磨き、建設的に伝えられる"],
+        ["プレゼンテーション","提案や依頼を通じて、意思決定・合意形成を導ける"],
+        ["チーム内コミュニケーション","チームの協働を促す雰囲気や場をつくれる"],
+      ]
+    },
+    consulting: {
+      num:"08", name:"コンサルティング", color:"#2E8F6C",
+      lead:"プロダクト開発を組織に根づかせる、伴走の力を学びます。ネゴシエーションや販売チャネル戦略など、事業全体を見渡す視点を養います。",
+      icon:'<path d="M8 12l3 3 5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/>',
+      outcome:"ドキュメンテーションやネゴシエーション、ファシリテーションを通じて、組織にプロダクト思考を浸透させる伴走役として動けるようになります。",
+      subs:[
+        ["ドキュメンテーション","取り組みのプロセスを言語化し、他者が実践できる形で残せる"],
+        ["ネゴシエーション","期待値のズレを調整し、合意形成を導ける"],
+        ["ファシリテーション","相手がスキルを習得するプロセスを設計し、導ける"],
+        ["プロジェクトの要件設計、管理","目標と期限に向けてスケジュールとプロセスを描き、リードできる"],
+        ["販売チャネル戦略","直販・代理店・オンラインなど、適切な販売チャネルを設計できる"],
+        ["コンテンツ・ブランディング戦略","コンテンツマーケティングやブランディングを通じて認知・信頼を構築できる"],
+      ]
+    },
+    success: {
+      num:"09", name:"カスタマーサクセス", color:"#3E9B7C",
+      lead:"導入後の顧客に価値を実感し続けてもらう力を、実例をもとに習得します。オンボーディングからチャーン防止まで、顧客に寄り添う視点を学びます。",
+      icon:'<path d="M12 21C7 18 4 14 4 9.5A6.5 6.5 0 0117 9.5C17 14 12 21 12 21z" fill="#fff"/>',
+      outcome:"新規顧客のオンボーディング設計から、解約要因の分析・防止、アップセル施策の立案まで、顧客の成功を支える一連の動きができるようになります。",
+      subs:[
+        ["オンボーディング設計","新規顧客がスムーズに価値を実感できる導入プロセスを設計できる"],
+        ["チャーン分析・防止","解約要因を分析し、防止策を企画・実行できる"],
+        ["アップセル・クロスセル戦略","既存顧客の利用拡大に向けた施策を設計できる"],
+      ]
+    },
+    global: {
+      num:"10", name:"グローバル", color:"#FF8A3D",
+      lead:"語学力を武器に、海外展開を推進する力を実践的なケースで鍛えます。英語での開発チーム牽引から、国ごとのGTM戦略まで学びます。",
+      icon:'<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z" fill="none" stroke="#fff" stroke-width="2"/>',
+      outcome:"英語での開発チームとのやり取りに自信を持ち、海外市場向けGTM戦略を国・地域ごとの違いを踏まえて実行できるようになります。",
+      subs:[
+        ["英語での開発チーム牽引","英語を用いて、海外拠点や多国籍のエンジニア・デザイナーを含む開発チームを牽引できる"],
+        ["英語でのグローバルGTM展開","英語を用いて、海外市場向けのGo-to-Market戦略を立案・実行できる"],
+        ["各国に応じたGTM戦略の実行","国や地域ごとの商習慣・文化の違いを踏まえ、ローカライズしたGTM戦略を実行できる"],
+      ]
+    },
+  };
+
+  const MODULE_ORDER = ["strategy","research","direction","requirement","design","release","communication","consulting","success","global"];
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get("m");
+  const activeKey = MODULES[key] ? key : "strategy";
+  const mod = MODULES[activeKey];
+
+  document.title = mod.name + "｜PdM登竜門";
+  document.getElementById("pageTitle").textContent = mod.name + "｜PdM登竜門";
+  document.getElementById("pageDesc").setAttribute("content", mod.lead);
+  document.getElementById("heroIcon").style.background = mod.color;
+  document.getElementById("heroIcon").innerHTML = `<svg viewBox="0 0 24 24">${mod.icon}</svg>`;
+  document.getElementById("heroNum").textContent = "MODULE " + mod.num + " / 10";
+  document.getElementById("heroTitle").textContent = mod.name;
+  document.getElementById("heroLead").textContent = mod.lead;
+  document.getElementById("outcomeText").textContent = mod.outcome;
+
+  document.getElementById("subskillList").innerHTML = mod.subs.map(s => `
+    <div class="subskill-item">
+      <div class="subskill-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div><h4>${s[0]}</h4><p>${s[1]}</p></div>
+    </div>`).join("");
+
+  document.getElementById("otherGrid").innerHTML = MODULE_ORDER.filter(k => k !== activeKey).map(k => {
+    const m = MODULES[k];
+    return `<a class="other-item" href="./module.html?m=${k}">
+      <div class="other-badge" style="background:${m.color};"><svg viewBox="0 0 24 24">${m.icon}</svg></div>
+      ${m.name}
+    </a>`;
+  }).join("");
+
+  // 診断結果ページから渡された文脈があれば、応募リンクに引き継ぐ
+  (function(){
+    const p = new URLSearchParams(window.location.search);
+    const ctxParams = new URLSearchParams();
+    ["pdmType","seniority","hensachi"].forEach(k=>{ if(p.has(k)) ctxParams.set(k, p.get(k)); });
+    if([...ctxParams.keys()].length){
+      document.getElementById("ctaApplyBtn").href = "./index.html?" + ctxParams.toString() + "#apply";
+    }
+  })();
+</script>
+
+</body>
+</html>

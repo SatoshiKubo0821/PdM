@@ -85,10 +85,27 @@
   }
   .fit-card:hover{transform:translateY(-4px); box-shadow:0 20px 40px -28px rgba(22,33,77,.3);}
   .fit-card .chip{
-    width:38px; height:38px; border-radius:11px; background:var(--blue-soft); color:var(--blue);
-    display:flex; align-items:center; justify-content:center; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:15px;
+    width:44px; height:44px; border-radius:12px; background:var(--blue-soft); color:var(--blue);
+    display:flex; align-items:center; justify-content:center;
   }
+  .fit-card .chip svg{width:22px; height:22px;}
   .fit-card p{font-size:14px; margin-top:14px; color:var(--ink);}
+
+  /* instructors */
+  .instructor-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+  .instructor-card{
+    background:var(--bg); border:1px solid var(--line); border-radius:16px; padding:24px 20px; text-align:center;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .instructor-card:hover{transform:translateY(-3px); box-shadow:0 16px 32px -26px rgba(22,33,77,.3);}
+  .instructor-avatar{
+    width:64px; height:64px; border-radius:50%; margin:0 auto 14px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:22px;
+  }
+  .instructor-card h3{font-size:15px;}
+  .instructor-role{font-size:11.5px; color:var(--blue); font-weight:700; margin-top:4px;}
+  .instructor-card p{font-size:12.5px; color:var(--ink-soft); margin-top:10px; text-align:left;}
 
   /* skill modules */
   .module-section{background:var(--paper);}
@@ -97,15 +114,18 @@
     background:var(--bg); border:1px solid var(--line); border-radius:16px; padding:22px 24px;
     display:flex; gap:16px; align-items:flex-start;
     transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    text-decoration:none; color:inherit;
   }
   .module-card:hover{transform:translateY(-3px); border-color:var(--accent); box-shadow:0 16px 32px -26px rgba(22,33,77,.35);}
   .module-badge{
-    flex-shrink:0; width:40px; height:40px; border-radius:12px; background:var(--accent, var(--blue));
+    flex-shrink:0; width:44px; height:44px; border-radius:12px; background:var(--accent, var(--blue));
     color:#fff; display:flex; align-items:center; justify-content:center;
-    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:14px;
   }
-  .module-card h3{font-size:15.5px;}
+  .module-badge svg{width:22px; height:22px;}
+  .module-card h3{font-size:15.5px; display:flex; align-items:center; gap:8px;}
+  .module-card .module-num{font-size:11px; color:var(--ink-soft); font-weight:700;}
   .module-card p{font-size:13px; color:var(--ink-soft); margin-top:5px;}
+  .module-card .module-link{font-size:12px; color:var(--blue); font-weight:700; margin-top:8px; display:inline-block;}
 
   /* features */
   .feature-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
@@ -244,6 +264,7 @@
     .final-cta-card{padding:44px 24px;}
     .resource-cta-card{flex-direction:column; align-items:flex-start;}
     .video-anim-logo{font-size:24px;}
+    .instructor-grid{grid-template-columns:repeat(2,1fr);}
   }
 </style>
 </head>
@@ -262,8 +283,8 @@
   <div class="wrap hero-grid">
     <div>
       <span class="eyebrow-pill">PRODUCT MANAGER BOOTCAMP</span>
-      <h1>実践課題とメンタリングで、<br><span class="hl">プロダクトマネジメント</span>を<br>一段深く学ぶ。</h1>
-      <p>事業戦略からグローバル展開まで、PdMに求められる10領域49スキルを体系的にカバー。実際のプロダクト課題に取り組みながら、経験豊富なメンターと一緒に力を伸ばしていくプログラムです。</p>
+      <h1>非エンジニアでもなれる、<br><span class="hl">未経験からのPdM登竜門</span></h1>
+      <p>「エンジニア出身じゃないと厳しいのでは」——そんな不安は不要です。事業戦略からグローバル展開まで、PdMに求められる10領域49スキルを未経験からでも体系的に学べます。実際のプロダクト課題に取り組みながら、<b style="color:var(--ink);">充実した講師陣</b>が一人ひとりに合わせて伴走します。</p>
       <div class="hero-cta-row">
         <a class="btn primary" href="./index.html#apply" id="heroApplyBtn">無料相談・応募はこちら →</a>
         <a class="btn outline" href="#curriculum">カリキュラムを見る</a>
@@ -298,6 +319,42 @@
   </div>
 </section>
 
+<section class="module-section" id="instructors">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow-pill">INSTRUCTORS</span>
+      <h2 class="section-title">充実した講師陣が、非エンジニアの一歩を支えます</h2>
+      <p class="section-lead">事業会社・スタートアップ・コンサルティングファームなど、異なるバックグラウンドを持つ現役PdM・元PdMが講師として在籍。技術的な知識がなくても、実務目線でわかりやすく伴走します。</p>
+    </div>
+    <div class="instructor-grid">
+      <div class="instructor-card">
+        <div class="instructor-avatar" style="background:linear-gradient(135deg,#16294C,#3163B0);">田</div>
+        <h3>田中 玲奈</h3>
+        <div class="instructor-role">国内大手SaaS企業 元プロダクト責任者</div>
+        <p>非エンジニア出身からPdMにキャリアチェンジ。事業戦略・要件定義まわりのメンタリングが得意です。</p>
+      </div>
+      <div class="instructor-card">
+        <div class="instructor-avatar" style="background:linear-gradient(135deg,#6C4AB6,#9B7CE0);">佐</div>
+        <h3>佐藤 健一</h3>
+        <div class="instructor-role">スタートアップ3社でCPOを歴任</div>
+        <p>0→1の事業立ち上げが専門。ディレクションやリリースなど、実行フェーズの伴走に定評があります。</p>
+      </div>
+      <div class="instructor-card">
+        <div class="instructor-avatar" style="background:linear-gradient(135deg,#2E8F6C,#5FBF9A);">中</div>
+        <h3>中村 美咲</h3>
+        <div class="instructor-role">外資系IT企業 プロダクトマーケティング責任者</div>
+        <p>グローバルGTMやカスタマーサクセス領域が専門。語学力を活かしたキャリア相談も対応します。</p>
+      </div>
+      <div class="instructor-card">
+        <div class="instructor-avatar" style="background:linear-gradient(135deg,#FF8A3D,#FFB877);">山</div>
+        <h3>山本 直樹</h3>
+        <div class="instructor-role">コンサルティングファーム出身 事業戦略アドバイザー</div>
+        <p>非エンジニアからのキャリアチェンジ支援が豊富。未経験者の疑問に寄り添った指導が持ち味です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <div class="resource-cta-card">
@@ -318,9 +375,9 @@
       <h2 class="section-title">こんな方におすすめです</h2>
     </div>
     <div class="fit-grid">
-      <div class="fit-card"><div class="chip">01</div><p>PdMになったばかりで、事業戦略から開発ディレクションまで、何から手をつければいいか整理したい方</p></div>
-      <div class="fit-card"><div class="chip">02</div><p>特定領域（開発・事業・マーケなど）には強みがあるが、他の領域にも視野を広げてキャリアの幅を作りたい方</p></div>
-      <div class="fit-card"><div class="chip">03</div><p>シニアPdMやCPOを目指す上で、自分の強み・弱みを客観的に把握し、計画的に伸ばしていきたい方</p></div>
+      <div class="fit-card"><div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div><p>PdMになったばかりで、事業戦略から開発ディレクションまで、何から手をつければいいか整理したい方</p></div>
+      <div class="fit-card"><div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></div><p>特定領域（開発・事業・マーケなど）には強みがあるが、他の領域にも視野を広げてキャリアの幅を作りたい方</p></div>
+      <div class="fit-card"><div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="#2952E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a5 5 0 100-10 5 5 0 000 10z"/><path d="M8.5 13.5L7 21l5-3 5 3-1.5-7.5"/></svg></div><p>シニアPdMやCPOを目指す上で、自分の強み・弱みを客観的に把握し、計画的に伸ばしていきたい方</p></div>
     </div>
   </div>
 </section>
@@ -333,16 +390,16 @@
       <p class="section-lead">PdMスキル診断でも使われている、事業戦略からグローバル展開まで10のカテゴリ・49項目を土台にカリキュラムを構成。自分の診断結果と照らし合わせながら、弱点を優先的に強化できます。</p>
     </div>
     <div class="module-grid">
-      <div class="module-card" style="--accent:#16294C;"><div class="module-badge" style="background:#16294C;">01</div><div><h3>事業戦略</h3><p>プロダクトの向かう先と向かい方を定義し、チームを前進させる力を養います。</p></div></div>
-      <div class="module-card" style="--accent:#1F3D74;"><div class="module-badge" style="background:#1F3D74;">02</div><div><h3>リサーチ</h3><p>顧客にとっての価値と市場からの需要を見極める、調査・分析の技術を学びます。</p></div></div>
-      <div class="module-card" style="--accent:#28519C;"><div class="module-badge" style="background:#28519C;">03</div><div><h3>ディレクション</h3><p>チームで開発を進めるための、ステークホルダーとの調整力を鍛えます。</p></div></div>
-      <div class="module-card" style="--accent:#3163B0;"><div class="module-badge" style="background:#3163B0;">04</div><div><h3>要件定義</h3><p>何のために何をやるのか、チームと認識をそろえる力を身につけます。</p></div></div>
-      <div class="module-card" style="--accent:#3E7FC4;"><div class="module-badge" style="background:#3E7FC4;">05</div><div><h3>詳細設計</h3><p>施策の詳細を設計し、関係者に正しく伝える力を実践課題で磨きます。</p></div></div>
-      <div class="module-card" style="--accent:#4FA0B8;"><div class="module-badge" style="background:#4FA0B8;">06</div><div><h3>リリース</h3><p>エンジニアやPRチームと協力し、問題なく世に出す力を養成します。</p></div></div>
-      <div class="module-card" style="--accent:#6C4AB6;"><div class="module-badge" style="background:#6C4AB6;">07</div><div><h3>コミュニケーション</h3><p>ステークホルダーと適切な関係を築く対人力を、ロールプレイ形式で鍛えます。</p></div></div>
-      <div class="module-card" style="--accent:#2E8F6C;"><div class="module-badge" style="background:#2E8F6C;">08</div><div><h3>コンサルティング</h3><p>プロダクト開発を組織に根づかせる、伴走の力を学びます。</p></div></div>
-      <div class="module-card" style="--accent:#3E9B7C;"><div class="module-badge" style="background:#3E9B7C;">09</div><div><h3>カスタマーサクセス</h3><p>導入後の顧客に価値を実感し続けてもらう力を、実例をもとに習得します。</p></div></div>
-      <div class="module-card" style="--accent:#FF8A3D;"><div class="module-badge" style="background:#FF8A3D;">10</div><div><h3>グローバル</h3><p>語学力を武器に、海外展開を推進する力を実践的なケースで鍛えます。</p></div></div>
+      <a class="module-card" href="./module.html?m=strategy" style="--accent:#16294C;"><div class="module-badge" style="background:#16294C;"><svg viewBox="0 0 24 24" fill="#fff"><path d="M6 3v18H4V3h2zm1 1h11l-2.5 3.5L18 11H7V4z"/></svg></div><div><h3>事業戦略 <span class="module-num">01</span></h3><p>プロダクトの向かう先と向かい方を定義し、チームを前進させる力を養います。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=research" style="--accent:#1F3D74;"><div class="module-badge" style="background:#1F3D74;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/></svg></div><div><h3>リサーチ <span class="module-num">02</span></h3><p>顧客にとっての価値と市場からの需要を見極める、調査・分析の技術を学びます。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=direction" style="--accent:#28519C;"><div class="module-badge" style="background:#28519C;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5L10 14l1.5-4.5L16 8z" fill="#fff" stroke="none"/></svg></div><div><h3>ディレクション <span class="module-num">03</span></h3><p>チームで開発を進めるための、ステークホルダーとの調整力を鍛えます。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=requirement" style="--accent:#3163B0;"><div class="module-badge" style="background:#3163B0;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div><div><h3>要件定義 <span class="module-num">04</span></h3><p>何のために何をやるのか、チームと認識をそろえる力を身につけます。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=design" style="--accent:#3E7FC4;"><div class="module-badge" style="background:#3E7FC4;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l3-1 10-10-2-2L5 17l-1 3z"/><path d="M14 6l2 2"/></svg></div><div><h3>詳細設計 <span class="module-num">05</span></h3><p>施策の詳細を設計し、関係者に正しく伝える力を実践課題で磨きます。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=release" style="--accent:#4FA0B8;"><div class="module-badge" style="background:#4FA0B8;"><svg viewBox="0 0 24 24" fill="#fff"><path d="M13 2c3 3 4 6 3 10l-3 3-3-3c-1-4 0-7 3-10z"/><circle cx="13" cy="9" r="1.6" fill="#4FA0B8"/><path d="M8 15l-3 5 5-3z"/></svg></div><div><h3>リリース <span class="module-num">06</span></h3><p>エンジニアやPRチームと協力し、問題なく世に出す力を養成します。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=communication" style="--accent:#6C4AB6;"><div class="module-badge" style="background:#6C4AB6;"><svg viewBox="0 0 24 24" fill="#fff"><path d="M4 4h13v9H8l-4 4V4z"/></svg></div><div><h3>コミュニケーション <span class="module-num">07</span></h3><p>ステークホルダーと適切な関係を築く対人力を、ロールプレイ形式で鍛えます。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=consulting" style="--accent:#2E8F6C;"><div class="module-badge" style="background:#2E8F6C;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8 12l3 3 5-6"/><circle cx="12" cy="12" r="9"/></svg></div><div><h3>コンサルティング <span class="module-num">08</span></h3><p>プロダクト開発を組織に根づかせる、伴走の力を学びます。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=success" style="--accent:#3E9B7C;"><div class="module-badge" style="background:#3E9B7C;"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 21C7 18 4 14 4 9.5A6.5 6.5 0 0117 9.5C17 14 12 21 12 21z"/></svg></div><div><h3>カスタマーサクセス <span class="module-num">09</span></h3><p>導入後の顧客に価値を実感し続けてもらう力を、実例をもとに習得します。</p><span class="module-link">詳しく見る →</span></div></a>
+      <a class="module-card" href="./module.html?m=global" style="--accent:#FF8A3D;"><div class="module-badge" style="background:#FF8A3D;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg></div><div><h3>グローバル <span class="module-num">10</span></h3><p>語学力を武器に、海外展開を推進する力を実践的なケースで鍛えます。</p><span class="module-link">詳しく見る →</span></div></a>
     </div>
   </div>
 </section>
