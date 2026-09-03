@@ -1732,6 +1732,13 @@ function renderAccount(){
 }
 
 /* ---------------- 「PdM登竜門」応募フォーム ---------------- */
+const JOB_CHANGE_INTENTS = [
+  "今すぐ転職したい",
+  "良い求人があれば検討したい",
+  "情報収集段階",
+  "転職は考えていない",
+];
+
 async function submitApplication(fields){
   if(!supabaseClient) return { ok:false, message:"現在フォームを受け付けられません。時間をおいて再度お試しください。" };
   try{
@@ -1742,6 +1749,9 @@ async function submitApplication(fields){
       email: fields.email,
       phone: fields.phone || null,
       message: fields.message || null,
+      company_name: fields.companyName || null,
+      current_role: fields.currentRole || null,
+      job_change_intent: fields.jobChangeIntent || null,
       referred_pdm_type: ctx.pdmType || null,
       referred_seniority: ctx.seniority || null,
       referred_hensachi: ctx.hensachi ?? null,
@@ -1777,6 +1787,18 @@ function renderApply(){
       <label class="profile-label" for="applyPhone" style="margin-top:18px;">電話番号（任意）</label>
       <input type="tel" id="applyPhone" class="profile-input" placeholder="090-xxxx-xxxx">
 
+      <label class="profile-label" for="applyCompany" style="margin-top:18px;">現在の会社名（任意）</label>
+      <input type="text" id="applyCompany" class="profile-input" placeholder="例：株式会社〇〇">
+
+      <label class="profile-label" for="applyRole" style="margin-top:18px;">現在の役職・職種（任意）</label>
+      <input type="text" id="applyRole" class="profile-input" placeholder="例：プロダクトマネージャー">
+
+      <label class="profile-label" for="applyIntent" style="margin-top:18px;">転職意欲<span style="color:var(--bad);">*</span></label>
+      <select id="applyIntent" class="profile-input" required>
+        <option value="">選択してください</option>
+        ${JOB_CHANGE_INTENTS.map(opt=>`<option value="${opt}">${opt}</option>`).join("")}
+      </select>
+
       <label class="profile-label" for="applyMessage" style="margin-top:18px;">ご相談内容・興味のある分野（任意）</label>
       <textarea id="applyMessage" class="profile-input profile-textarea" rows="4" placeholder="例：BizDev領域を体系的に学びたい、転職も視野に相談したい　など"></textarea>
 
@@ -1798,6 +1820,9 @@ function renderApply(){
     const name = document.getElementById("applyName").value.trim();
     const email = document.getElementById("applyEmail").value.trim();
     const phone = document.getElementById("applyPhone").value.trim();
+    const companyName = document.getElementById("applyCompany").value.trim();
+    const currentRole = document.getElementById("applyRole").value.trim();
+    const jobChangeIntent = document.getElementById("applyIntent").value;
     const message = document.getElementById("applyMessage").value.trim();
     const msgEl = document.getElementById("applyMsg");
 
@@ -1810,13 +1835,17 @@ function renderApply(){
       msgEl.textContent = "メールアドレスの形式が正しくありません。";
       return;
     }
+    if(!jobChangeIntent){
+      msgEl.textContent = "転職意欲を選択してください。";
+      return;
+    }
 
     const btn = document.getElementById("applySubmitBtn");
     btn.disabled = true;
     msgEl.style.color = "var(--ink-soft)";
     msgEl.textContent = "送信中…";
 
-    const result = await submitApplication({ name, email, phone, message });
+    const result = await submitApplication({ name, email, phone, companyName, currentRole, jobChangeIntent, message });
     if(result.ok){
       renderApplyThanks();
     }else{

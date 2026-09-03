@@ -80,11 +80,19 @@ create table if not exists public.applications (
   name text not null,
   email text not null,
   phone text,
+  company_name text,          -- 現在の会社名（簡単なプロフィール）
+  current_role text,          -- 現在の役職・職種（簡単なプロフィール）
+  job_change_intent text,     -- 転職意欲
   message text,
   referred_pdm_type text,
   referred_seniority text,
   referred_hensachi int
 );
+
+-- 既存プロジェクト用：すでにテーブルがある場合でも安全に追加カラムを反映する
+alter table public.applications add column if not exists company_name text;
+alter table public.applications add column if not exists current_role text;
+alter table public.applications add column if not exists job_change_intent text;
 
 alter table public.applications enable row level security;
 
