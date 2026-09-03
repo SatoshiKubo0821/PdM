@@ -214,25 +214,28 @@
   .logo-section{padding:64px 0;}
   .logo-marquee-mask{
     position:relative; overflow:hidden;
-    -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-    mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
   .logo-track{
-    display:flex; align-items:center; gap:56px; width:max-content;
+    display:flex; align-items:center; gap:64px; width:max-content;
     animation:logoScroll 46s linear infinite;
   }
   .logo-track img{
-    height:34px; width:auto; object-fit:contain;
-    opacity:.65; filter:grayscale(100%);
-    transition:opacity .2s ease, filter .2s ease;
+    height:64px; width:auto; object-fit:contain;
+    opacity:1; transition:transform .2s ease;
   }
-  .logo-track img:hover{opacity:1; filter:grayscale(0%);}
+  .logo-track img:hover{transform:scale(1.08);}
   @keyframes logoScroll{
     from{transform:translateX(0);}
     to{transform:translateX(-50%);}
   }
   @media (prefers-reduced-motion: reduce){
     .logo-track{animation:none;}
+  }
+  @media (max-width:600px){
+    .logo-track img{height:46px;}
+    .logo-track{gap:40px;}
   }
 
   /* skill modules */
