@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PdMスキルレーダー｜49項目セルフ診断</title>
+<title>PdMスキルクエスト｜ドット絵で見る49の力</title>
 <meta name="description" content="10カテゴリ・49項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
 
 <!-- favicon: レーダーチャートをモチーフにしたオリジナルの図形（外部ファイル不要のインラインSVG） -->
@@ -12,61 +12,139 @@
 <!-- OGP（SNS・チャットでシェアされた際の見え方）。og:image は独自ドメインでの公開後、画像を用意してURLを差し替えてください -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:title" content="PdMスキルレーダー｜49項目セルフ診断">
+<meta property="og:title" content="PdMスキルクエスト｜ドット絵で見る49の力">
 <meta property="og:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
-<meta property="og:site_name" content="PdMスキルレーダー">
+<meta property="og:site_name" content="PdMスキルクエスト">
 <!-- <meta property="og:image" content="https://あなたのドメイン/ogp.png"> -->
 <!-- <meta property="og:url" content="https://あなたのドメイン/"> -->
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PdMスキルレーダー｜49項目セルフ診断">
+<meta name="twitter:title" content="PdMスキルクエスト｜ドット絵で見る49の力">
 <meta name="twitter:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #F7F7F8;
+    --bg: #0B0E27;
     --paper: #FFFFFF;
     --ink: #16171A;
-    --ink-soft: #5B5D66;
-    --line: #E4E4E7;
+    --ink-soft: #4B4E5C;
+    --line: #16171A;
 
-    /* key color: black（バクラク風のUI言語はそのまま、キーカラーをブラックに） */
-    --navy-950: #08090B;
-    --navy-900: #16171A;
-    --navy-800: #232429;
-    --blue-500: #1C1D21;
-    --blue-300: #45474E;
-    --blue-100: #EDEDEF;
+    /* DQ風：紺のメッセージウィンドウ + 金/白の縁取り */
+    --navy-950: #05061A;
+    --navy-900: #0000AA;
+    --navy-800: #1414C4;
+    --blue-500: #0000AA;
+    --blue-300: #4646D6;
+    --blue-100: #E8E8FF;
 
-    --gold: #FF8A3D;
-    --gold-soft: #FFEDDD;
-    --good: #2E8F6C;
-    --bad: #E14B4B;
-    --radius: 12px;
+    --gold: #F8C630;
+    --gold-soft: #FFF3D0;
+    --good: #38C172;
+    --bad: #E6432E;
+    --radius: 0px;
 
-    --grad-main: linear-gradient(135deg, var(--navy-950) 0%, var(--blue-500) 55%, var(--blue-300) 100%);
-    --grad-soft: linear-gradient(135deg, rgba(22,23,26,.08) 0%, rgba(69,71,78,.03) 100%);
+    --grad-main: linear-gradient(180deg, var(--navy-800) 0%, var(--navy-900) 100%);
+    --grad-soft: linear-gradient(135deg, rgba(0,0,170,.06) 0%, rgba(70,70,214,.03) 100%);
+    --pixel-font: "DotGothic16", "Noto Sans JP", sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:var(--bg);
+    background:
+      radial-gradient(1.5px 1.5px at 20px 30px, #ffffff55, transparent),
+      radial-gradient(1.5px 1.5px at 80px 90px, #ffffff44, transparent),
+      radial-gradient(1.5px 1.5px at 140px 50px, #ffffff33, transparent),
+      radial-gradient(1.5px 1.5px at 200px 120px, #ffffff44, transparent),
+      radial-gradient(1.5px 1.5px at 260px 20px, #ffffff33, transparent),
+      var(--bg);
+    background-size:300px 300px;
     color:var(--ink);
-    font-family:"Noto Sans JP", sans-serif;
-    line-height:1.7;
-    -webkit-font-smoothing:antialiased;
+    font-family:var(--pixel-font);
+    line-height:1.8;
+    -webkit-font-smoothing:none;
+    image-rendering:pixelated;
   }
   .wrap{
     max-width:780px;
     margin:0 auto;
     padding:56px 24px 96px;
   }
+  /* DQ風メッセージウィンドウ：紺地に白の二重ピクセル枠 */
+  .dq-window{
+    background:var(--grad-main);
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px var(--navy-950), 6px 6px 0 rgba(0,0,0,.35);
+    color:#fff;
+    padding:20px 22px;
+    position:relative;
+  }
+  .dq-window::before{
+    content:"";
+    position:absolute; inset:5px;
+    border:1px solid rgba(255,255,255,.35);
+    pointer-events:none;
+  }
+  /* 明るい内容用：羊皮紙風のピクセル枠（読みやすさ優先の場面で使用） */
+  .dq-scroll{
+    background:#FFFBEF;
+    border:3px solid var(--navy-950);
+    box-shadow:4px 4px 0 rgba(0,0,0,.25);
+    color:var(--ink);
+    padding:18px 20px;
+  }
+  .pixel-bar-track{
+    background:#1a1a1a;
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px #000;
+    height:16px;
+    padding:2px;
+  }
+  .pixel-bar-fill{
+    height:100%;
+    background:repeating-linear-gradient(90deg, #38C172 0, #38C172 3px, #2FA862 3px, #2FA862 6px);
+  }
+  .pixel-bar-fill.mp{background:repeating-linear-gradient(90deg, #4696F0 0, #4696F0 3px, #2E7CD6 3px, #2E7CD6 6px);}
+
+  /* ---------- DQ status window components ---------- */
+  .dq-status-top{display:flex; align-items:center; gap:16px; margin-bottom:16px;}
+  .dq-job-icon{
+    width:56px; height:56px; background:rgba(255,255,255,.12); border:2px solid #fff; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dq-job-icon svg{width:36px; height:36px;}
+  .dq-name{font-family:var(--pixel-font); font-size:16px; font-weight:700;}
+  .dq-job{font-family:var(--pixel-font); font-size:12px; margin-top:4px; color:var(--gold-soft);}
+  .dq-lv{font-family:var(--pixel-font); font-size:14px; margin-top:4px; color:var(--gold);}
+  .dq-bar-row{display:flex; align-items:center; gap:10px; margin-top:8px;}
+  .dq-bar-label{font-family:var(--pixel-font); font-size:12px; width:28px; flex-shrink:0;}
+  .dq-bar-num{font-family:var(--pixel-font); font-size:11px; width:64px; text-align:right; flex-shrink:0;}
+  .dq-persona{font-family:var(--pixel-font); font-size:12.5px; margin-top:14px; padding-top:12px; border-top:1px dashed rgba(255,255,255,.35);}
+  .dq-persona-desc{font-size:11px; color:rgba(255,255,255,.75); line-height:1.8;}
+
+  .dq-stat-row{display:flex; align-items:center; gap:10px; padding:6px 0;}
+  .dq-stat-name{font-family:var(--pixel-font); font-size:12px; width:150px; flex-shrink:0;}
+  .dq-stat-name small{font-size:9px; color:rgba(255,255,255,.6); display:block; margin-top:2px;}
+  .dq-stat-num{font-family:var(--pixel-font); font-size:13px; width:32px; text-align:right; flex-shrink:0; color:var(--gold);}
+
+  .dq-tech-row{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed rgba(255,255,255,.2);}
+  .dq-tech-row:last-child{border-bottom:none;}
+  .dq-tech-kind{
+    font-family:var(--pixel-font); font-size:10px; background:var(--gold); color:#000; padding:2px 8px; flex-shrink:0; min-width:52px; text-align:center;
+  }
+  .dq-tech-kind.spell{background:#4696F0; color:#fff;}
+  .dq-tech-name{font-family:var(--pixel-font); font-size:12.5px; flex:1;}
+  .dq-tech-cost{font-family:var(--pixel-font); font-size:11px; color:var(--gold-soft); flex-shrink:0;}
+  @media (max-width:480px){
+    .dq-stat-name{width:110px; font-size:11px;}
+  }
   /* ---------- Site header ---------- */
   .site-header{
-    background:var(--blue-500);
-    border-bottom:none;
+    background:var(--navy-900);
+    border-bottom:3px solid #fff;
+    box-shadow:0 3px 0 var(--navy-950);
     position:sticky; top:0; z-index:50;
   }
   .site-header-inner{
@@ -75,30 +153,30 @@
   }
   .site-logo{
     display:flex; align-items:center; gap:8px; text-decoration:none;
-    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:15px; color:#fff;
+    font-family:var(--pixel-font); font-weight:700; font-size:15px; color:#fff;
   }
-  .site-logo-dot{width:9px; height:9px; border-radius:50%; background:var(--gold);}
+  .site-logo-dot{width:9px; height:9px; background:var(--gold);}
   .site-nav{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
   .site-nav a{
-    color:rgba(255,255,255,.8); font-size:13px; font-weight:600; text-decoration:none;
-    display:inline-flex; align-items:center; gap:6px;
+    color:rgba(255,255,255,.85); font-size:13px; font-weight:600; text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--pixel-font);
   }
   .site-nav a:hover{color:var(--gold);}
   .ext-badge{
-    font-size:10px; background:rgba(255,255,255,.15); color:#fff; padding:1px 6px; border-radius:8px; font-weight:700;
+    font-size:10px; background:rgba(255,255,255,.15); color:#fff; padding:1px 6px; font-weight:700;
   }
   .auth-pill{
-    display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.15); border-radius:20px; padding:5px 6px 5px 12px;
-    font-size:12.5px; color:#fff; font-weight:600;
+    display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.15); padding:5px 6px 5px 12px;
+    font-size:12.5px; color:#fff; font-weight:600; font-family:var(--pixel-font);
   }
   .auth-pill button{
     border:none; background:var(--paper); color:var(--ink-soft); font-size:11.5px; font-weight:700;
-    padding:5px 10px; border-radius:16px; cursor:pointer; border:1px solid var(--line);
+    padding:5px 10px; cursor:pointer; border:2px solid var(--navy-950); font-family:var(--pixel-font);
   }
   .google-btn{
-    display:inline-flex; align-items:center; gap:8px; background:#fff; border:1.5px solid var(--line);
-    padding:7px 14px 7px 8px; border-radius:20px; font-size:12.5px; font-weight:700; color:var(--ink);
-    cursor:pointer; font-family:"Noto Sans JP",sans-serif;
+    display:inline-flex; align-items:center; gap:8px; background:#fff; border:2px solid var(--navy-950);
+    padding:7px 14px 7px 8px; font-size:12.5px; font-weight:700; color:var(--ink);
+    cursor:pointer; font-family:var(--pixel-font);
   }
   .google-btn:hover{border-color:var(--gold);}
   .google-btn svg{width:16px; height:16px;}
@@ -107,13 +185,13 @@
     .site-nav{width:100%; justify-content:space-between;}
   }
   h1,h2,h3{
-    font-family:"Zen Kaku Gothic New", sans-serif;
+    font-family:var(--pixel-font);
     margin:0;
-    color:var(--navy-900);
+    color:#fff;
   }
   .eyebrow{
     font-size:13px;
-    color:var(--ink-soft);
+    color:#B8BEFF;
     letter-spacing:.02em;
     margin-bottom:10px;
   }
@@ -129,7 +207,7 @@
   .hero-lead{
     margin-top:18px;
     font-size:16px;
-    color:var(--ink-soft);
+    color:#C9CDF5;
     max-width:58ch;
   }
   .hero-visual{
@@ -188,37 +266,35 @@
     flex-wrap:wrap;
   }
   button.primary, a.primary{
-    background:var(--grad-main);
+    background:var(--navy-900);
     color:#fff;
-    border:none;
-    font-family:"Zen Kaku Gothic New",sans-serif;
-    font-weight:800;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px var(--navy-950), 4px 4px 0 rgba(0,0,0,.3);
+    font-family:var(--pixel-font);
+    font-weight:700;
     font-size:15px;
-    padding:15px 30px;
-    border-radius:100px;
+    padding:14px 28px;
     cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 10px 24px -8px rgba(22,23,26,.4);
+    transition:transform .1s ease;
     display:inline-block;
     text-decoration:none;
     box-sizing:border-box;
   }
-  button.primary:hover, a.primary:hover{transform:translateY(-2px); box-shadow:0 14px 28px -8px rgba(22,23,26,.5);}
-  button.primary:active, a.primary:active{transform:translateY(0) scale(.98);}
+  button.primary:hover, a.primary:hover{background:var(--navy-800);}
+  button.primary:active, a.primary:active{transform:translate(2px,2px); box-shadow:0 0 0 3px var(--navy-950), 2px 2px 0 rgba(0,0,0,.3);}
   button.ghost{
     background:#fff;
-    border:1.5px solid var(--line);
+    border:2px solid var(--navy-950);
     color:var(--ink);
-    font-family:"Noto Sans JP",sans-serif;
+    font-family:var(--pixel-font);
     font-weight:600;
     font-size:14px;
-    padding:13px 24px;
-    border-radius:100px;
+    padding:12px 22px;
     cursor:pointer;
-    transition:border-color .15s ease, color .15s ease;
+    transition:background .1s ease;
   }
-  button.ghost:hover{border-color:var(--gold); color:var(--gold);}
-  .resume-note{font-size:13px;color:var(--ink-soft);}
+  button.ghost:hover{background:var(--gold-soft); border-color:var(--gold);}
+  .resume-note{font-size:13px;color:#B8BEFF; font-family:var(--pixel-font);}
 
   /* ---------- Assessment (1ページ10問のカードリスト。同意尺度は16personalities風の円サイズ表現) ---------- */
   .thin-progress{
@@ -400,7 +476,7 @@
   .profile-label{
     font-size:13px;
     font-weight:600;
-    color:var(--ink);
+    color:#C9CDF5;
     margin-bottom:8px;
   }
   .profile-input{
@@ -633,11 +709,11 @@
   .career-step .bar{
     width:100%;
     max-width:120px;
-    border-radius:8px 8px 0 0;
-    background:var(--grad-main);
-    opacity:.55;
+    background:linear-gradient(180deg, #F8C630 0%, #C98A1A 100%);
+    border:2px solid var(--navy-950);
+    opacity:.7;
   }
-  .career-step.current .bar{opacity:1; box-shadow:0 -4px 0 0 var(--gold) inset;}
+  .career-step.current .bar{opacity:1; box-shadow:0 -4px 0 0 #fff inset;}
   .career-step .now-badge{
     position:absolute;
     top:-24px;
@@ -648,14 +724,14 @@
     padding:2px 10px;
     border-radius:10px;
   }
-  .career-step .label{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700; font-size:14px; text-align:center;}
-  .career-step .years{font-size:11px; color:var(--ink-soft);}
-  .career-step .salary{font-size:12.5px; color:var(--navy-900); font-weight:700;}
+  .career-step .label{font-family:var(--pixel-font); font-weight:700; font-size:14px; text-align:center; color:#fff;}
+  .career-step .years{font-size:11px; color:#B8BEFF;}
+  .career-step .salary{font-size:12.5px; color:var(--gold); font-weight:700;}
 
   .career-branch-label{
     text-align:center;
     font-size:12.5px;
-    color:var(--ink-soft);
+    color:#B8BEFF;
     margin-top:28px;
     position:relative;
   }
@@ -737,7 +813,7 @@
     letter-spacing:.02em;
     color:var(--gold);
     font-weight:700;
-    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-family:var(--pixel-font);
     display:flex;
     align-items:center;
     gap:8px;
@@ -750,22 +826,22 @@
   }
   .insight{
     background:var(--paper);
-    border:1px solid var(--line);
-    border-left:3px solid var(--blue-500);
+    border:2px solid var(--navy-950);
+    border-left:6px solid var(--blue-500);
+    box-shadow:3px 3px 0 rgba(0,0,0,.15);
     padding:16px 18px;
     margin-top:14px;
-    border-radius:0 var(--radius) var(--radius) 0;
   }
   .insight.weak{border-left-color:var(--bad);}
   .insight.strong{border-left-color:var(--good);}
-  .insight.fusion{border-left-color:var(--gold); background:var(--grad-soft);}
+  .insight.fusion{border-left-color:var(--gold); background:var(--gold-soft);}
   .insight.neutral{border-left-color:var(--line);}
   .history-row{transition:border-color .12s ease, transform .12s ease;}
   .history-row:hover{border-color:var(--blue-300); transform:translateX(2px);}
   .insight h4{
     margin:0 0 6px;
     font-size:15px;
-    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-family:var(--pixel-font);
     color:var(--ink);
     display:flex;
     justify-content:space-between;
@@ -843,8 +919,8 @@
   footer.note{
     margin-top:56px;
     font-size:12.5px;
-    color:var(--ink-soft);
-    border-top:1px solid var(--line);
+    color:#8A8EC4;
+    border-top:1px solid rgba(255,255,255,.2);
     padding-top:18px;
   }
   footer.note a{color:var(--gold);}
@@ -862,7 +938,7 @@
 <body>
 <header class="site-header" id="siteHeader">
   <div class="site-header-inner">
-    <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMスキルレーダー</a>
+    <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMスキルクエスト</a>
     <nav class="site-nav">
       <a href="./toryumon.html">PdM登竜門</a>
       <a href="#" id="navOrgLink">組織タイプ診断</a>
@@ -1026,6 +1102,68 @@ const CLUSTER_OF = {
   "アップセル・クロスセル戦略":"bizdev",
 };
 
+/* ---------------- PdMスキルクエスト：ドラクエ風RPGデータ ----------------
+   PdMタイプ→職業、カテゴリ→ステータス名、MBTI→せいかく、というオリジナルの対応表。
+   特定のゲームタイトルの固有名詞・具体的な数値バランスを模したものではなく、
+   ドット絵RPGで一般的に見られる「職業・ステータス・せいかく」という表現手法を
+   ゼロから設計したもの。 */
+const JOB_CLASS = {
+  tech:    { name:"まほうつかい", en:"MAGE", desc:"知略と技術で局面を切り拓く、知力特化の職業。", icon:"mage" },
+  bizdev:  { name:"せんし",       en:"WARRIOR", desc:"事業という名の戦場を、力づくで前進させる職業。", icon:"warrior" },
+  pmm:     { name:"しょうにん",   en:"MERCHANT", desc:"市場を読み、価値を届けることに長けた職業。", icon:"merchant" },
+  general: { name:"ゆうしゃ",     en:"HERO", desc:"どんな戦場でも戦える、バランス型の主人公職。", icon:"hero" },
+};
+
+/* カテゴリ→ドラクエ風ステータス名（元のカテゴリ名も併記して表示する） */
+const STAT_FLAVOR = {
+  strategy:      "せんりゃくりょく",
+  research:      "かんさつりょく",
+  direction:     "とうそつりょく",
+  requirement:   "げんみつせい",
+  design:        "こうちくりょく",
+  release:       "じっこうりょく",
+  communication: "わじゅつ",
+  consulting:    "せっとくりょく",
+  success:       "きずなのちから",
+  global:        "せかいりょく",
+};
+
+/* MBTI→せいかく（オリジナルの16パターン。既存ゲームの固有の性格名・成長システムを模したものではない） */
+const MBTI_DQ_PERSONA = {
+  INTJ:{ title:"ちりゃくか", desc:"ひとりで黙々と計画を練り、静かに勝算を積み上げるタイプ。" },
+  INTP:{ title:"けんきゅうずき", desc:"知的好奇心のままに、仕組みの奥まで探求するタイプ。" },
+  ENTJ:{ title:"ぐんしのような", desc:"皆を率いて、迷いなく前へ突き進むタイプ。" },
+  ENTP:{ title:"きしゃくじゆう", desc:"新しい発想を次々と繰り出す、ひらめき重視タイプ。" },
+  INFJ:{ title:"しずかなりそうか", desc:"深い信念を胸に、静かに周囲を導くタイプ。" },
+  INFP:{ title:"ゆめみるひと", desc:"自分の価値観を大切に、理想を追い求めるタイプ。" },
+  ENFJ:{ title:"めんどうみがいい", desc:"仲間の成長を我がことのように喜ぶ、世話焼きタイプ。" },
+  ENFP:{ title:"おまつりずき", desc:"周りを巻き込み、場を盛り上げるムードメーカータイプ。" },
+  ISTJ:{ title:"きちょうめん", desc:"決めたことをコツコツ積み上げる、堅実なタイプ。" },
+  ISFJ:{ title:"かげのごえいへい", desc:"目立たぬところで、皆をそっと支えるタイプ。" },
+  ESTJ:{ title:"げんばのとうりょう", desc:"実務を仕切り、着実に成果へ導くタイプ。" },
+  ESFJ:{ title:"わのちからじまん", desc:"周囲との調和を大切にし、場を丸くおさめるタイプ。" },
+  ISTP:{ title:"しょくにんかたぎ", desc:"手を動かしながら、最適な一手を見極めるタイプ。" },
+  ISFP:{ title:"びのたんきゅうしゃ", desc:"感性を大事に、自分のペースを崩さないタイプ。" },
+  ESTP:{ title:"こうどうりょくばつぐん", desc:"考えるより先に動く、行動派の勝負師タイプ。" },
+  ESFP:{ title:"ムードメーカー", desc:"その場を明るくする、天性のエンターテイナータイプ。" },
+  unknown:{ title:"なぞのぼうけんしゃ", desc:"せいかくはまだ、しんぴのベールに包まれている。" },
+};
+
+/* スキルを「とくぎ（実行系）」か「じゅもん（知略系）」に分類するカテゴリ判定 */
+const SKILL_KIND_BY_CATEGORY = {
+  strategy:"じゅもん", research:"じゅもん", direction:"とくぎ", requirement:"じゅもん",
+  design:"とくぎ", release:"とくぎ", communication:"とくぎ", consulting:"じゅもん",
+  success:"とくぎ", global:"じゅもん",
+};
+
+/* 職業アイコン（オリジナルのドット絵風SVG） */
+const JOB_ICON_SVG = {
+  mage: `<rect x="10" y="2" width="4" height="4" fill="#F8C630"/><path d="M6 10h12l-2 6H8z" fill="#4646D6"/><rect x="4" y="16" width="16" height="6" fill="#2E2E8C"/><rect x="9" y="16" width="6" height="6" fill="#F5D7A8"/><rect x="10" y="18" width="1" height="1" fill="#000"/><rect x="13" y="18" width="1" height="1" fill="#000"/>`,
+  warrior: `<rect x="8" y="2" width="8" height="6" fill="#F5D7A8"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="14" y="4" width="1" height="1" fill="#000"/><rect x="4" y="8" width="16" height="8" fill="#C0392B"/><rect x="2" y="9" width="4" height="10" fill="#8C8C8C"/><rect x="18" y="9" width="4" height="10" fill="#8C8C8C"/><rect x="8" y="16" width="8" height="6" fill="#7A7A7A"/>`,
+  merchant: `<rect x="8" y="2" width="8" height="6" fill="#F5D7A8"/><rect x="6" y="8" width="12" height="4" fill="#38C172"/><rect x="4" y="12" width="16" height="10" fill="#8C5A2B"/><rect x="9" y="15" width="6" height="5" fill="#F8C630"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="14" y="4" width="1" height="1" fill="#000"/>`,
+  hero: `<rect x="8" y="2" width="8" height="6" fill="#F5D7A8"/><rect x="6" y="0" width="12" height="3" fill="#F8C630"/><rect x="4" y="8" width="16" height="8" fill="#4646D6"/><rect x="2" y="9" width="4" height="12" fill="#E6432E"/><rect x="8" y="16" width="8" height="6" fill="#2E2E8C"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="14" y="4" width="1" height="1" fill="#000"/>`,
+};
+
 const PDM_TYPES = {
   tech:    { label:"テックドリブンPdM",  desc:"要件定義・詳細設計・リリースなど、開発チームと並走して形にする力に強みがあります。エンジニアリングへの理解を武器に、実装まで見通した意思決定ができるタイプです。" },
   bizdev:  { label:"BizDevPdM",         desc:"事業戦略・市場調査・優先度判断など、事業成長の道筋を描く力に強みがあります。KPIや市場環境を踏まえ、プロダクトを事業として前に進めるタイプです。" },
@@ -1101,6 +1239,35 @@ const CAREER_BRANCHES = [
   { label:"フリーランスPdM", salary:"800万〜1,500万円（案件により変動大）", desc:"複数社と契約し、稼働量やプロジェクトを自分でコントロールする働き方。" },
   { label:"起業・独立", salary:"変動大（0円〜青天井）", desc:"自らプロダクトを立ち上げ、事業オーナーとしてリスクを取りながら成長を追う道。" },
 ];
+/* ---------------- ドラクエ風ステータス計算 ---------------- */
+function buildRPGStats(){
+  const avg = overallAverage();
+  const strategyAvg = categoryAverage(CATEGORY_BY_KEY.strategy);
+  const researchAvg = categoryAverage(CATEGORY_BY_KEY.research);
+  const directionAvg = categoryAverage(CATEGORY_BY_KEY.direction);
+  const releaseAvg = categoryAverage(CATEGORY_BY_KEY.release);
+  const consultingAvg = categoryAverage(CATEGORY_BY_KEY.consulting);
+
+  const lv = Math.max(1, Math.min(99, Math.round((avg-1)/4*98)+1));
+  const hp = Math.max(10, Math.round(((directionAvg+releaseAvg+consultingAvg)/3) * 40));
+  const maxHp = 200;
+  const mp = Math.max(5, Math.round(((strategyAvg+researchAvg)/2) * 30));
+  const maxMp = 150;
+
+  return { lv, hp, maxHp, mp, maxMp };
+}
+
+/* 得意スキル上位5件を、とくぎ・じゅもんとして表示するためのリストを作る */
+function buildSkillTechniques(){
+  const flat = allSkillsFlat().sort((a,b)=>b.v-a.v).slice(0,5);
+  return flat.map(s=>{
+    const cat = CATEGORIES.find(c=>c.skills.some(sk=>sk[0]===s.name));
+    const kind = cat ? SKILL_KIND_BY_CATEGORY[cat.key] : "とくぎ";
+    const cost = Math.max(1, 6 - s.v); // スコアが高いほど「MP消費が少ない=使い慣れている」という表現
+    return { name:s.name, kind, cost, v:s.v, catName:s.catName };
+  });
+}
+
 function buildCareerPath(seniorityKey){
   return {
     main: CAREER_MAIN.map(s=>({...s, current: s.key===seniorityKey})),
@@ -2691,7 +2858,7 @@ function resultsRadarSVG(){
     const angle = (Math.PI*2*i/n) - Math.PI/2;
     const lx = cx + (r+38)*Math.cos(angle);
     const ly = cy + (r+38)*Math.sin(angle);
-    return `<text x="${lx}" y="${ly}" font-size="11.5" font-family="Noto Sans JP, sans-serif" fill="#16171A" text-anchor="middle" dominant-baseline="middle">${CATEGORIES[i].name}</text>`;
+    return `<text x="${lx}" y="${ly}" font-size="11.5" font-family="DotGothic16, sans-serif" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">${CATEGORIES[i].name}</text>`;
   }).join("");
   const dots = radarPoints(values,cx,cy,r).map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#FF8A3D" stroke="#fff" stroke-width="1.5"/>`).join("");
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
@@ -2768,17 +2935,68 @@ function renderResults(){
   const swot = buildSwot(strengthCats, growthCats, matrix);
   const careerPath = buildCareerPath(seniorityKey);
   const toeicNote = toeicComment(state.profile.toeic);
+  const rpg = buildRPGStats();
+  const jobClass = JOB_CLASS[typeResult.key];
+  const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
+  const techniques = buildSkillTechniques();
 
   saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi });
 
   app.innerHTML = `
     <div class="eyebrow">診断結果</div>
-    <h1 class="hero-title" style="font-size:30px;">${state.profile.nickname ? `${state.profile.nickname}さんの` : "あなたの"}PdMスキルレーダー</h1>
-    ${state.profile.experienceYears!=null ? `<p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">PdM経験年数：${state.profile.experienceYears}年</p>` : ""}
+    <h1 class="hero-title" style="font-size:30px;">${state.profile.nickname ? `${state.profile.nickname}さんの` : "あなたの"}PdMスキルクエスト</h1>
+    ${state.profile.experienceYears!=null ? `<p style="font-size:13px; color:#B8BEFF; margin-top:4px;">PdM経験年数：${state.profile.experienceYears}年</p>` : ""}
     ${state.viewingHistory ? `
     <div class="insight fusion" style="margin-top:14px;">
       <p>📅 ${new Date(state.viewingHistory).toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"})} 時点の診断結果を表示しています。<a href="#" id="backToHistoryLink" style="color:var(--gold); font-weight:600;">履歴一覧に戻る</a></p>
     </div>` : ""}
+
+    <div class="dq-window" style="margin-top:20px;">
+      <div class="dq-status-top">
+        <div class="dq-job-icon"><svg viewBox="0 0 24 24">${JOB_ICON_SVG[jobClass.icon]}</svg></div>
+        <div>
+          <div class="dq-name">${state.profile.nickname || "ぼうけんしゃ"}</div>
+          <div class="dq-job">しょくぎょう：${jobClass.name}（${jobClass.en}）</div>
+          <div class="dq-lv">Lv ${rpg.lv}</div>
+        </div>
+      </div>
+      <div class="dq-bar-row">
+        <span class="dq-bar-label">HP</span>
+        <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:${Math.min(100, rpg.hp/rpg.maxHp*100)}%;"></div></div>
+        <span class="dq-bar-num">${rpg.hp}/${rpg.maxHp}</span>
+      </div>
+      <div class="dq-bar-row">
+        <span class="dq-bar-label">MP</span>
+        <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill mp" style="width:${Math.min(100, rpg.mp/rpg.maxMp*100)}%;"></div></div>
+        <span class="dq-bar-num">${rpg.mp}/${rpg.maxMp}</span>
+      </div>
+      <div class="dq-persona">せいかく：${persona.title}<br><span class="dq-persona-desc">${persona.desc}</span></div>
+    </div>
+
+    <div class="section-label" style="margin-top:28px;">のうりょくパラメーター</div>
+    <div class="dq-window" style="margin-top:10px;">
+      ${CATEGORIES.map(c=>{
+        const v = categoryAverage(c);
+        const pct = Math.round((v-1)/4*100);
+        const num = Math.round((v-1)/4*99)+1;
+        return `
+        <div class="dq-stat-row">
+          <span class="dq-stat-name">${STAT_FLAVOR[c.key]}<small>（${c.name}）</small></span>
+          <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:${pct}%;"></div></div>
+          <span class="dq-stat-num">${num}</span>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="section-label" style="margin-top:28px;">おぼえている とくぎ・じゅもん</div>
+    <div class="dq-window" style="margin-top:10px;">
+      ${techniques.map(t=>`
+        <div class="dq-tech-row">
+          <span class="dq-tech-kind ${t.kind==='じゅもん'?'spell':''}">${t.kind}</span>
+          <span class="dq-tech-name">${t.name}</span>
+          <span class="dq-tech-cost">MP${t.cost}</span>
+        </div>`).join("")}
+    </div>
 
     <div class="score-hero">
       <div>
