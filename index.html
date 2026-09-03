@@ -153,7 +153,7 @@
   button.ghost:hover{border-color:var(--blue-500); color:var(--blue-500);}
   .resume-note{font-size:13px;color:var(--ink-soft);}
 
-  /* ---------- Assessment (16personalities風：1問ずつ表示) ---------- */
+  /* ---------- Assessment (1ページ10問のカードリスト。同意尺度は16personalities風の円サイズ表現) ---------- */
   .thin-progress{
     height:6px;
     background:var(--line);
@@ -172,38 +172,46 @@
     font-size:12px;
     color:var(--ink-soft);
     text-align:center;
-    margin-bottom:56px;
+    margin-bottom:32px;
     font-weight:600;
   }
-  .single-q-wrap{
-    max-width:640px;
-    margin:0 auto;
-    text-align:center;
-    min-height:40vh;
+  .q-card-list{
     display:flex;
     flex-direction:column;
-    justify-content:center;
+    gap:16px;
   }
-  .q-statement{
-    font-size:23px;
+  .q-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px 24px 22px;
+    text-align:center;
+  }
+  .q-card:has(.scale-circle.on){border-color:var(--blue-300);}
+  .q-card-statement{
+    font-size:17px;
     font-weight:700;
-    line-height:1.7;
+    line-height:1.6;
     font-family:"Zen Kaku Gothic New",sans-serif;
     color:var(--ink);
-    margin-bottom:56px;
+    margin-bottom:26px;
+    max-width:560px;
+    margin-left:auto;
+    margin-right:auto;
   }
   .scale-row{
     display:flex;
     align-items:flex-end;
     justify-content:center;
-    gap:20px;
+    gap:14px;
   }
   .scale-circle-wrap{
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:12px;
+    gap:10px;
     cursor:pointer;
+    width:82px;
   }
   .scale-circle{
     border-radius:50%;
@@ -217,17 +225,23 @@
     border-color:transparent;
     box-shadow:0 8px 18px -6px rgba(41,82,227,.55);
   }
+  /* ラベルの有無に関わらず全列に同じ高さの枠を確保することで、円の下端をきれいに揃える */
   .scale-label{
-    font-size:12px;
+    font-size:11.5px;
     color:var(--ink-soft);
-    max-width:88px;
-    line-height:1.5;
+    max-width:82px;
+    line-height:1.4;
+    min-height:32px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
   }
   .q-nav{
     display:flex;
     justify-content:center;
-    margin-top:64px;
+    margin-top:40px;
   }
+  .q-nav-split{justify-content:space-between;}
 
   /* ---------- MBTI screen ---------- */
   .mbti-card-groups{
@@ -336,9 +350,15 @@
 
   @media (max-width:600px){
     .mbti-card-grid{grid-template-columns:repeat(2,1fr);}
-    .scale-row{gap:10px;}
-    .scale-label{font-size:10.5px; max-width:60px;}
-    .q-statement{font-size:19px;}
+    .scale-row{gap:8px;}
+    .scale-circle-wrap{width:58px;}
+    .scale-label{font-size:10px; max-width:58px; min-height:28px;}
+    .q-card-statement{font-size:15.5px;}
+    .q-card{padding:22px 16px 18px;}
+  }
+  @media (max-width:380px){
+    .scale-row{gap:2px;}
+    .scale-circle-wrap{transform:scale(.85); width:50px;}
   }
 
   /* ---------- Results ---------- */
@@ -1412,7 +1432,7 @@ const TOTAL_SKILLS = CATEGORIES.reduce((n,c)=>n+c.skills.length,0);
 /* ---------------- State ---------------- */
 let state = {
   screen: "intro",   // intro | assess | mbti | profile | results | history | account
-  qIndex: 0,          // 現在の設問番号（1問ずつ表示、カテゴリ横断でシャッフル済み）
+  pageIndex: 0,       // 現在の設問ページ番号（1ページ10問、カテゴリ横断でシャッフル済み）
   answers: {},        // "catKey:skillName" -> 1..5
   mbti: null,         // "INTJ" 等、または null（未選択／わからない）
   profile: { toeic: null, certifications: "", nickname: "", experienceYears: null },
@@ -1895,7 +1915,7 @@ async function renderIntro(){
     captureIntroProfile();
     await saveProgress();
     state.screen="assess";
-    state.qIndex = firstUnfinishedQuestion();
+    state.pageIndex = firstUnfinishedPage();
     render();
   };
   const restartBtn = document.getElementById("restartBtn");
@@ -1910,7 +1930,7 @@ async function renderIntro(){
       state.savedThisResult = false;
       await saveProgress();
       state.screen="assess";
-      state.qIndex = 0;
+      state.pageIndex = 0;
       render();
     };
   }
@@ -1920,71 +1940,106 @@ async function renderIntro(){
   }
 }
 
-function firstUnfinishedQuestion(){
+const PAGE_SIZE = 10;
+function totalPageCount(){
+  return Math.ceil(ALL_SKILLS_FLAT_META.length / PAGE_SIZE);
+}
+function pageIndices(pageIdx){
   const order = shuffledMasterOrder();
-  for(let i=0;i<order.length;i++){
-    const item = ALL_SKILLS_FLAT_META[order[i]];
-    if(state.answers[item.catKey+":"+item.name] == null) return i;
+  return order.slice(pageIdx*PAGE_SIZE, pageIdx*PAGE_SIZE + PAGE_SIZE);
+}
+function firstUnfinishedPage(){
+  const total = totalPageCount();
+  for(let p=0;p<total;p++){
+    const done = pageIndices(p).every(idx=>{
+      const item = ALL_SKILLS_FLAT_META[idx];
+      return state.answers[item.catKey+":"+item.name] != null;
+    });
+    if(!done) return p;
   }
   return 0;
 }
 
-/* 16personalitiesのように、1問ずつ大きく表示して回答すると自動で次へ進むUI。
-   配色はバクラクのブルー×オレンジ基調を踏襲。 */
+const SCALE_SIZE_MAP = {1:52, 2:42, 3:34, 4:42, 5:52};
+/* 5段階の同意尺度を、円の大きさで強度を表現するUI（16personalities風）。
+   ラベルの有無に関わらず全ての列に同じ高さのラベル枠を確保することで、円の下端がきれいに揃う。 */
+function renderScaleRow(key, currentVal){
+  return `
+    <div class="scale-row">
+      ${LEVELS.map(l=>{
+        const size = SCALE_SIZE_MAP[l.v];
+        const showLabel = (l.v===1 || l.v===3 || l.v===5);
+        return `
+        <div class="scale-circle-wrap" data-v="${l.v}">
+          <div class="scale-circle ${currentVal===l.v?'on':''}" style="width:${size}px; height:${size}px;"></div>
+          <div class="scale-label" style="${showLabel?'':'visibility:hidden;'}">${showLabel ? l.label : '&nbsp;'}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+
+/* 1ページ10問のカードリスト形式。配色はバクラクのブルー×オレンジ基調を踏襲し、
+   各カードの同意尺度は16personalities風の円サイズ表現を採用。 */
 function renderAssess(){
-  const order = shuffledMasterOrder();
-  const total = order.length;
-  const idx = order[state.qIndex];
-  const item = ALL_SKILLS_FLAT_META[idx];
-  const key = item.catKey+":"+item.name;
-  const currentVal = state.answers[key];
-  const isLast = state.qIndex === total-1;
+  const total = totalPageCount();
+  const idxList = pageIndices(state.pageIndex);
+  const isLast = state.pageIndex === total-1;
+  const pageDone = idxList.every(idx=>{
+    const item = ALL_SKILLS_FLAT_META[idx];
+    return state.answers[item.catKey+":"+item.name] != null;
+  });
   const pct = Math.round(100*answeredCount()/TOTAL_SKILLS);
-  const sizeMap = {1:58, 2:46, 3:36, 4:46, 5:58};
+  const startNum = state.pageIndex*PAGE_SIZE + 1;
+  const endNum = state.pageIndex*PAGE_SIZE + idxList.length;
 
   app.innerHTML = `
     <div class="thin-progress"><i style="width:${pct}%;"></i></div>
-    <div class="q-counter">設問 ${state.qIndex+1} / ${total}</div>
+    <div class="q-counter">ページ ${state.pageIndex+1} / ${total}　（設問 ${startNum}〜${endNum} / ${TOTAL_SKILLS}）</div>
 
-    <div class="single-q-wrap">
-      <div class="q-statement">${item.statement}</div>
-      <div class="scale-row">
-        ${LEVELS.map(l=>{
-          const size = sizeMap[l.v];
-          const showLabel = (l.v===1 || l.v===3 || l.v===5);
-          return `
-          <div class="scale-circle-wrap" data-v="${l.v}">
-            <div class="scale-circle ${currentVal===l.v?'on':''}" style="width:${size}px; height:${size}px;"></div>
-            ${showLabel ? `<div class="scale-label">${l.label}</div>` : ""}
-          </div>`;
-        }).join("")}
-      </div>
+    <div class="q-card-list">
+      ${idxList.map((idx)=>{
+        const item = ALL_SKILLS_FLAT_META[idx];
+        const key = item.catKey+":"+item.name;
+        const currentVal = state.answers[key];
+        return `
+        <div class="q-card" data-idx="${idx}">
+          <div class="q-card-statement">${item.statement}</div>
+          ${renderScaleRow(key, currentVal)}
+        </div>`;
+      }).join("")}
     </div>
 
-    <div class="q-nav">
-      ${state.qIndex>0 ? `<button class="ghost" id="qBackBtn">← 前の設問へ</button>` : `<span></span>`}
+    <div class="q-nav q-nav-split">
+      <button class="ghost" id="qBackBtn" ${state.pageIndex===0?"disabled style='opacity:.4;cursor:default;'":""}>← 前のページへ</button>
+      <button class="primary" id="qNextBtn" ${pageDone?"":"disabled style='opacity:.4;cursor:default;'"}>${isLast? "次へ（タイプ診断）" : "次のページへ →"}</button>
     </div>
   `;
 
-  app.querySelectorAll(".scale-circle-wrap").forEach(wrap=>{
-    wrap.onclick = async ()=>{
-      const v = parseInt(wrap.getAttribute("data-v"),10);
-      state.answers[key] = v;
-      await saveProgress();
-      setTimeout(()=>{
-        if(isLast){ state.screen="mbti"; }
-        else { state.qIndex++; }
-        render(); window.scrollTo(0,0);
-      }, 220);
-      // 選択直後に見た目を即時反映（アニメーション待ちの間もフィードバックを出す）
-      app.querySelectorAll(".scale-circle").forEach(c=>c.classList.remove("on"));
-      wrap.querySelector(".scale-circle").classList.add("on");
-    };
+  app.querySelectorAll(".q-card").forEach(card=>{
+    const idx = parseInt(card.getAttribute("data-idx"),10);
+    const item = ALL_SKILLS_FLAT_META[idx];
+    const key = item.catKey+":"+item.name;
+    card.querySelectorAll(".scale-circle-wrap").forEach(wrap=>{
+      wrap.onclick = async ()=>{
+        const v = parseInt(wrap.getAttribute("data-v"),10);
+        state.answers[key] = v;
+        await saveProgress();
+        renderAssess();
+      };
+    });
   });
 
   const backBtn = document.getElementById("qBackBtn");
-  if(backBtn){
-    backBtn.onclick = ()=>{ state.qIndex--; render(); window.scrollTo(0,0); };
+  if(backBtn && state.pageIndex>0){
+    backBtn.onclick = ()=>{ state.pageIndex--; render(); window.scrollTo(0,0); };
+  }
+  const nextBtn = document.getElementById("qNextBtn");
+  if(nextBtn && pageDone){
+    nextBtn.onclick = ()=>{
+      if(isLast){ state.screen="mbti"; }
+      else { state.pageIndex++; }
+      render(); window.scrollTo(0,0);
+    };
   }
 }
 
@@ -2533,7 +2588,7 @@ function renderResults(){
 
   document.getElementById("retryBtn").onclick = ()=>{
     state.screen="assess";
-    state.qIndex=0;
+    state.pageIndex=0;
     render(); window.scrollTo(0,0);
   };
   document.getElementById("mbtiEditBtn").onclick = ()=>{
