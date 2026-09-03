@@ -45,13 +45,21 @@
   .btn.on-dark-outline{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.5);}
 
   /* ---------- Header ---------- */
-  .topbar{padding:20px 0; display:flex; align-items:center; justify-content:space-between;}
-  .brand{display:flex; align-items:center; gap:8px; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:17px; color:var(--ink);}
+  .site-header-tory{background:var(--blue); position:sticky; top:0; z-index:40;}
+  .topbar{padding:16px 0; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:8px; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:17px; color:#fff;}
   .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--orange);}
-  .topbar nav{display:flex; align-items:center; gap:24px; flex-wrap:wrap;}
-  .topbar nav a{color:var(--ink-soft); font-size:13.5px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;}
-  .topbar nav a:hover{color:var(--blue);}
-  .ext-badge{font-size:10px; background:var(--bg); color:var(--ink-soft); padding:1px 6px; border-radius:8px; font-weight:700;}
+  .topbar nav{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .topbar nav a{color:rgba(255,255,255,.85); font-size:13.5px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;}
+  .topbar nav a:hover{color:#fff;}
+  .ext-badge{font-size:10px; background:rgba(255,255,255,.18); color:#fff; padding:1px 6px; border-radius:8px; font-weight:700;}
+  .header-resource-btn{
+    background:#fff; color:var(--blue); border:none; border-radius:20px; padding:8px 16px 8px 16px;
+    font-weight:800; font-size:12.5px; cursor:pointer; display:inline-flex; align-items:center; gap:7px;
+    font-family:"Zen Kaku Gothic New",sans-serif; transition:transform .15s ease;
+  }
+  .header-resource-btn:hover{transform:translateY(-1px);}
+  .free-tag{font-size:9.5px; background:var(--orange); color:#fff; padding:2px 6px; border-radius:8px; font-weight:800;}
   .google-btn{
     display:inline-flex; align-items:center; gap:8px; background:#fff; border:1.5px solid var(--line);
     padding:7px 14px 7px 8px; border-radius:20px; font-size:12.5px; font-weight:700; color:var(--ink);
@@ -60,8 +68,8 @@
   .google-btn:hover{border-color:var(--blue);}
   .google-btn svg{width:16px; height:16px;}
   .auth-pill{
-    display:inline-flex; align-items:center; gap:8px; background:var(--bg); border-radius:20px; padding:5px 6px 5px 12px;
-    font-size:12px; color:var(--ink-soft); font-weight:600;
+    display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.16); border-radius:20px; padding:5px 6px 5px 12px;
+    font-size:12px; color:#fff; font-weight:600;
   }
   .auth-pill button{
     border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:11px; font-weight:700;
@@ -71,7 +79,7 @@
   /* ---------- Hero ---------- */
   .hero{padding:48px 0 40px;}
   .hero-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:48px; align-items:center;}
-  .hero h1{font-size:42px; font-weight:900; line-height:1.45; margin-top:20px;}
+  .hero h1{font-size:clamp(26px, 3.2vw, 42px); font-weight:900; line-height:1.45; margin-top:20px; white-space:normal;}
   .hero h1 .hl{color:var(--blue);}
   .hero p{font-size:15.5px; color:var(--ink-soft); margin-top:18px; max-width:48ch;}
   .hero-cta-row{display:flex; gap:14px; margin-top:28px; flex-wrap:wrap;}
@@ -180,6 +188,27 @@
   .instructor-card h3{font-size:15px;}
   .instructor-role{font-size:11.5px; color:var(--blue); font-weight:700; margin-top:4px;}
   .instructor-card p{font-size:12.5px; color:var(--ink-soft); margin-top:10px; text-align:left;}
+
+  /* graduate outcomes */
+  .outcome-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .outcome-card-item{
+    background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:26px 22px; text-align:center;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .outcome-card-item:hover{transform:translateY(-3px); box-shadow:0 16px 32px -26px rgba(22,33,77,.3);}
+  .outcome-badge{
+    display:inline-block; background:var(--blue-soft); color:var(--blue); font-size:12px; font-weight:800;
+    padding:5px 14px; border-radius:20px; font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+  .outcome-salary-row{display:flex; align-items:center; justify-content:center; gap:12px; margin-top:20px;}
+  .outcome-salary-before, .outcome-salary-after{display:flex; flex-direction:column; align-items:center; gap:4px;}
+  .outcome-salary-label{font-size:10.5px; color:var(--ink-soft); font-weight:600;}
+  .outcome-salary-num{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:24px; color:var(--ink);}
+  .outcome-salary-after .outcome-salary-num{color:var(--orange);}
+  .outcome-salary-num small{font-size:12px; font-weight:700; margin-left:1px;}
+  .outcome-arrow{color:var(--blue); font-weight:900; font-size:18px;}
+  .outcome-diff{margin-top:14px; font-size:13px; font-weight:800; color:var(--good, #2E8F6C); font-family:"Zen Kaku Gothic New",sans-serif;}
+  .outcome-disclaimer{font-size:11px; color:var(--ink-soft); margin-top:20px; line-height:1.7;}
 
   /* skill modules */
   .module-section{background:var(--paper);}
@@ -358,7 +387,6 @@
   @media (max-width:820px){
     .hero-grid{grid-template-columns:1fr;}
     .hero-visual-panel{order:-1; max-width:340px; margin:0 auto 48px;}
-    .hero h1{font-size:30px;}
     .fit-grid{grid-template-columns:1fr;}
     .module-grid{grid-template-columns:1fr;}
     .feature-grid{grid-template-columns:1fr;}
@@ -369,6 +397,7 @@
     .resource-cta-card{flex-direction:column; align-items:flex-start;}
     .video-anim-logo{font-size:24px;}
     .instructor-grid{grid-template-columns:repeat(2,1fr);}
+    .outcome-grid{grid-template-columns:1fr;}
     .course-band{grid-template-columns:1fr; padding:32px 24px;}
     .course-cards.grid2{grid-template-columns:1fr;}
     .float-card{max-width:180px; padding:10px 12px;}
@@ -382,16 +411,19 @@
 </head>
 <body>
 
-<div class="wrap topbar">
-  <div class="brand"><span class="dot"></span>PdM登竜門</div>
-  <nav>
-    <a href="#curriculum">カリキュラム</a>
-    <a href="#features">特徴</a>
-    <a href="./index.html">PdMスキル診断</a>
-    <a href="./index.html#orgculture">組織タイプ診断</a>
-    <span id="navAuthArea"></span>
-  </nav>
-</div>
+<header class="site-header-tory">
+  <div class="wrap topbar">
+    <div class="brand"><span class="dot"></span>PdM登竜門</div>
+    <nav>
+      <a href="#curriculum">カリキュラム</a>
+      <a href="#features">特徴</a>
+      <a href="./index.html">PdMスキル診断</a>
+      <a href="./index.html#orgculture">組織タイプ診断</a>
+      <button class="header-resource-btn" id="headerResourceBtn">資料請求<span class="free-tag">無料</span></button>
+      <span id="navAuthArea"></span>
+    </nav>
+  </div>
+</header>
 
 <section class="hero">
   <div class="wrap hero-grid">
@@ -498,6 +530,64 @@
         <p>非エンジニアからのキャリアチェンジ支援が豊富。未経験者の疑問に寄り添った指導が持ち味です。</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="outcomes">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow-pill">GRADUATE STORIES</span>
+      <h2 class="section-title">未経験からPdMへ。受講生の実績</h2>
+      <p class="section-lead">美容師・看護師・メーカー企画職・コンサルタントなど、様々なバックグラウンドから未経験でPdMへ転身した受講生がいます。年収の変化の一例をご紹介します。</p>
+    </div>
+    <div class="outcome-grid">
+      <div class="outcome-card-item">
+        <div class="outcome-badge">美容師 → PdM</div>
+        <div class="outcome-salary-row">
+          <div class="outcome-salary-before">
+            <span class="outcome-salary-label">受講前</span>
+            <span class="outcome-salary-num">600<small>万円</small></span>
+          </div>
+          <div class="outcome-arrow">→</div>
+          <div class="outcome-salary-after">
+            <span class="outcome-salary-label">転職後</span>
+            <span class="outcome-salary-num">970<small>万円</small></span>
+          </div>
+        </div>
+        <p class="outcome-diff">年収 +370万円</p>
+      </div>
+      <div class="outcome-card-item">
+        <div class="outcome-badge">看護師 → PdM</div>
+        <div class="outcome-salary-row">
+          <div class="outcome-salary-before">
+            <span class="outcome-salary-label">受講前</span>
+            <span class="outcome-salary-num">480<small>万円</small></span>
+          </div>
+          <div class="outcome-arrow">→</div>
+          <div class="outcome-salary-after">
+            <span class="outcome-salary-label">転職後</span>
+            <span class="outcome-salary-num">750<small>万円</small></span>
+          </div>
+        </div>
+        <p class="outcome-diff">年収 +270万円</p>
+      </div>
+      <div class="outcome-card-item">
+        <div class="outcome-badge">メーカー企画職 → PdM</div>
+        <div class="outcome-salary-row">
+          <div class="outcome-salary-before">
+            <span class="outcome-salary-label">受講前</span>
+            <span class="outcome-salary-num">850<small>万円</small></span>
+          </div>
+          <div class="outcome-arrow">→</div>
+          <div class="outcome-salary-after">
+            <span class="outcome-salary-label">転職後</span>
+            <span class="outcome-salary-num">1100<small>万円</small></span>
+          </div>
+        </div>
+        <p class="outcome-diff">年収 +250万円</p>
+      </div>
+    </div>
+    <p class="outcome-disclaimer">※上記は受講生の実績をもとにした一例です。年収の変化は個人の経験・転職先・タイミング等により異なり、内定・年収を保証するものではありません。</p>
   </div>
 </section>
 
@@ -828,6 +918,7 @@
   }
 
   document.getElementById("openResourceModalBtn").onclick = ()=> openLeadModal("resource_download");
+  document.getElementById("headerResourceBtn").onclick = ()=> openLeadModal("resource_download");
   document.getElementById("courseResourceBtn").onclick = ()=> openLeadModal("resource_download");
   document.getElementById("courseResourceBtn2").onclick = ()=> openLeadModal("resource_download");
   document.getElementById("openVideoModalBtn").onclick = ()=> openLeadModal("video_view");
