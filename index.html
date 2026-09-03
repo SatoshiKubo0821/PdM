@@ -26,19 +26,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #F7F9FE;
+    --bg: #F7F7F8;
     --paper: #FFFFFF;
-    --ink: #16213D;
-    --ink-soft: #5D6B8A;
-    --line: #E3E8F5;
+    --ink: #16171A;
+    --ink-soft: #5B5D66;
+    --line: #E4E4E7;
 
-    /* key color: vivid blue (バクラク風) */
-    --navy-950: #0F1A3D;
-    --navy-900: #16244D;
-    --navy-800: #1F3A6E;
-    --blue-500: #2952E3;
-    --blue-300: #6E8CF5;
-    --blue-100: #DCE5FE;
+    /* key color: black（バクラク風のUI言語はそのまま、キーカラーをブラックに） */
+    --navy-950: #08090B;
+    --navy-900: #16171A;
+    --navy-800: #232429;
+    --blue-500: #1C1D21;
+    --blue-300: #45474E;
+    --blue-100: #EDEDEF;
 
     --gold: #FF8A3D;
     --gold-soft: #FFEDDD;
@@ -46,8 +46,8 @@
     --bad: #E14B4B;
     --radius: 12px;
 
-    --grad-main: linear-gradient(135deg, var(--navy-900) 0%, var(--blue-500) 55%, var(--blue-300) 100%);
-    --grad-soft: linear-gradient(135deg, rgba(41,82,227,.10) 0%, rgba(110,140,245,.04) 100%);
+    --grad-main: linear-gradient(135deg, var(--navy-950) 0%, var(--blue-500) 55%, var(--blue-300) 100%);
+    --grad-soft: linear-gradient(135deg, rgba(22,23,26,.08) 0%, rgba(69,71,78,.03) 100%);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -83,7 +83,7 @@
     color:var(--ink-soft); font-size:13px; font-weight:600; text-decoration:none;
     display:inline-flex; align-items:center; gap:6px;
   }
-  .site-nav a:hover{color:var(--blue-500);}
+  .site-nav a:hover{color:var(--gold);}
   .ext-badge{
     font-size:10px; background:var(--bg); color:var(--ink-soft); padding:1px 6px; border-radius:8px; font-weight:700;
   }
@@ -100,7 +100,7 @@
     padding:7px 14px 7px 8px; border-radius:20px; font-size:12.5px; font-weight:700; color:var(--ink);
     cursor:pointer; font-family:"Noto Sans JP",sans-serif;
   }
-  .google-btn:hover{border-color:var(--blue-500);}
+  .google-btn:hover{border-color:var(--gold);}
   .google-btn svg{width:16px; height:16px;}
   @media (max-width:600px){
     .site-header-inner{flex-direction:column; align-items:flex-start; gap:10px;}
@@ -117,7 +117,7 @@
     letter-spacing:.02em;
     margin-bottom:10px;
   }
-  .eyebrow b{color:var(--blue-500);}
+  .eyebrow b{color:var(--gold);}
 
   /* ---------- Intro ---------- */
   .hero-title{
@@ -198,12 +198,12 @@
     border-radius:100px;
     cursor:pointer;
     transition:transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 10px 24px -8px rgba(41,82,227,.5);
+    box-shadow:0 10px 24px -8px rgba(22,23,26,.4);
     display:inline-block;
     text-decoration:none;
     box-sizing:border-box;
   }
-  button.primary:hover, a.primary:hover{transform:translateY(-2px); box-shadow:0 14px 28px -8px rgba(41,82,227,.6);}
+  button.primary:hover, a.primary:hover{transform:translateY(-2px); box-shadow:0 14px 28px -8px rgba(22,23,26,.5);}
   button.primary:active, a.primary:active{transform:translateY(0) scale(.98);}
   button.ghost{
     background:#fff;
@@ -217,7 +217,7 @@
     cursor:pointer;
     transition:border-color .15s ease, color .15s ease;
   }
-  button.ghost:hover{border-color:var(--blue-500); color:var(--blue-500);}
+  button.ghost:hover{border-color:var(--gold); color:var(--gold);}
   .resume-note{font-size:13px;color:var(--ink-soft);}
 
   /* ---------- Assessment (1ページ10問のカードリスト。同意尺度は16personalities風の円サイズ表現) ---------- */
@@ -286,11 +286,11 @@
     border:2px solid var(--line);
     transition:transform .15s ease, border-color .15s ease, background .15s ease;
   }
-  .scale-circle-wrap:hover .scale-circle{border-color:var(--blue-500); transform:scale(1.06);}
+  .scale-circle-wrap:hover .scale-circle{border-color:var(--gold); transform:scale(1.06);}
   .scale-circle.on{
     background:var(--grad-main);
     border-color:transparent;
-    box-shadow:0 8px 18px -6px rgba(41,82,227,.55);
+    box-shadow:0 8px 18px -6px rgba(22,23,26,.45);
   }
   /* ラベルの有無に関わらず全列に同じ高さの枠を確保することで、円の下端をきれいに揃える */
   .scale-label{
@@ -412,7 +412,7 @@
     color:var(--ink);
     background:var(--paper);
   }
-  .profile-input:focus{outline:2px solid var(--blue-300); border-color:var(--blue-500);}
+  .profile-input:focus{outline:2px solid var(--gold-soft); border-color:var(--gold);}
   .profile-textarea{resize:vertical; font-family:inherit;}
 
   @media (max-width:600px){
@@ -847,7 +847,7 @@
     border-top:1px solid var(--line);
     padding-top:18px;
   }
-  footer.note a{color:var(--blue-500);}
+  footer.note a{color:var(--gold);}
 
   @media (max-width:600px){
     .hero-title{font-size:28px;}
@@ -1907,7 +1907,7 @@ async function renderHistory(){
       <div class="insight history-row" data-id="${r.id}" style="cursor:pointer;">
         <h4>${date}${r.nickname ? `｜${r.nickname}さん` : ""} <b>${Number(r.overall_avg).toFixed(1)}</b></h4>
         <p>${typeLabel}／${seniorityLabel}／偏差値${r.hensachi}${r.mbti ? "／"+r.mbti : ""}${r.experience_years!=null ? `／経験${r.experience_years}年` : ""}</p>
-        <p style="margin-top:6px; font-size:12px; color:var(--blue-500);">タップして当時の詳細結果を見る →</p>
+        <p style="margin-top:6px; font-size:12px; color:var(--gold);">タップして当時の詳細結果を見る →</p>
       </div>`;
     }).join("")}
 
@@ -2653,14 +2653,14 @@ function previewRadarSVG(){
   const axes = axisPoints(8,cx,cy,r);
   const rings=[0.25,0.5,0.75,1].map(f=>{
     const rp = axisPoints(8,cx,cy,r*f).map(p=>p.join(",")).join(" ");
-    return `<polygon points="${rp}" fill="none" stroke="#DFE4EE" stroke-width="1"/>`;
+    return `<polygon points="${rp}" fill="none" stroke="#E4E4E7" stroke-width="1"/>`;
   }).join("");
-  const spokes = axes.map(p=>`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#DFE4EE" stroke-width="1"/>`).join("");
+  const spokes = axes.map(p=>`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#E4E4E7" stroke-width="1"/>`).join("");
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
       <linearGradient id="previewGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2E5FD9"/>
-        <stop offset="100%" stop-color="#101C36"/>
+        <stop offset="0%" stop-color="#FF8A3D"/>
+        <stop offset="100%" stop-color="#16171A"/>
       </linearGradient>
     </defs>
     ${rings}${spokes}
@@ -2676,21 +2676,21 @@ function resultsRadarSVG(){
   const axes = axisPoints(n,cx,cy,r);
   const rings=[0.2,0.4,0.6,0.8,1].map(f=>{
     const rp = axisPoints(n,cx,cy,r*f).map(p=>p.join(",")).join(" ");
-    return `<polygon points="${rp}" fill="none" stroke="#DFE4EE" stroke-width="1"/>`;
+    return `<polygon points="${rp}" fill="none" stroke="#E4E4E7" stroke-width="1"/>`;
   }).join("");
-  const spokes = axes.map(p=>`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#DFE4EE" stroke-width="1"/>`).join("");
+  const spokes = axes.map(p=>`<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="#E4E4E7" stroke-width="1"/>`).join("");
   const labels = axes.map((p,i)=>{
     const angle = (Math.PI*2*i/n) - Math.PI/2;
     const lx = cx + (r+38)*Math.cos(angle);
     const ly = cy + (r+38)*Math.sin(angle);
-    return `<text x="${lx}" y="${ly}" font-size="11.5" font-family="Noto Sans JP, sans-serif" fill="#131A2B" text-anchor="middle" dominant-baseline="middle">${CATEGORIES[i].name}</text>`;
+    return `<text x="${lx}" y="${ly}" font-size="11.5" font-family="Noto Sans JP, sans-serif" fill="#16171A" text-anchor="middle" dominant-baseline="middle">${CATEGORIES[i].name}</text>`;
   }).join("");
-  const dots = radarPoints(values,cx,cy,r).map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#2E5FD9" stroke="#fff" stroke-width="1.5"/>`).join("");
+  const dots = radarPoints(values,cx,cy,r).map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#FF8A3D" stroke="#fff" stroke-width="1.5"/>`).join("");
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
       <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#2E5FD9"/>
-        <stop offset="100%" stop-color="#0B1220"/>
+        <stop offset="0%" stop-color="#FF8A3D"/>
+        <stop offset="100%" stop-color="#08090B"/>
       </linearGradient>
     </defs>
     ${rings}${spokes}
@@ -2769,7 +2769,7 @@ function renderResults(){
     ${state.profile.experienceYears!=null ? `<p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">PdM経験年数：${state.profile.experienceYears}年</p>` : ""}
     ${state.viewingHistory ? `
     <div class="insight fusion" style="margin-top:14px;">
-      <p>📅 ${new Date(state.viewingHistory).toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"})} 時点の診断結果を表示しています。<a href="#" id="backToHistoryLink" style="color:var(--blue-500); font-weight:600;">履歴一覧に戻る</a></p>
+      <p>📅 ${new Date(state.viewingHistory).toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"})} 時点の診断結果を表示しています。<a href="#" id="backToHistoryLink" style="color:var(--gold); font-weight:600;">履歴一覧に戻る</a></p>
     </div>` : ""}
 
     <div class="score-hero">
