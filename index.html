@@ -712,6 +712,8 @@
   .insight.strong{border-left-color:var(--good);}
   .insight.fusion{border-left-color:var(--gold); background:var(--grad-soft);}
   .insight.neutral{border-left-color:var(--line);}
+  .history-row{transition:border-color .12s ease, transform .12s ease;}
+  .history-row:hover{border-color:var(--blue-300); transform:translateX(2px);}
   .insight h4{
     margin:0 0 6px;
     font-size:15px;
@@ -1458,6 +1460,7 @@ let state = {
   savedThisResult: false, // 今回の診断結果をクラウドに保存済みか（二重保存防止）
   history: [],            // クラウドから取得した過去の診断履歴
   displayOrder: {},       // カテゴリごとにランダム化した設問の表示順（キャッシュ）
+  viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -1614,7 +1617,7 @@ async function fetchHistory(){
   try{
     const { data, error } = await supabaseClient
       .from("diagnoses")
-      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years")
+      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications")
       .order("created_at", { ascending:false })
       .limit(20);
     if(error) return [];
@@ -1651,9 +1654,10 @@ async function renderHistory(){
       const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
       const seniorityLabel = SENIORITY[r.seniority] ? SENIORITY[r.seniority].label : r.seniority;
       return `
-      <div class="insight">
+      <div class="insight history-row" data-id="${r.id}" style="cursor:pointer;">
         <h4>${date}${r.nickname ? `｜${r.nickname}さん` : ""} <b>${Number(r.overall_avg).toFixed(1)}</b></h4>
         <p>${typeLabel}／${seniorityLabel}／偏差値${r.hensachi}${r.mbti ? "／"+r.mbti : ""}${r.experience_years!=null ? `／経験${r.experience_years}年` : ""}</p>
+        <p style="margin-top:6px; font-size:12px; color:var(--blue-500);">タップして当時の詳細結果を見る →</p>
       </div>`;
     }).join("")}
 
@@ -1664,6 +1668,26 @@ async function renderHistory(){
   `;
   document.getElementById("toAccountBtn").onclick = ()=>{ state.screen="account"; render(); window.scrollTo(0,0); };
   document.getElementById("backHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
+
+  app.querySelectorAll(".history-row").forEach(el=>{
+    el.onclick = ()=>{
+      const id = el.getAttribute("data-id");
+      const row = rows.find(r=>String(r.id)===String(id));
+      if(!row) return;
+      state.answers = row.answers || {};
+      state.mbti = row.mbti || null;
+      state.profile = {
+        toeic: row.toeic ?? null,
+        certifications: row.certifications || "",
+        nickname: row.nickname || "",
+        experienceYears: row.experience_years ?? null,
+      };
+      state.savedThisResult = true; // 過去の結果を開いただけなので、新規保存はしない
+      state.viewingHistory = row.created_at;
+      state.screen = "results";
+      render(); window.scrollTo(0,0);
+    };
+  });
 }
 
 function renderAccount(){
@@ -2101,6 +2125,10 @@ function renderResults(){
     <div class="eyebrow">診断結果</div>
     <h1 class="hero-title" style="font-size:30px;">${state.profile.nickname ? `${state.profile.nickname}さんの` : "あなたの"}PdMスキルレーダー</h1>
     ${state.profile.experienceYears!=null ? `<p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">PdM経験年数：${state.profile.experienceYears}年</p>` : ""}
+    ${state.viewingHistory ? `
+    <div class="insight fusion" style="margin-top:14px;">
+      <p>📅 ${new Date(state.viewingHistory).toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"})} 時点の診断結果を表示しています。<a href="#" id="backToHistoryLink" style="color:var(--blue-500); font-weight:600;">履歴一覧に戻る</a></p>
+    </div>` : ""}
 
     <div class="score-hero">
       <div>
@@ -2358,6 +2386,12 @@ function renderResults(){
       <a class="primary cta-btn" href="#" id="toryumonBtn" target="_blank" rel="noopener">PdM登竜門に応募する →</a>
     </div>
 
+    ${state.viewingHistory ? `
+    <div class="start-row" style="margin-top:44px;">
+      <button class="ghost" id="toHistoryBtn">履歴一覧に戻る</button>
+      <button class="primary" id="toIntroBtn">新しく診断する</button>
+    </div>
+    ` : `
     <div class="start-row" style="margin-top:44px;">
       <button class="primary" id="retryBtn">回答を修正する</button>
       <button class="ghost" id="mbtiEditBtn">MBTIを選び直す</button>
@@ -2365,6 +2399,7 @@ function renderResults(){
       ${supabaseClient ? `<button class="ghost" id="historyBtn">診断履歴を見る</button>` : ""}
       <button class="ghost" id="resetBtn">最初からやり直す</button>
     </div>
+    `}
 
     <footer class="note">
       本診断はセルフチェック用の簡易ツールです。半年に一度など定期的に見直すことで、成長やスキルの重心の変化を確認しやすくなります。
@@ -2373,6 +2408,30 @@ function renderResults(){
       回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
     </footer>
   `;
+
+  const backToHistoryLink = document.getElementById("backToHistoryLink");
+  if(backToHistoryLink){
+    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.screen="history"; render(); window.scrollTo(0,0); };
+  }
+
+  if(state.viewingHistory){
+    document.getElementById("toHistoryBtn").onclick = ()=>{
+      state.viewingHistory=null;
+      state.screen="history";
+      render(); window.scrollTo(0,0);
+    };
+    document.getElementById("toIntroBtn").onclick = ()=>{
+      state.viewingHistory=null;
+      state.answers = {};
+      state.mbti = null;
+      state.displayOrder = {};
+      state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null };
+      state.savedThisResult = false;
+      state.screen="intro";
+      render(); window.scrollTo(0,0);
+    };
+    return;
+  }
 
   document.getElementById("retryBtn").onclick = ()=>{
     state.screen="assess";
