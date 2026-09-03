@@ -294,6 +294,76 @@
   footer{padding:40px 0 60px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
   footer a{color:var(--blue);}
 
+  /* ---------- Comparison table ---------- */
+  .compare-table{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:stretch;}
+  .compare-col{border-radius:20px; padding:32px 28px;}
+  .compare-col-before{background:var(--paper); border:1px solid var(--line);}
+  .compare-col-after{background:var(--grad-blue); color:#fff;}
+  .compare-col-head{display:flex; align-items:center; gap:12px; margin-bottom:20px;}
+  .compare-icon{width:40px; height:40px; border-radius:10px; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .compare-icon.on{background:rgba(255,255,255,.2);}
+  .compare-icon svg{width:20px; height:20px;}
+  .compare-col-head h3{font-size:16px;}
+  .compare-col-after h3{color:#fff;}
+  .compare-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:14px;}
+  .compare-list li{display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color:var(--ink-soft);}
+  .compare-list.on li{color:rgba(255,255,255,.9);}
+  .x-icon{color:#C7C9CE; font-weight:900; flex-shrink:0;}
+  .check-icon{color:var(--orange); font-weight:900; flex-shrink:0;}
+  .compare-arrow-mobile{display:none; text-align:center; font-size:22px; color:var(--blue); font-weight:900;}
+
+  /* ---------- Market value chart / job examples ---------- */
+  .value-chart-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:32px;
+    display:flex; flex-direction:column; align-items:center; margin-top:8px;
+  }
+  .value-chart-label{font-size:12px; color:var(--ink-soft); margin-bottom:12px;}
+  .value-chart-svg{width:100%; max-width:480px; height:auto;}
+  .value-chart-note{font-size:11px; color:var(--ink-soft); margin-top:10px;}
+  .job-example-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px;}
+  .job-example-card{background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:20px;}
+  .job-tag{
+    display:inline-block; font-size:11px; font-weight:800; padding:3px 10px; border-radius:14px;
+    background:var(--blue-soft); color:var(--blue); font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+  .job-example-card h4{font-size:14px; margin-top:10px; line-height:1.5;}
+  .job-salary{font-size:15px; font-weight:900; color:var(--orange); margin-top:8px; font-family:"Zen Kaku Gothic New",sans-serif;}
+
+  /* ---------- More-row (community/zemi/workshop) ---------- */
+  .more-row{display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; margin-bottom:56px;}
+  .more-row:last-child{margin-bottom:0;}
+  .more-row.reverse{direction:rtl;}
+  .more-row.reverse > *{direction:ltr;}
+  .more-num{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; color:var(--orange); font-size:13px; letter-spacing:.05em;}
+  .more-text h3{font-size:19px; margin-top:8px;}
+  .more-text p{font-size:13.5px; color:var(--ink-soft); margin-top:12px;}
+  .more-list{list-style:none; padding:0; margin:16px 0 0; display:flex; flex-direction:column; gap:8px;}
+  .more-list li{font-size:12.5px; color:var(--ink-soft); padding-left:18px; position:relative;}
+  .more-list li::before{content:"•"; position:absolute; left:0; color:var(--blue); font-weight:900;}
+  .more-illust{display:flex; justify-content:center;}
+  .more-illust svg{width:100%; max-width:280px; height:auto;}
+
+  /* ---------- Pricing plans ---------- */
+  .price-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; align-items:stretch;}
+  .price-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:32px 26px;
+    display:flex; flex-direction:column; position:relative;
+  }
+  .price-card.featured{border:2px solid var(--blue); box-shadow:0 20px 40px -24px rgba(41,82,227,.3);}
+  .price-badge{
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    background:var(--blue); color:#fff; font-size:11px; font-weight:800; padding:5px 16px; border-radius:20px;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+  .price-card-name{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:17px;}
+  .price-card-desc{font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+  .price-card-num{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:24px; margin-top:16px; color:var(--ink);}
+  .price-currency{font-size:12px; font-weight:700; color:var(--ink-soft); margin-right:4px;}
+  .price-unit{font-size:12px; font-weight:700; color:var(--ink-soft); margin-left:2px;}
+  .price-feature-list{list-style:none; padding:0; margin:20px 0 0; display:flex; flex-direction:column; gap:10px; flex:1;}
+  .price-feature-list li{font-size:12.5px; color:var(--ink-soft); padding-left:20px; position:relative;}
+  .price-feature-list li::before{content:"✓"; position:absolute; left:0; color:var(--orange); font-weight:900;}
+
   /* ---------- Course band (通常講座・特別講座) ---------- */
   .course-band{
     background:var(--grad-blue); color:#fff; border-radius:28px; padding:52px 44px;
@@ -411,6 +481,13 @@
     .video-anim-logo{font-size:24px;}
     .instructor-grid{grid-template-columns:repeat(2,1fr);}
     .outcome-grid{grid-template-columns:1fr;}
+    .compare-table{grid-template-columns:1fr;}
+    .compare-arrow-mobile{display:block; margin:4px 0;}
+    .job-example-grid{grid-template-columns:1fr;}
+    .more-row, .more-row.reverse{grid-template-columns:1fr; direction:ltr;}
+    .more-illust{order:-1; margin-bottom:8px;}
+    .more-illust svg{max-width:200px;}
+    .price-grid{grid-template-columns:1fr;}
     .course-band{grid-template-columns:1fr; padding:32px 24px;}
     .course-cards.grid2{grid-template-columns:1fr;}
     .float-card{max-width:180px; padding:10px 12px;}
@@ -505,6 +582,43 @@
       <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">学習領域</div></div>
       <div class="stat-item"><div class="stat-num">49</div><div class="stat-label">カバーするスキル項目</div></div>
       <div class="stat-item"><div class="stat-num">1on1</div><div class="stat-label">メンタリング体制</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="comparison">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <span class="eyebrow-pill">COMPARISON</span>
+      <h2 class="section-title" style="font-size:26px;">PdM登竜門が、学び方の常識を変えます。</h2>
+      <p class="section-lead" style="margin-left:auto; margin-right:auto;">領域ごとに何十万円も払ってバラバラに学ぶ時代は、もう終わり。10領域49スキルを、1つのプログラムで体系的に学べます。</p>
+    </div>
+    <div class="compare-table">
+      <div class="compare-col compare-col-before">
+        <div class="compare-col-head">
+          <div class="compare-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#8A8D96" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <h3>従来のスクール・独学</h3>
+        </div>
+        <ul class="compare-list">
+          <li><span class="x-icon">✕</span>領域ごとに個別の講座を契約、費用がかさむ</li>
+          <li><span class="x-icon">✕</span>実務未経験者向けの体系だった講師サポートが薄い</li>
+          <li><span class="x-icon">✕</span>断片的な知識で終わり、実践課題が少ない</li>
+          <li><span class="x-icon">✕</span>質問できる相手が限られている</li>
+        </ul>
+      </div>
+      <div class="compare-arrow-mobile">↓</div>
+      <div class="compare-col compare-col-after">
+        <div class="compare-col-head">
+          <div class="compare-icon on"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
+          <h3>PdM登竜門</h3>
+        </div>
+        <ul class="compare-list on">
+          <li><span class="check-icon">✓</span>10領域49スキルが1つのプログラムに集約</li>
+          <li><span class="check-icon">✓</span>非エンジニア・未経験者向けの手厚いメンタリング</li>
+          <li><span class="check-icon">✓</span>実際のプロダクト課題に取り組む実践中心設計</li>
+          <li><span class="check-icon">✓</span>現役PdM講師陣にいつでも相談できる</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
@@ -659,6 +773,63 @@
       </div>
     </div>
     <p class="outcome-disclaimer">※上記は受講生の実績をもとにした一例です。年収の変化は個人の経験・転職先・タイミング等により異なり、内定・年収を保証するものではありません。</p>
+  </div>
+</section>
+
+<section id="why-now">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow-pill">WHY NOW</span>
+      <h2 class="section-title">なぜ今、PdMスキルを学ぶのか？</h2>
+      <p class="section-lead">エンジニア・マーケター・デザイナーなど、どんな職種にいても「プロダクトを動かす力」を掛け合わせることで、キャリアの選択肢と市場価値は大きく広がります。</p>
+    </div>
+
+    <div class="value-chart-card">
+      <div class="value-chart-label">イメージ：市場での評価のされ方（イラスト）</div>
+      <svg viewBox="0 0 520 220" class="value-chart-svg">
+        <line x1="60" y1="180" x2="500" y2="180" stroke="#E4E4E7" stroke-width="2"/>
+        <rect x="110" y="120" width="70" height="60" rx="6" fill="#D8D9DC"/>
+        <text x="145" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#5B5D66">PdMスキルなし</text>
+        <rect x="330" y="50" width="70" height="130" rx="6" fill="#FF8A3D"/>
+        <text x="365" y="38" text-anchor="middle" font-size="13" font-weight="700" fill="#16171A">PdMスキルあり</text>
+      </svg>
+      <p class="value-chart-note">※特定の統計データではなく、一般的な傾向を表したイメージ図です。</p>
+    </div>
+
+    <div class="section-label" style="margin-top:44px;">求人サイトなどで見られる、PdM関連ポジションの例</div>
+    <div class="job-example-grid">
+      <div class="job-example-card">
+        <span class="job-tag">正社員</span>
+        <h4>SaaS企業 プロダクトマネージャー</h4>
+        <p class="job-salary">年収 600〜900万円</p>
+      </div>
+      <div class="job-example-card">
+        <span class="job-tag">正社員</span>
+        <h4>スタートアップ 事業責任者候補</h4>
+        <p class="job-salary">年収 700〜1200万円</p>
+      </div>
+      <div class="job-example-card">
+        <span class="job-tag">業務委託</span>
+        <h4>フリーランスPdM（要件定義支援）</h4>
+        <p class="job-salary">月額 60〜120万円</p>
+      </div>
+      <div class="job-example-card">
+        <span class="job-tag">正社員</span>
+        <h4>大手メーカー DX推進PdM</h4>
+        <p class="job-salary">年収 650〜1000万円</p>
+      </div>
+      <div class="job-example-card">
+        <span class="job-tag">正社員</span>
+        <h4>外資系IT プロダクトマーケティング責任者</h4>
+        <p class="job-salary">年収 800〜1400万円</p>
+      </div>
+      <div class="job-example-card">
+        <span class="job-tag">業務委託</span>
+        <h4>スタートアップ PdMアドバイザー</h4>
+        <p class="job-salary">月額 50〜100万円</p>
+      </div>
+    </div>
+    <p class="outcome-disclaimer">※上記は求人サイト等で見られる一般的な募集内容をもとにした例であり、特定の求人・企業を示すものではありません。金額を保証するものでもありません。</p>
   </div>
 </section>
 
@@ -932,6 +1103,135 @@
         <div><h3>キャリア相談・転職サポート</h3><p>スキルアップだけでなく、シニアPdMやCPO、あるいは別の道へのキャリアパス相談にも対応しています。</p></div>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="more" class="module-section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow-pill">MORE</span>
+      <h2 class="section-title">その他、PdM登竜門でできること</h2>
+    </div>
+
+    <div class="more-row">
+      <div class="more-text">
+        <div class="more-num">01</div>
+        <h3>受講生同士が繋がれるコミュニティ</h3>
+        <p>受講生限定のコミュニティで、情報交換や相談、成果物の共有ができます。一人では挫折しがちな学習も、仲間と励まし合えば続けやすくなります。</p>
+        <ul class="more-list">
+          <li>全講座の受講生が集まる交流の場</li>
+          <li>質問・相談・情報共有が可能</li>
+          <li>同じ業界・分野を目指す仲間と繋がれる</li>
+        </ul>
+      </div>
+      <div class="more-illust">
+        <svg viewBox="0 0 320 260">
+          <circle cx="160" cy="130" r="120" fill="#EDF1FE"/>
+          <circle cx="110" cy="100" r="26" fill="#3163B0"/>
+          <circle cx="190" cy="90" r="22" fill="#FF8A3D"/>
+          <circle cx="220" cy="150" r="24" fill="#6C4AB6"/>
+          <circle cx="120" cy="170" r="20" fill="#2E8F6C"/>
+          <line x1="110" y1="100" x2="190" y2="90" stroke="#B9C3E8" stroke-width="3"/>
+          <line x1="190" y1="90" x2="220" y2="150" stroke="#B9C3E8" stroke-width="3"/>
+          <line x1="220" y1="150" x2="120" y2="170" stroke="#B9C3E8" stroke-width="3"/>
+          <line x1="120" y1="170" x2="110" y2="100" stroke="#B9C3E8" stroke-width="3"/>
+          <line x1="110" y1="100" x2="220" y2="150" stroke="#B9C3E8" stroke-width="2" opacity=".6"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="more-row reverse">
+      <div class="more-text">
+        <div class="more-num">02</div>
+        <h3>現役PdMとの少人数ライブゼミ</h3>
+        <p>週1回・数ヶ月にわたるライブ形式のゼミを、追加料金なしで受講可能。現役PdMによる公開フィードバックを受けながら、実務レベルのアウトプットを目指します。</p>
+        <ul class="more-list">
+          <li>週1回×複数ヶ月のライブ講義</li>
+          <li>現役PdMによる公開フィードバック</li>
+          <li>定期的に募集、自分のタイミングで参加可能</li>
+        </ul>
+      </div>
+      <div class="more-illust">
+        <svg viewBox="0 0 320 260">
+          <rect x="40" y="40" width="240" height="160" rx="16" fill="#FFEDDD"/>
+          <rect x="64" y="64" width="192" height="112" rx="10" fill="#fff" stroke="#E3E8F5" stroke-width="2"/>
+          <circle cx="110" cy="120" r="22" fill="#FF8A3D"/>
+          <rect x="150" y="106" width="80" height="10" rx="5" fill="#E3E8F5"/>
+          <rect x="150" y="126" width="60" height="10" rx="5" fill="#E3E8F5"/>
+          <circle cx="256" cy="76" r="10" fill="#2E8F6C"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="more-row">
+      <div class="more-text">
+        <div class="more-num">03</div>
+        <h3>会員限定ワークショップ</h3>
+        <p>各領域の第一線で活躍するPdMによるワークショップを定期開催。最新のプロダクトマネジメントの潮流や、実務で使えるナレッジをキャッチアップできます。</p>
+        <ul class="more-list">
+          <li>現役PdMから直接学べる</li>
+          <li>最新のプロダクト戦略・組織づくりのナレッジ</li>
+          <li>リアルタイムで質問・ディスカッションが可能</li>
+        </ul>
+      </div>
+      <div class="more-illust">
+        <svg viewBox="0 0 320 260">
+          <circle cx="160" cy="130" r="120" fill="#E4F5EE"/>
+          <rect x="90" y="80" width="140" height="100" rx="12" fill="#fff" stroke="#E3E8F5" stroke-width="2"/>
+          <path d="M120 110h80M120 130h80M120 150h50" stroke="#2E8F6C" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="230" cy="70" r="18" fill="#3163B0"/>
+          <circle cx="90" cy="190" r="14" fill="#FF8A3D"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="module-section">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <span class="eyebrow-pill">PRICING</span>
+      <h2 class="section-title" style="font-size:26px;">料金プラン</h2>
+      <p class="section-lead" style="margin-left:auto; margin-right:auto;">目的に合わせて3つのプランからお選びいただけます。まずは無料相談で、あなたに合うプランをご提案します。</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="price-card-name">ライトプラン</div>
+        <div class="price-card-desc">まず一歩を踏み出したい方へ</div>
+        <div class="price-card-num"><span class="price-currency">月額</span>要問合せ<span class="price-unit">〜</span></div>
+        <ul class="price-feature-list">
+          <li>基礎カリキュラム受講</li>
+          <li>コミュニティ参加</li>
+          <li>AIチューターへの質問</li>
+        </ul>
+        <a class="btn outline" href="./index.html#apply" style="width:100%; justify-content:center; margin-top:20px;">相談する</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">おすすめ</div>
+        <div class="price-card-name">スタンダードプラン</div>
+        <div class="price-card-desc">未経験からPdMを目指す方へ</div>
+        <div class="price-card-num"><span class="price-currency">月額</span>要問合せ<span class="price-unit">〜</span></div>
+        <ul class="price-feature-list">
+          <li>10領域49スキル 全カリキュラム受講</li>
+          <li>現役PdMによる1on1メンタリング</li>
+          <li>ライブゼミ参加（追加料金なし）</li>
+          <li>キャリア相談・転職サポート</li>
+        </ul>
+        <a class="btn primary" href="./index.html#apply" style="width:100%; justify-content:center; margin-top:20px;">このプランで相談する</a>
+      </div>
+      <div class="price-card">
+        <div class="price-card-name">プロプラン</div>
+        <div class="price-card-desc">特別講座まで学び切りたい方へ</div>
+        <div class="price-card-num"><span class="price-currency">月額</span>要問合せ<span class="price-unit">〜</span></div>
+        <ul class="price-feature-list">
+          <li>スタンダードプランの全内容</li>
+          <li>特別講座（AI駆動開発・ファイナンス等）受講</li>
+          <li>ワークショップ優先案内</li>
+        </ul>
+        <a class="btn outline" href="./index.html#apply" style="width:100%; justify-content:center; margin-top:20px;">相談する</a>
+      </div>
+    </div>
+    <p class="outcome-disclaimer" style="text-align:center;">※具体的な料金は、個別相談の際にご案内します。</p>
   </div>
 </section>
 
