@@ -26,28 +26,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #F4F6FA;
+    --bg: #F7F9FE;
     --paper: #FFFFFF;
-    --ink: #131A2B;
-    --ink-soft: #5A6478;
-    --line: #DFE4EE;
+    --ink: #16213D;
+    --ink-soft: #5D6B8A;
+    --line: #E3E8F5;
 
-    /* key color: dark navy, with a lighter blue for gradients */
-    --navy-950: #0B1220;
-    --navy-900: #101C36;
-    --navy-800: #16294C;
-    --blue-500: #2E5FD9;
-    --blue-300: #6FA0FF;
-    --blue-100: #D7E4FF;
+    /* key color: vivid blue (バクラク風) */
+    --navy-950: #0F1A3D;
+    --navy-900: #16244D;
+    --navy-800: #1F3A6E;
+    --blue-500: #2952E3;
+    --blue-300: #6E8CF5;
+    --blue-100: #DCE5FE;
 
-    --gold: #C0812C;
-    --gold-soft: #F3E3C8;
+    --gold: #FF8A3D;
+    --gold-soft: #FFEDDD;
     --good: #2E8F6C;
-    --bad: #C4562E;
-    --radius: 4px;
+    --bad: #E14B4B;
+    --radius: 12px;
 
-    --grad-main: linear-gradient(135deg, var(--navy-900) 0%, var(--blue-500) 100%);
-    --grad-soft: linear-gradient(135deg, rgba(46,95,217,.12) 0%, rgba(111,160,255,.05) 100%);
+    --grad-main: linear-gradient(135deg, var(--navy-900) 0%, var(--blue-500) 55%, var(--blue-300) 100%);
+    --grad-soft: linear-gradient(135deg, rgba(41,82,227,.10) 0%, rgba(110,140,245,.04) 100%);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -125,28 +125,30 @@
     color:#fff;
     border:none;
     font-family:"Zen Kaku Gothic New",sans-serif;
-    font-weight:700;
+    font-weight:800;
     font-size:15px;
-    padding:14px 28px;
-    border-radius:var(--radius);
+    padding:15px 30px;
+    border-radius:100px;
     cursor:pointer;
-    transition:transform .12s ease, filter .12s ease;
-    box-shadow:0 8px 20px -8px rgba(16,28,54,.55);
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 10px 24px -8px rgba(41,82,227,.5);
     display:inline-block;
     text-decoration:none;
     box-sizing:border-box;
   }
-  button.primary:hover, a.primary:hover{filter:brightness(1.08);}
-  button.primary:active, a.primary:active{transform:scale(.98);}
+  button.primary:hover, a.primary:hover{transform:translateY(-2px); box-shadow:0 14px 28px -8px rgba(41,82,227,.6);}
+  button.primary:active, a.primary:active{transform:translateY(0) scale(.98);}
   button.ghost{
-    background:none;
-    border:1px solid var(--line);
+    background:#fff;
+    border:1.5px solid var(--line);
     color:var(--ink);
     font-family:"Noto Sans JP",sans-serif;
+    font-weight:600;
     font-size:14px;
-    padding:13px 22px;
-    border-radius:var(--radius);
+    padding:13px 24px;
+    border-radius:100px;
     cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
   }
   button.ghost:hover{border-color:var(--blue-500); color:var(--blue-500);}
   .resume-note{font-size:13px;color:var(--ink-soft);}
@@ -1451,7 +1453,7 @@ const TOTAL_SKILLS = CATEGORIES.reduce((n,c)=>n+c.skills.length,0);
 /* ---------------- State ---------------- */
 let state = {
   screen: "intro",   // intro | assess | mbti | profile | results | history | account
-  catIndex: 0,
+  pageIndex: 0,       // 設問ページ番号（1ページ20件、カテゴリ横断）
   answers: {},        // "catKey:skillName" -> 1..5
   mbti: null,         // "INTJ" 等、または null（未選択／わからない）
   profile: { toeic: null, certifications: "", nickname: "", experienceYears: null },
@@ -1459,7 +1461,7 @@ let state = {
   userEmail: null,        // メール連携済みの場合のみ入る
   savedThisResult: false, // 今回の診断結果をクラウドに保存済みか（二重保存防止）
   history: [],            // クラウドから取得した過去の診断履歴
-  displayOrder: {},       // カテゴリごとにランダム化した設問の表示順（キャッシュ）
+  displayOrder: {},       // 全設問のランダム化した表示順（キャッシュ）
   viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
   applyContext: null,     // 応募フォームに渡す診断結果の参考情報（任意）
 };
@@ -1494,18 +1496,35 @@ async function saveProgress(){
 function answeredCount(){
   return Object.keys(state.answers).length;
 }
-/* Fisher–Yates shuffle。カテゴリごとに一度だけ計算し、以後の再描画では順序を維持する（メタ回答対策のランダム化）。
+const PAGE_SIZE = 20;
+/* 全カテゴリの設問を1つのフラットな配列にまとめたもの（ページネーション用）。
+   各要素は {catKey, name, desc, statement, reverse} で、カテゴリをまたいで並ぶ。 */
+const ALL_SKILLS_FLAT_META = [];
+CATEGORIES.forEach(cat=>{
+  cat.skills.forEach(skill=>{
+    ALL_SKILLS_FLAT_META.push({ catKey:cat.key, name:skill[0], desc:skill[1], statement:skill[2], reverse:skill[3] });
+  });
+});
+/* Fisher–Yates shuffle。全設問（カテゴリ横断）で一度だけ計算し、以後の再描画では順序を維持する。
+   ページをまたいでカテゴリが混ざるため、メタ回答対策（どのカテゴリの設問かを推測されにくくする）がさらに強化される。
    スキル名そのものではなく「元の配列インデックス」をシャッフルするため、DOM上に設問名が一切露出しない。 */
-function shuffledIndices(cat){
-  if(!state.displayOrder[cat.key]){
-    const arr = cat.skills.map((_,i)=>i);
+function shuffledMasterOrder(){
+  if(!state.displayOrder.master){
+    const arr = ALL_SKILLS_FLAT_META.map((_,i)=>i);
     for(let i=arr.length-1;i>0;i--){
       const j = Math.floor(Math.random()*(i+1));
       [arr[i],arr[j]] = [arr[j],arr[i]];
     }
-    state.displayOrder[cat.key] = arr;
+    state.displayOrder.master = arr;
   }
-  return state.displayOrder[cat.key];
+  return state.displayOrder.master;
+}
+function totalPageCount(){
+  return Math.ceil(ALL_SKILLS_FLAT_META.length / PAGE_SIZE);
+}
+function pageIndices(pageIdx){
+  const order = shuffledMasterOrder();
+  return order.slice(pageIdx*PAGE_SIZE, pageIdx*PAGE_SIZE + PAGE_SIZE);
 }
 /* 逆転項目（reverse:true）は回答を6-rawで反転し、実質的なスキルスコアに変換する */
 function effectiveScore(catKey, skill){
@@ -1925,7 +1944,7 @@ async function renderIntro(){
     captureIntroProfile();
     await saveProgress();
     state.screen="assess";
-    state.catIndex = firstUnfinishedCategory();
+    state.pageIndex = firstUnfinishedPage();
     render();
   };
   const restartBtn = document.getElementById("restartBtn");
@@ -1940,7 +1959,7 @@ async function renderIntro(){
       state.savedThisResult = false;
       await saveProgress();
       state.screen="assess";
-      state.catIndex = 0;
+      state.pageIndex = 0;
       render();
     };
   }
@@ -1950,60 +1969,71 @@ async function renderIntro(){
   }
 }
 
-function firstUnfinishedCategory(){
-  for(let i=0;i<CATEGORIES.length;i++){
-    const c = CATEGORIES[i];
-    const done = c.skills.every(s => state.answers[c.key+":"+s[0]]);
-    if(!done) return i;
+function firstUnfinishedPage(){
+  const total = totalPageCount();
+  for(let p=0;p<total;p++){
+    const done = pageIndices(p).every(idx=>{
+      const item = ALL_SKILLS_FLAT_META[idx];
+      return state.answers[item.catKey+":"+item.name] != null;
+    });
+    if(!done) return p;
   }
   return 0;
 }
 
 function renderAssess(){
-  const cat = CATEGORIES[state.catIndex];
-  const isLast = state.catIndex === CATEGORIES.length-1;
-  const catDone = cat.skills.every(s => state.answers[cat.key+":"+s[0]]);
-  const catColor = CATEGORY_COLOR[cat.key];
+  const total = totalPageCount();
+  const idxList = pageIndices(state.pageIndex);
+  const isLast = state.pageIndex === total-1;
+  const pageDone = idxList.every(idx=>{
+    const item = ALL_SKILLS_FLAT_META[idx];
+    return state.answers[item.catKey+":"+item.name] != null;
+  });
   const overallPct = Math.round(100*answeredCount()/TOTAL_SKILLS);
+  const answeredOnPage = idxList.filter(idx=>{
+    const item = ALL_SKILLS_FLAT_META[idx];
+    return state.answers[item.catKey+":"+item.name] != null;
+  }).length;
+  const startNum = state.pageIndex*PAGE_SIZE + 1;
+  const endNum = state.pageIndex*PAGE_SIZE + idxList.length;
 
   app.innerHTML = `
     <div class="progress-rail">
-      ${CATEGORIES.map((c,i)=>{
-        const segColor = CATEGORY_COLOR[c.key];
-        const pct = i<state.catIndex ? 100 : (i===state.catIndex ? (100*cat.skills.filter(s=>state.answers[cat.key+":"+s[0]]).length/cat.skills.length) : 0);
-        return `<div><i style="width:${pct}%; background:${segColor};"></i></div>`;
+      ${Array.from({length: total}).map((_,i)=>{
+        const pct = i<state.pageIndex ? 100 : (i===state.pageIndex ? (100*answeredOnPage/idxList.length) : 0);
+        return `<div><i style="width:${pct}%; background:var(--blue-500);"></i></div>`;
       }).join("")}
     </div>
     <div class="progress-pct">全体の進捗：${overallPct}%（${answeredCount()} / ${TOTAL_SKILLS}項目）</div>
 
     <div class="cat-header">
-      <div class="cat-badge" style="background:${catColor};">${state.catIndex+1}</div>
+      <div class="cat-badge" style="background:var(--blue-500);">${state.pageIndex+1}</div>
       <div>
-        <div class="cat-index" style="color:${catColor};">CATEGORY 0${state.catIndex+1} / 0${CATEGORIES.length}</div>
-        <div class="cat-title">${cat.name}</div>
+        <div class="cat-index" style="color:var(--blue-500);">PAGE ${state.pageIndex+1} / ${total}</div>
+        <div class="cat-title">設問 ${startNum}〜${endNum}</div>
       </div>
     </div>
-    <div class="cat-sub">${cat.sub}</div>
+    <div class="cat-sub">1ページあたり最大${PAGE_SIZE}件の設問に答えてください。カテゴリは横断的に混ざって出題されます。</div>
     <div class="legend-bar">${LEVEL_LEGEND.map(l=>`<span>${l}</span>`).join("")}</div>
 
-    ${shuffledIndices(cat).map((idx)=>{
-      const skill = cat.skills[idx];
-      const [name,,statement] = skill;
-      const key = cat.key+":"+name;
+    ${idxList.map((idx)=>{
+      const item = ALL_SKILLS_FLAT_META[idx];
+      const key = item.catKey+":"+item.name;
       const val = state.answers[key];
+      const itemColor = CATEGORY_COLOR[item.catKey] || "var(--blue-500)";
       return `
-      <div class="skill-card" style="border-left:3px solid ${val?catColor:'var(--line)'};">
-        <div class="skill-name">${statement}</div>
+      <div class="skill-card" style="border-left:3px solid ${val?itemColor:'var(--line)'};">
+        <div class="skill-name">${item.statement}</div>
         <div class="scale" data-idx="${idx}">
-          ${LEVELS.map(l=>`<button data-v="${l.v}" class="${val===l.v?'on':''}" style="${val===l.v?`background:${catColor}; border-color:${catColor};`:''}">${l.v}<br>${l.label}</button>`).join("")}
+          ${LEVELS.map(l=>`<button data-v="${l.v}" class="${val===l.v?'on':''}" style="${val===l.v?`background:${itemColor}; border-color:${itemColor};`:''}">${l.v}<br>${l.label}</button>`).join("")}
         </div>
       </div>`;
     }).join("")}
 
     <div class="nav-row">
-      <button class="ghost" id="prevBtn" ${state.catIndex===0?"disabled style='opacity:.4;cursor:default;'":""}>← 前のカテゴリ</button>
+      <button class="ghost" id="prevBtn" ${state.pageIndex===0?"disabled style='opacity:.4;cursor:default;'":""}>← 前のページ</button>
       <span class="nav-hint">${answeredCount()} / ${TOTAL_SKILLS} 項目回答済み</span>
-      <button class="primary" id="nextBtn" ${catDone?"":"disabled style='opacity:.4;cursor:default;'"} style="${catDone?`background:${catColor};`:''}">${isLast? "次へ（タイプ診断）" : "次のカテゴリへ →"}</button>
+      <button class="primary" id="nextBtn" ${pageDone?"":"disabled style='opacity:.4;cursor:default;'"}>${isLast? "次へ（タイプ診断）" : "次のページへ →"}</button>
     </div>
   `;
 
@@ -2011,8 +2041,8 @@ function renderAssess(){
     scaleEl.querySelectorAll("button").forEach(btn=>{
       btn.onclick = async ()=>{
         const idx = parseInt(scaleEl.getAttribute("data-idx"),10);
-        const name = cat.skills[idx][0];
-        const key = cat.key+":"+name;
+        const item = ALL_SKILLS_FLAT_META[idx];
+        const key = item.catKey+":"+item.name;
         state.answers[key] = parseInt(btn.getAttribute("data-v"),10);
         await saveProgress();
         renderAssess();
@@ -2021,14 +2051,14 @@ function renderAssess(){
   });
 
   const prevBtn = document.getElementById("prevBtn");
-  if(prevBtn && state.catIndex>0){
-    prevBtn.onclick = ()=>{ state.catIndex--; render(); window.scrollTo(0,0); };
+  if(prevBtn && state.pageIndex>0){
+    prevBtn.onclick = ()=>{ state.pageIndex--; render(); window.scrollTo(0,0); };
   }
   const nextBtn = document.getElementById("nextBtn");
-  if(nextBtn && catDone){
+  if(nextBtn && pageDone){
     nextBtn.onclick = ()=>{
       if(isLast){ state.screen="mbti"; }
-      else { state.catIndex++; }
+      else { state.pageIndex++; }
       render(); window.scrollTo(0,0);
     };
   }
@@ -2579,7 +2609,7 @@ function renderResults(){
 
   document.getElementById("retryBtn").onclick = ()=>{
     state.screen="assess";
-    state.catIndex=0;
+    state.pageIndex=0;
     render(); window.scrollTo(0,0);
   };
   document.getElementById("mbtiEditBtn").onclick = ()=>{
