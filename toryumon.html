@@ -158,6 +158,79 @@
   footer{padding:40px 0 60px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
   footer a{color:var(--blue);}
 
+  /* ---------- Resource download CTA ---------- */
+  .resource-cta-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:20px;
+    padding:32px 36px; display:flex; align-items:center; justify-content:space-between; gap:24px;
+    box-shadow:0 20px 40px -30px rgba(22,33,77,.25);
+  }
+
+  /* ---------- Video gated section ---------- */
+  .video-frame{
+    position:relative; border-radius:20px; overflow:hidden; aspect-ratio:16/9;
+    background:linear-gradient(135deg,#16244D,#2952E3); border:1px solid var(--line);
+  }
+  .video-locked{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    color:#fff; text-align:center; padding:24px;
+  }
+  .video-lock-icon{
+    width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.16);
+    display:flex; align-items:center; justify-content:center; font-size:22px; color:#fff;
+    backdrop-filter:blur(2px);
+  }
+  .video-locked p{font-size:14px; color:rgba(255,255,255,.85); max-width:36ch;}
+  .video-player{position:absolute; inset:0;}
+  .video-sample-badge{
+    position:absolute; top:16px; right:16px; background:rgba(255,255,255,.16); color:#fff;
+    font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; z-index:2;
+  }
+  .video-anim-stage{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;}
+  .video-anim-logo{
+    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:34px; color:#fff;
+    animation:pulseLogo 3s ease-in-out infinite;
+  }
+  .video-anim-logo span{color:var(--orange);}
+  @keyframes pulseLogo{0%,100%{transform:scale(1);opacity:.92;}50%{transform:scale(1.05);opacity:1;}}
+  .video-anim-caption{position:relative; height:26px; width:100%; text-align:center;}
+  .video-anim-caption span{
+    position:absolute; left:0; right:0; color:rgba(255,255,255,.9); font-size:14px; font-weight:600;
+    opacity:0; animation:captionCycle 12s ease-in-out infinite;
+  }
+  @keyframes captionCycle{
+    0%{opacity:0;} 3%{opacity:1;} 22%{opacity:1;} 27%{opacity:0;} 100%{opacity:0;}
+  }
+  .video-anim-dots{display:flex; gap:8px;}
+  .video-anim-dots span{
+    width:10px; height:10px; border-radius:50%; display:inline-block;
+    animation:dotPulse 3s ease-in-out infinite; animation-delay:var(--d);
+  }
+  @keyframes dotPulse{0%,100%{transform:scale(1); opacity:.5;} 50%{transform:scale(1.4); opacity:1;}}
+
+  /* ---------- Lead capture modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(15,26,61,.55); backdrop-filter:blur(2px);
+    display:none; align-items:center; justify-content:center; padding:20px; z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:#fff; border-radius:20px; padding:32px 30px; max-width:400px; width:100%;
+    position:relative; box-shadow:0 30px 60px -20px rgba(15,26,61,.4);
+  }
+  .modal-close{
+    position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%;
+    border:none; background:var(--bg); color:var(--ink-soft); font-size:16px; cursor:pointer;
+  }
+  .modal-card h3{font-size:19px; font-family:"Zen Kaku Gothic New",sans-serif; padding-right:20px;}
+  .modal-desc{font-size:13px; color:var(--ink-soft); margin-top:8px; margin-bottom:20px;}
+  .lead-form{display:flex; flex-direction:column; gap:10px;}
+  .lead-input{
+    border:1.5px solid var(--line); border-radius:10px; padding:12px 14px; font-size:14px;
+    font-family:"Noto Sans JP",sans-serif; color:var(--ink);
+  }
+  .lead-input:focus{outline:none; border-color:var(--blue);}
+  .lead-msg{font-size:12.5px; min-height:16px;}
+
   @media (max-width:820px){
     .hero-grid{grid-template-columns:1fr;}
     .hero-visual{order:-1; max-width:280px; margin:0 auto;}
@@ -169,6 +242,8 @@
     .stat-item{border-right:none; border-bottom:1px solid var(--line);}
     .stat-item:last-child{border-bottom:none;}
     .final-cta-card{padding:44px 24px;}
+    .resource-cta-card{flex-direction:column; align-items:flex-start;}
+    .video-anim-logo{font-size:24px;}
   }
 </style>
 </head>
@@ -225,6 +300,19 @@
 
 <section>
   <div class="wrap">
+    <div class="resource-cta-card">
+      <div class="resource-cta-text">
+        <span class="eyebrow-pill">DOWNLOAD</span>
+        <h2 class="section-title" style="margin-top:14px; font-size:23px;">資料をダウンロードする</h2>
+        <p style="color:var(--ink-soft); font-size:14px; margin-top:10px;">カリキュラムの詳細・料金・学習の進め方をまとめた資料（PDF）を無料でお届けします。</p>
+      </div>
+      <button class="btn primary" id="openResourceModalBtn">資料をダウンロード（無料） →</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <div class="section-head">
       <span class="eyebrow-pill">WHO IS THIS FOR</span>
       <h2 class="section-title">こんな方におすすめです</h2>
@@ -255,6 +343,47 @@
       <div class="module-card" style="--accent:#2E8F6C;"><div class="module-badge" style="background:#2E8F6C;">08</div><div><h3>コンサルティング</h3><p>プロダクト開発を組織に根づかせる、伴走の力を学びます。</p></div></div>
       <div class="module-card" style="--accent:#3E9B7C;"><div class="module-badge" style="background:#3E9B7C;">09</div><div><h3>カスタマーサクセス</h3><p>導入後の顧客に価値を実感し続けてもらう力を、実例をもとに習得します。</p></div></div>
       <div class="module-card" style="--accent:#FF8A3D;"><div class="module-badge" style="background:#FF8A3D;">10</div><div><h3>グローバル</h3><p>語学力を武器に、海外展開を推進する力を実践的なケースで鍛えます。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="video">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow-pill">VIDEO</span>
+      <h2 class="section-title">3分でわかる、PdM登竜門</h2>
+      <p class="section-lead">プログラムの雰囲気やカリキュラムを、動画でご紹介します。ご登録いただいたメールアドレス宛にも、動画のリンクをお送りします。</p>
+    </div>
+    <div class="video-frame">
+      <div class="video-locked" id="videoLocked">
+        <div class="video-lock-icon">▶</div>
+        <p>メールアドレスをご登録いただくと、動画をご覧いただけます</p>
+        <button class="btn primary" id="openVideoModalBtn">動画を見る →</button>
+      </div>
+      <div class="video-player" id="videoPlayer" style="display:none;">
+        <div class="video-sample-badge">サンプル動画</div>
+        <div class="video-anim-stage">
+          <div class="video-anim-logo">PdM<span>登竜門</span></div>
+          <div class="video-anim-caption">
+            <span style="animation-delay:0s;">10領域49スキルを体系的に学ぶ</span>
+            <span style="animation-delay:3s;">実践課題で現場力を鍛える</span>
+            <span style="animation-delay:6s;">現役PdMと1on1で伴走</span>
+            <span style="animation-delay:9s;">シニアPdM・CPOへの一歩を</span>
+          </div>
+          <div class="video-anim-dots">
+            <span style="--d:0.0s; background:#16294C;"></span>
+            <span style="--d:0.3s; background:#1F3D74;"></span>
+            <span style="--d:0.6s; background:#28519C;"></span>
+            <span style="--d:0.9s; background:#3163B0;"></span>
+            <span style="--d:1.2s; background:#3E7FC4;"></span>
+            <span style="--d:1.5s; background:#4FA0B8;"></span>
+            <span style="--d:1.8s; background:#6C4AB6;"></span>
+            <span style="--d:2.1s; background:#2E8F6C;"></span>
+            <span style="--d:2.4s; background:#3E9B7C;"></span>
+            <span style="--d:2.7s; background:#FF8A3D;"></span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -330,6 +459,23 @@
   </div>
 </footer>
 
+<!-- 資料ダウンロード／動画視聴、共通のリード獲得モーダル -->
+<div class="modal-overlay" id="leadModalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="modalCloseBtn" aria-label="閉じる">×</button>
+    <h3 id="modalTitle"></h3>
+    <p class="modal-desc" id="modalDesc"></p>
+    <div class="lead-form">
+      <input type="text" id="leadName" class="lead-input" placeholder="お名前">
+      <input type="email" id="leadEmail" class="lead-input" placeholder="メールアドレス">
+      <input type="text" id="leadCompany" class="lead-input" placeholder="会社名（任意）">
+      <div class="lead-msg" id="leadMsg"></div>
+      <button class="btn primary" id="leadSubmitBtn" style="width:100%; justify-content:center; margin-top:6px;">送信する</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   // 診断結果ページから渡された文脈（pdmType/seniority/hensachi）を、応募フォームへのリンクにそのまま引き継ぐ
   (function(){
@@ -341,6 +487,102 @@
       if(el) el.href = "./index.html" + suffix + "#apply";
     });
   })();
+
+  // Supabase連携（index.htmlと同じプロジェクトを使用。未設定の場合はモーダルがエラーメッセージを表示する）
+  const SUPABASE_URL = "https://qdwiaedhairoythkqxoh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkd2lhZWRoYWlyb3l0aGtxeG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTY3NDUsImV4cCI6MjEwMzczMjc0NX0.zMy2DCPil6T59RgSddJmKkELkh5mZpMRrKvufzXP51A";
+  const supabaseClient = (SUPABASE_URL.includes("YOUR-PROJECT-ID"))
+    ? null
+    : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentLeadSource = null; // "resource_download" | "video_view"
+
+  function openLeadModal(source){
+    currentLeadSource = source;
+    const isResource = source === "resource_download";
+    document.getElementById("modalTitle").textContent = isResource ? "資料をダウンロード" : "動画を見る";
+    document.getElementById("modalDesc").textContent = isResource
+      ? "カリキュラムの詳細・料金・進め方をまとめた資料をお送りします。"
+      : "ご登録いただくと、3分でわかる紹介動画をご覧いただけます。";
+    document.getElementById("leadName").value = "";
+    document.getElementById("leadEmail").value = "";
+    document.getElementById("leadCompany").value = "";
+    document.getElementById("leadMsg").textContent = "";
+    document.getElementById("leadSubmitBtn").textContent = isResource ? "送信してダウンロード" : "送信して視聴する";
+    document.getElementById("leadModalOverlay").classList.add("open");
+  }
+  function closeLeadModal(){
+    document.getElementById("leadModalOverlay").classList.remove("open");
+  }
+
+  document.getElementById("openResourceModalBtn").onclick = ()=> openLeadModal("resource_download");
+  document.getElementById("openVideoModalBtn").onclick = ()=> openLeadModal("video_view");
+  document.getElementById("modalCloseBtn").onclick = closeLeadModal;
+  document.getElementById("leadModalOverlay").addEventListener("click", (e)=>{
+    if(e.target.id === "leadModalOverlay") closeLeadModal();
+  });
+
+  document.getElementById("leadSubmitBtn").onclick = async ()=>{
+    const name = document.getElementById("leadName").value.trim();
+    const email = document.getElementById("leadEmail").value.trim();
+    const company = document.getElementById("leadCompany").value.trim();
+    const msgEl = document.getElementById("leadMsg");
+    const btn = document.getElementById("leadSubmitBtn");
+
+    if(!name || !email){
+      msgEl.textContent = "お名前とメールアドレスは必須です。";
+      msgEl.style.color = "#E14B4B";
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailPattern.test(email)){
+      msgEl.textContent = "メールアドレスの形式が正しくありません。";
+      msgEl.style.color = "#E14B4B";
+      return;
+    }
+    if(!supabaseClient){
+      msgEl.textContent = "現在受け付けられません。時間をおいて再度お試しください。";
+      msgEl.style.color = "#E14B4B";
+      return;
+    }
+
+    btn.disabled = true;
+    msgEl.style.color = "var(--ink-soft)";
+    msgEl.textContent = "送信中…";
+
+    try{
+      const { error } = await supabaseClient.from("leads").insert({
+        source: currentLeadSource,
+        name, email,
+        company: company || null,
+      });
+      if(error){
+        msgEl.style.color = "#E14B4B";
+        msgEl.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+        btn.disabled = false;
+        return;
+      }
+      if(currentLeadSource === "resource_download"){
+        msgEl.style.color = "#2E8F6C";
+        msgEl.textContent = "ありがとうございます。資料のダウンロードを開始します。";
+        const a = document.createElement("a");
+        a.href = "./PdM_toryumon_pamphlet.pdf";
+        a.download = "PdM登竜門_資料.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(closeLeadModal, 1400);
+      }else{
+        closeLeadModal();
+        document.getElementById("videoLocked").style.display = "none";
+        document.getElementById("videoPlayer").style.display = "block";
+      }
+    }catch(e){
+      msgEl.style.color = "#E14B4B";
+      msgEl.textContent = "通信エラーが発生しました。時間をおいて再度お試しください。";
+    }
+    btn.disabled = false;
+  };
 </script>
 
 </body>

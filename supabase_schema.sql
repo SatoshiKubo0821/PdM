@@ -108,6 +108,25 @@ create policy "anyone can submit application"
 --   where is_anonymous = true
 --   and created_at < now() - interval '30 days';
 
+-- 6) 「PdM登竜門」ページ（toryumon.html）の軽量リード獲得フォーム用テーブル
+--    資料ダウンロード・説明動画視聴の2種類をsourceで区別する。
+--    応募フォーム(applications)より項目を絞った、心理的ハードルの低いフォーム用。
+create table if not exists public.leads (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  source text not null,       -- 'resource_download' または 'video_view'
+  name text not null,
+  email text not null,
+  company text
+);
+
+alter table public.leads enable row level security;
+
+drop policy if exists "anyone can submit lead" on public.leads;
+create policy "anyone can submit lead"
+  on public.leads for insert
+  with check (true);
+
 -- ============================================================
 -- 実行後の確認事項（Supabaseダッシュボード側）：
 -- 1. Authentication → Providers → Anonymous Sign-Ins を有効化
