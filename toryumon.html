@@ -75,9 +75,65 @@
   .hero h1 .hl{color:var(--blue);}
   .hero p{font-size:15.5px; color:var(--ink-soft); margin-top:18px; max-width:48ch;}
   .hero-cta-row{display:flex; gap:14px; margin-top:28px; flex-wrap:wrap;}
+  .hero-caption{font-size:12px; color:var(--ink-soft); margin-top:16px !important;}
 
-  .hero-visual{position:relative; display:flex; align-items:center; justify-content:center;}
-  .hero-visual svg{width:100%; height:auto; max-width:420px;}
+  .eyebrow-pill.dot-pill{background:#fff; border:1px solid var(--line); box-shadow:0 6px 16px -10px rgba(22,33,77,.2);}
+  .live-dot{width:8px; height:8px; border-radius:50%; background:#2E8F6C; display:inline-block;}
+
+  /* ---------- Hero floating card panel (実在の人物写真は使わず、オリジナルイラスト＋機能カードで表現) ---------- */
+  .hero-visual-panel{position:relative; min-height:380px;}
+  .hero-illust{
+    position:relative; border-radius:24px; overflow:hidden;
+    box-shadow:0 30px 60px -30px rgba(22,33,77,.35);
+  }
+  .hero-illust svg{width:100%; height:auto; display:block;}
+  .float-card{
+    position:absolute; background:#fff; border-radius:16px; padding:14px 16px;
+    box-shadow:0 20px 40px -18px rgba(22,33,77,.35); display:flex; align-items:center; gap:12px;
+    max-width:230px;
+  }
+  .float-card-title{font-size:12.5px; font-weight:800; font-family:"Zen Kaku Gothic New",sans-serif; color:var(--ink);}
+  .float-card-sub{font-size:11px; color:var(--ink-soft); margin-top:2px;}
+  .float-card-top{top:-10px; left:-10px;}
+  .float-avatar{
+    width:34px; height:34px; border-radius:10px; background:var(--grad-blue); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:900; font-family:"Zen Kaku Gothic New",sans-serif;
+    flex-shrink:0;
+  }
+  .float-card-poll{bottom:70px; left:-24px; display:block;}
+  .float-poll-row{display:flex; gap:6px; margin-top:8px;}
+  .float-poll-row span{
+    width:24px; height:24px; border-radius:50%; background:var(--bg); color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;
+  }
+  .float-poll-row span.on{background:var(--blue); color:#fff;}
+  .float-card-poll .float-card-sub{margin-top:8px;}
+  .float-card-praise{bottom:-16px; right:-16px; display:block; max-width:210px;}
+  .float-card-quote{font-size:12.5px; font-weight:700; color:var(--ink); margin-top:6px; line-height:1.5;}
+  .float-avatars{display:flex; margin-top:10px;}
+  .float-avatars span{
+    width:24px; height:24px; border-radius:50%; background:var(--blue-soft); color:var(--blue);
+    display:flex; align-items:center; justify-content:center; font-size:9.5px; font-weight:800;
+    border:2px solid #fff; margin-left:-6px;
+  }
+  .float-avatars span:first-child{margin-left:0;}
+  .float-avatars span.more{background:var(--orange-soft); color:var(--orange);}
+
+  /* ---------- 特別講座プロモバー ---------- */
+  .special-promo-bar{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:#fff; border:1px solid var(--line); border-radius:100px; padding:10px 20px;
+    text-decoration:none; box-shadow:0 12px 24px -20px rgba(22,33,77,.3);
+    transition:border-color .15s ease;
+  }
+  .special-promo-bar:hover{border-color:var(--blue);}
+  .special-promo-badge{
+    background:var(--orange); color:#fff; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:20px;
+    font-family:"Zen Kaku Gothic New",sans-serif; flex-shrink:0;
+  }
+  .special-promo-text{font-size:12.5px; font-weight:700; color:var(--ink); flex-shrink:0;}
+  .special-promo-chip{font-size:11.5px; color:var(--ink-soft); background:var(--bg); padding:4px 10px; border-radius:20px;}
+  .special-promo-arrow{color:var(--blue); font-weight:800; margin-left:auto;}
 
   /* ---------- Stat bar ---------- */
   .stat-bar{
@@ -301,7 +357,7 @@
 
   @media (max-width:820px){
     .hero-grid{grid-template-columns:1fr;}
-    .hero-visual{order:-1; max-width:280px; margin:0 auto;}
+    .hero-visual-panel{order:-1; max-width:340px; margin:0 auto 48px;}
     .hero h1{font-size:30px;}
     .fit-grid{grid-template-columns:1fr;}
     .module-grid{grid-template-columns:1fr;}
@@ -315,6 +371,12 @@
     .instructor-grid{grid-template-columns:repeat(2,1fr);}
     .course-band{grid-template-columns:1fr; padding:32px 24px;}
     .course-cards.grid2{grid-template-columns:1fr;}
+    .float-card{max-width:180px; padding:10px 12px;}
+    .float-card-top{top:-16px; left:-8px;}
+    .float-card-poll{bottom:60px; left:-16px;}
+    .float-card-praise{bottom:-24px; right:-8px; max-width:170px;}
+    .special-promo-bar{flex-direction:column; align-items:flex-start; border-radius:16px;}
+    .special-promo-arrow{margin-left:0;}
   }
 </style>
 </head>
@@ -334,35 +396,67 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <span class="eyebrow-pill">PRODUCT MANAGER BOOTCAMP</span>
+      <span class="eyebrow-pill dot-pill"><span class="live-dot"></span>非エンジニアでも、圧倒的に成長できるPdM育成</span>
       <h1>非エンジニアでもなれる、<br><span class="hl">未経験からのPdM登竜門</span></h1>
       <p>「エンジニア出身じゃないと厳しいのでは」——そんな不安は不要です。事業戦略からグローバル展開まで、PdMに求められる10領域49スキルを未経験からでも体系的に学べます。実際のプロダクト課題に取り組みながら、<b style="color:var(--ink);">充実した講師陣</b>が一人ひとりに合わせて伴走します。</p>
       <div class="hero-cta-row">
         <a class="btn primary" href="./index.html#apply" id="heroApplyBtn">無料相談・応募はこちら →</a>
         <a class="btn outline" href="#curriculum">カリキュラムを見る</a>
       </div>
+      <p class="hero-caption">クレジットカード不要・オンライン完結・現役PdMによる1on1メンタリング付き</p>
     </div>
-    <div class="hero-visual">
-      <svg viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="200" cy="190" r="160" fill="#EDF1FE"/>
-        <circle cx="310" cy="80" r="34" fill="#FFEDDD"/>
-        <circle cx="70" cy="290" r="22" fill="#DCE5FE"/>
-        <rect x="90" y="110" width="220" height="150" rx="18" fill="#ffffff" stroke="#E3E8F5" stroke-width="2"/>
-        <rect x="112" y="136" width="120" height="12" rx="6" fill="#2952E3"/>
-        <rect x="112" y="160" width="176" height="8" rx="4" fill="#E3E8F5"/>
-        <rect x="112" y="176" width="150" height="8" rx="4" fill="#E3E8F5"/>
-        <rect x="112" y="200" width="60" height="34" rx="8" fill="#EDF1FE"/>
-        <rect x="182" y="200" width="60" height="34" rx="8" fill="#FFEDDD"/>
-        <rect x="252" y="200" width="36" height="34" rx="8" fill="#EDF1FE"/>
-        <circle cx="270" cy="130" r="16" fill="#FF8A3D"/>
-        <path d="M263 130l5 5 9-10" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="112" cy="290" r="10" fill="#2952E3"/>
-        <circle cx="140" cy="300" r="6" fill="#5B7CF0"/>
-      </svg>
+    <div class="hero-visual-panel">
+      <div class="hero-illust">
+        <svg viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="200" cy="190" r="170" fill="#EDF1FE"/>
+          <circle cx="320" cy="70" r="30" fill="#FFEDDD"/>
+          <circle cx="60" cy="300" r="20" fill="#DCE5FE"/>
+          <rect x="80" y="100" width="240" height="180" rx="20" fill="#ffffff" stroke="#E3E8F5" stroke-width="2"/>
+          <circle cx="150" cy="150" r="20" fill="#DCE5FE"/>
+          <circle cx="210" cy="150" r="20" fill="#FFEDDD"/>
+          <circle cx="270" cy="150" r="20" fill="#DCE5FE"/>
+          <path d="M130 210q20-24 40 0M190 210q20-24 40 0M250 210q20-24 40 0" stroke="#2952E3" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <rect x="110" y="240" width="180" height="10" rx="5" fill="#E3E8F5"/>
+          <rect x="110" y="258" width="120" height="10" rx="5" fill="#E3E8F5"/>
+        </svg>
+      </div>
+      <div class="float-card float-card-top">
+        <div class="float-avatar">P</div>
+        <div>
+          <div class="float-card-title">今日のPdM登竜門</div>
+          <div class="float-card-sub">特別講座、好評開講中です</div>
+        </div>
+      </div>
+      <div class="float-card float-card-poll">
+        <div class="float-card-title">あなたのPdM熟練度は？</div>
+        <div class="float-poll-row">
+          <span>1</span><span>2</span><span>3</span><span class="on">4</span><span>5</span>
+        </div>
+        <div class="float-card-sub">約5分で無料診断できます</div>
+      </div>
+      <div class="float-card float-card-praise">
+        <div class="float-card-title">受講生の声</div>
+        <div class="float-card-quote">「要件定義の考え方が整理できました」</div>
+        <div class="float-avatars">
+          <span>田</span><span>佐</span><span>中</span><span class="more">+12</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="wrap" style="margin-top:56px;">
+  <div class="wrap" style="margin-top:16px;">
+    <a class="special-promo-bar" href="#courses">
+      <span class="special-promo-badge">PICK UP</span>
+      <span class="special-promo-text">特別講座、好評開講中：</span>
+      <span class="special-promo-chip">AI駆動開発PdM</span>
+      <span class="special-promo-chip">ファイナンスPdM</span>
+      <span class="special-promo-chip">スクラムマスター型PdM</span>
+      <span class="special-promo-chip">CPO向け組織構築</span>
+      <span class="special-promo-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="wrap" style="margin-top:32px;">
     <div class="stat-bar">
       <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">学習領域</div></div>
       <div class="stat-item"><div class="stat-num">49</div><div class="stat-label">カバーするスキル項目</div></div>
