@@ -63,6 +63,49 @@
     margin:0 auto;
     padding:56px 24px 96px;
   }
+  /* ---------- Site header ---------- */
+  .site-header{
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:50;
+  }
+  .site-header-inner{
+    max-width:780px; margin:0 auto; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .site-logo{
+    display:flex; align-items:center; gap:8px; text-decoration:none;
+    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:15px; color:var(--ink);
+  }
+  .site-logo-dot{width:9px; height:9px; border-radius:50%; background:var(--gold);}
+  .site-nav{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
+  .site-nav a{
+    color:var(--ink-soft); font-size:13px; font-weight:600; text-decoration:none;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .site-nav a:hover{color:var(--blue-500);}
+  .ext-badge{
+    font-size:10px; background:var(--bg); color:var(--ink-soft); padding:1px 6px; border-radius:8px; font-weight:700;
+  }
+  .auth-pill{
+    display:inline-flex; align-items:center; gap:8px; background:var(--bg); border-radius:20px; padding:5px 6px 5px 12px;
+    font-size:12.5px; color:var(--ink-soft); font-weight:600;
+  }
+  .auth-pill button{
+    border:none; background:var(--paper); color:var(--ink-soft); font-size:11.5px; font-weight:700;
+    padding:5px 10px; border-radius:16px; cursor:pointer; border:1px solid var(--line);
+  }
+  .google-btn{
+    display:inline-flex; align-items:center; gap:8px; background:#fff; border:1.5px solid var(--line);
+    padding:7px 14px 7px 8px; border-radius:20px; font-size:12.5px; font-weight:700; color:var(--ink);
+    cursor:pointer; font-family:"Noto Sans JP",sans-serif;
+  }
+  .google-btn:hover{border-color:var(--blue-500);}
+  .google-btn svg{width:16px; height:16px;}
+  @media (max-width:600px){
+    .site-header-inner{flex-direction:column; align-items:flex-start; gap:10px;}
+    .site-nav{width:100%; justify-content:space-between;}
+  }
   h1,h2,h3{
     font-family:"Zen Kaku Gothic New", sans-serif;
     margin:0;
@@ -94,25 +137,49 @@
     display:flex;
     justify-content:center;
   }
+  /* イントロ画面の実績バー（バクラク風の大きい数字） */
+  .intro-stat-bar{
+    display:flex;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+    margin:32px 0;
+    box-shadow:0 16px 32px -26px rgba(22,33,77,.25);
+  }
+  .intro-stat-item{flex:1; text-align:center; padding:20px 10px; border-right:1px solid var(--line);}
+  .intro-stat-item:last-child{border-right:none;}
+  .intro-stat-num{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:26px; color:var(--gold);}
+  .intro-stat-label{font-size:11px; color:var(--ink-soft); margin-top:2px; font-weight:600;}
+
   .cat-list{
-    margin-top:40px;
+    margin-top:24px;
     display:grid;
     grid-template-columns:repeat(2,1fr);
-    gap:2px;
-    background:var(--line);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    overflow:hidden;
+    gap:10px;
   }
-  .cat-list div{
+  .cat-list a, .cat-list div.cat-card{
     background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
     padding:14px 16px;
-    font-size:14px;
+    font-size:13.5px;
     display:flex;
-    justify-content:space-between;
-    gap:8px;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+    color:var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   }
-  .cat-list span{color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+  .cat-list a:hover, .cat-list div.cat-card:hover{transform:translateY(-2px); box-shadow:0 12px 24px -20px rgba(22,33,77,.35); border-color:var(--blue-300);}
+  .cat-icon{
+    flex-shrink:0; width:34px; height:34px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cat-icon svg{width:17px; height:17px;}
+  .cat-card-text{flex:1;}
+  .cat-card-num{font-size:10.5px; color:var(--ink-soft); font-weight:700; display:block;}
+  .cat-card-count{color:var(--ink-soft); font-variant-numeric:tabular-nums; font-size:12px; flex-shrink:0;}
   .start-row{
     margin-top:40px;
     display:flex;
@@ -793,6 +860,16 @@
 </style>
 </head>
 <body>
+<header class="site-header" id="siteHeader">
+  <div class="site-header-inner">
+    <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMスキルレーダー</a>
+    <nav class="site-nav">
+      <a href="https://chordone.jp/org-culture-diagnosis.html" target="_blank" rel="noopener">組織タイプ診断<span class="ext-badge">外部</span></a>
+      <a href="#" id="navMypageLink">マイページ</a>
+      <span id="navAuthArea"></span>
+    </nav>
+  </div>
+</header>
 <div class="wrap" id="app"></div>
 
 <!-- ============================================================
@@ -1420,11 +1497,24 @@ function buildSwot(strengthCats, growthCats, matrix){
   return { S, W, O, T };
 }
 
-/* カテゴリごとのアクセントカラー（診断画面の視認性向上のため） */
+/* カテゴリごとのアクセントカラー（診断画面の視認性向上のため。toryumon.htmlのモジュールカードと同じ配色） */
 const CATEGORY_COLOR = {
   strategy:"#16294C", research:"#1F3D74", direction:"#28519C", requirement:"#3163B0",
   design:"#3E7FC4", release:"#4FA0B8", communication:"#6C4AB6", consulting:"#2E8F6C",
-  global:"#C0812C", success:"#3E9B7C",
+  success:"#3E9B7C", global:"#FF8A3D",
+};
+/* カテゴリごとのアイコン（toryumon.htmlのモジュールカードと共通のオリジナル図形） */
+const CATEGORY_ICON = {
+  strategy: '<path d="M6 3v18H4V3h2zm1 1h11l-2.5 3.5L18 11H7V4z" fill="#fff"/>',
+  research: '<circle cx="10" cy="10" r="6" fill="none" stroke="#fff" stroke-width="2"/><path d="M15 15l6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  direction: '<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M14.5 9.5L10 14l1.5-4.5L16 8z" fill="#fff"/>',
+  requirement: '<rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  design: '<path d="M4 20l3-1 10-10-2-2L5 17l-1 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6l2 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  release: '<path d="M13 2c3 3 4 6 3 10l-3 3-3-3c-1-4 0-7 3-10z" fill="#fff"/><circle cx="13" cy="9" r="1.6" fill="#4FA0B8"/><path d="M8 15l-3 5 5-3z" fill="#fff"/>',
+  communication: '<path d="M4 4h13v9H8l-4 4V4z" fill="#fff"/>',
+  consulting: '<path d="M8 12l3 3 5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/>',
+  success: '<path d="M12 21C7 18 4 14 4 9.5A6.5 6.5 0 0117 9.5C17 14 12 21 12 21z" fill="#fff"/>',
+  global: '<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z" fill="none" stroke="#fff" stroke-width="2"/>',
 };
 
 const TOTAL_SKILLS = CATEGORIES.reduce((n,c)=>n+c.skills.length,0);
@@ -1560,6 +1650,7 @@ function render(){
   else if(state.screen==="mbti") renderMbti();
   else if(state.screen==="profile") renderProfile();
   else if(state.screen==="history") renderHistory();
+  else if(state.screen==="mypage") renderHistory();
   else if(state.screen==="account") renderAccount();
   else if(state.screen==="apply") renderApply();
   else renderResults();
@@ -1628,19 +1719,75 @@ async function linkEmail(email){
   }
 }
 
+/* Googleアカウントでのログイン。
+   匿名セッション中なら linkIdentity() で同じuser_idのまま永久アカウントに昇格（履歴を引き継ぐ）。
+   すでに永久アカウントの場合は signInWithOAuth() で通常ログイン。 */
+async function signInWithGoogle(){
+  if(!supabaseClient) return;
+  const redirectTo = window.location.origin + window.location.pathname + "#mypage";
+  try{
+    const { data:{ session } } = await supabaseClient.auth.getSession();
+    if(session && session.user && session.user.is_anonymous){
+      await supabaseClient.auth.linkIdentity({ provider:"google", options:{ redirectTo } });
+    }else{
+      await supabaseClient.auth.signInWithOAuth({ provider:"google", options:{ redirectTo } });
+    }
+  }catch(e){ /* リダイレクトに失敗した場合は何もしない */ }
+}
+async function signOutUser(){
+  if(!supabaseClient) return;
+  try{ await supabaseClient.auth.signOut(); }catch(e){ /* ignore */ }
+  state.userId = null;
+  state.userEmail = null;
+  await ensureSession();
+  renderHeader();
+  render();
+}
+
+/* 画面共通のヘッダー（ログイン状態表示）を更新する */
+function renderHeader(){
+  const authArea = document.getElementById("navAuthArea");
+  if(!authArea) return;
+  if(!supabaseClient){
+    authArea.innerHTML = "";
+    return;
+  }
+  if(state.userEmail){
+    authArea.innerHTML = `<span class="auth-pill">${state.userEmail}<button id="headerLogoutBtn">ログアウト</button></span>`;
+    const btn = document.getElementById("headerLogoutBtn");
+    if(btn) btn.onclick = signOutUser;
+  }else{
+    authArea.innerHTML = `<button class="google-btn" id="headerGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>ログイン</button>`;
+    const btn = document.getElementById("headerGoogleBtn");
+    if(btn) btn.onclick = signInWithGoogle;
+  }
+}
+
 async function renderHistory(){
   const rows = await fetchHistory();
+  const loggedIn = !!state.userEmail;
   app.innerHTML = `
-    <div class="eyebrow">診断履歴</div>
-    <h1 class="hero-title" style="font-size:28px;">これまでの診断結果</h1>
+    <div class="eyebrow">マイページ</div>
+    <h1 class="hero-title" style="font-size:28px;">${state.profile.nickname ? state.profile.nickname+"さんの" : "あなたの"}マイページ</h1>
     <p class="hero-lead">
-      ${state.userEmail ? `${state.userEmail} に連携されたアカウントの履歴です。` : "この端末（匿名アカウント）に保存された履歴です。メール連携すると他の端末からも見られるようになります。"}
+      ${loggedIn ? `${state.userEmail} でログイン中です。どの端末からでも同じ履歴にアクセスできます。` : "この端末（匿名アカウント）に保存された履歴です。ログインすると、他の端末からも同じ履歴にアクセスできるようになります。"}
     </p>
 
     ${!supabaseClient ? `
-    <div class="insight weak"><p>Supabaseが未設定のため、履歴機能は利用できません。</p></div>
-    ` : rows.length===0 ? `
-    <div class="insight"><p>まだ保存された診断履歴がありません。診断を完了すると、ここに記録されていきます。</p></div>
+    <div class="insight weak"><p>Supabaseが未設定のため、マイページ機能は利用できません。</p></div>
+    ` : !loggedIn ? `
+    <div class="insight fusion">
+      <h4>ログインして、履歴をどの端末でも見られるように</h4>
+      <p style="margin-bottom:12px;">Googleアカウントでログインすると、今の匿名データがそのまま引き継がれます。</p>
+      <button class="google-btn" id="mypageGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>Googleでログイン</button>
+      <span style="margin:0 8px; color:var(--ink-soft); font-size:12px;">または</span>
+      <button class="ghost" id="toAccountBtn" style="font-size:12.5px; padding:8px 16px;">メールアドレスで同期</button>
+    </div>
+    ` : ""}
+
+    <div class="section-label" style="margin-top:32px;">診断履歴</div>
+    ${rows.length===0 ? `
+    <div class="insight" style="margin-top:14px;"><p>まだ保存された診断履歴がありません。診断を完了すると、ここに記録されていきます。</p></div>
     ` : rows.map(r=>{
       const date = new Date(r.created_at).toLocaleDateString("ja-JP", {year:"numeric", month:"short", day:"numeric"});
       const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
@@ -1654,11 +1801,16 @@ async function renderHistory(){
     }).join("")}
 
     <div class="start-row" style="margin-top:32px;">
-      <button class="ghost" id="toAccountBtn">${state.userEmail ? "アカウント設定" : "メールで同期する"}</button>
+      ${loggedIn ? `<button class="ghost" id="logoutBtnPage">ログアウト</button>` : ""}
       <button class="primary" id="backHomeBtn">診断トップに戻る</button>
     </div>
   `;
-  document.getElementById("toAccountBtn").onclick = ()=>{ state.screen="account"; render(); window.scrollTo(0,0); };
+  const toAccountBtn = document.getElementById("toAccountBtn");
+  if(toAccountBtn) toAccountBtn.onclick = ()=>{ state.screen="account"; render(); window.scrollTo(0,0); };
+  const mypageGoogleBtn = document.getElementById("mypageGoogleBtn");
+  if(mypageGoogleBtn) mypageGoogleBtn.onclick = signInWithGoogle;
+  const logoutBtnPage = document.getElementById("logoutBtnPage");
+  if(logoutBtnPage) logoutBtnPage.onclick = signOutUser;
   document.getElementById("backHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
 
   app.querySelectorAll(".history-row").forEach(el=>{
@@ -1703,7 +1855,7 @@ function renderAccount(){
     </div>` : ""}
 
     <div class="start-row" style="margin-top:32px;">
-      <button class="ghost" id="backHistoryBtn">履歴に戻る</button>
+      <button class="ghost" id="backHistoryBtn">マイページに戻る</button>
     </div>
   `;
   document.getElementById("backHistoryBtn").onclick = ()=>{ state.screen="history"; render(); window.scrollTo(0,0); };
@@ -1874,10 +2026,16 @@ async function renderIntro(){
       事業戦略からコンサルティングまで、プロダクトマネージャーに求められる能力を10カテゴリ49項目に分解。
       各項目を5段階で自己評価すると、強みと伸びしろがレーダーチャートで見えてくるほか、
       「テックドリブンPdM」「BizDevPdM」「PMM系PdM」「総合型PdM」のどのタイプに近いか、
-      経験レベル（ジュニア〜シニア/CPO）や、性格タイプ（MBTI）を掛け合わせた総合分析も行います。所要時間は約5分です。
+      経験レベル（ジュニア〜シニア/CPO）や、性格タイプ（MBTI）を掛け合わせた総合分析も行います。
     </p>
 
     <div class="hero-visual">${previewRadarSVG()}</div>
+
+    <div class="intro-stat-bar">
+      <div class="intro-stat-item"><div class="intro-stat-num">10</div><div class="intro-stat-label">カテゴリ</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">49</div><div class="intro-stat-label">スキル項目</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">約5分</div><div class="intro-stat-label">所要時間</div></div>
+    </div>
 
     <div class="profile-form" style="max-width:520px;">
       <label class="profile-label" for="nicknameInput">ニックネーム（任意）</label>
@@ -1888,18 +2046,24 @@ async function renderIntro(){
     </div>
 
     <div class="cat-list">
-      ${CATEGORIES.map((c,i)=>`<div><span>0${i+1}</span>${c.name}<span>${c.skills.length}項目</span></div>`).join("")}
+      ${CATEGORIES.map((c,i)=>`
+        <div class="cat-card">
+          <div class="cat-icon" style="background:${CATEGORY_COLOR[c.key]};"><svg viewBox="0 0 24 24">${CATEGORY_ICON[c.key]}</svg></div>
+          <div class="cat-card-text"><span class="cat-card-num">0${i+1}</span>${c.name}</div>
+          <span class="cat-card-count">${c.skills.length}項目</span>
+        </div>`).join("")}
     </div>
 
     <div class="start-row">
       <button class="primary" id="startBtn">${hasSaved ? "続きから診断する" : "診断をはじめる"}</button>
       ${hasSaved ? `<button class="ghost" id="restartBtn">最初からやり直す</button>` : ""}
-      ${supabaseClient ? `<button class="ghost" id="historyBtn">診断履歴を見る</button>` : ""}
+      ${supabaseClient ? `<button class="ghost" id="historyBtn">マイページを見る</button>` : ""}
       ${hasSaved ? `<span class="resume-note">前回の回答（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}項目）が保存されています</span>` : ""}
     </div>
 
     <footer class="note">
       本診断はセルフチェック用の簡易ツールです。回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
+      もっと体系的に学びたい方は<a href="./toryumon.html">PdM登竜門</a>もご覧ください。
     </footer>
   `;
 
@@ -2549,7 +2713,7 @@ function renderResults(){
       <button class="primary" id="retryBtn">回答を修正する</button>
       <button class="ghost" id="mbtiEditBtn">MBTIを選び直す</button>
       <button class="ghost" id="profileEditBtn">語学・資格を編集</button>
-      ${supabaseClient ? `<button class="ghost" id="historyBtn">診断履歴を見る</button>` : ""}
+      ${supabaseClient ? `<button class="ghost" id="historyBtn">マイページを見る</button>` : ""}
       <button class="ghost" id="resetBtn">最初からやり直す</button>
     </div>
     `}
@@ -2633,7 +2797,14 @@ function renderResults(){
   }
   if(window.location.hash === "#apply"){
     state.screen = "apply";
+  }else if(window.location.hash === "#mypage"){
+    state.screen = "mypage";
   }
+  const navMypageLink = document.getElementById("navMypageLink");
+  if(navMypageLink){
+    navMypageLink.onclick = (e)=>{ e.preventDefault(); state.screen="mypage"; render(); window.scrollTo(0,0); };
+  }
+  renderHeader();
   render();
 })();
 </script>
