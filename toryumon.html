@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PdM登竜門｜実践で学ぶプロダクトマネジメント</title>
+<meta name="description" content="事業戦略からグローバル展開まで、10領域49スキルを実践課題とメンタリングで鍛えるPdM育成プログラム「PdM登竜門」。">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23101C36%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2212%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22%20opacity%3D%220.7%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%236FA0FF%22%20opacity%3D%220.5%22/%3E%3Ccircle%20cx%3D%2242%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23C0812C%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F6FA; --paper:#FFFFFF; --ink:#131A2B; --ink-soft:#5A6478; --line:#DFE4EE;
+    --navy-950:#0B1220; --navy-900:#101C36; --blue-500:#2E5FD9; --blue-300:#6FA0FF;
+    --gold:#C0812C; --gold-soft:#F3E3C8;
+    --grad-main: linear-gradient(135deg, var(--navy-900) 0%, var(--blue-500) 100%);
+    --grad-soft: linear-gradient(135deg, rgba(46,95,217,.10) 0%, rgba(111,160,255,.04) 100%);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans JP", sans-serif; line-height:1.75;}
+  h1,h2,h3{font-family:"Zen Kaku Gothic New", sans-serif; margin:0; color:var(--navy-900);}
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+  a{color:var(--blue-500);}
+
+  /* ---------- Hero ---------- */
+  .hero{background:var(--grad-main); color:#fff; padding:80px 0 96px;}
+  .hero .wrap{display:flex; flex-direction:column; align-items:flex-start; gap:18px;}
+  .eyebrow{font-size:13px; letter-spacing:.08em; opacity:.75; font-weight:600;}
+  .hero h1{color:#fff; font-size:40px; font-weight:900; line-height:1.4; max-width:22ch;}
+  .hero p{font-size:16px; opacity:.85; max-width:56ch;}
+  .hero-stats{display:flex; gap:32px; margin-top:8px; flex-wrap:wrap;}
+  .hero-stat b{display:block; font-family:"Zen Kaku Gothic New",sans-serif; font-size:26px; font-weight:900;}
+  .hero-stat span{font-size:12.5px; opacity:.75;}
+  .btn{
+    display:inline-block; text-decoration:none; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700;
+    padding:15px 30px; border-radius:6px; font-size:15px; margin-top:8px;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .btn:hover{filter:brightness(1.08); transform:translateY(-1px);}
+  .btn.gold{background:var(--gold); color:#3A2508;}
+  .btn.outline{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.55);}
+
+  /* ---------- Sections ---------- */
+  section{padding:72px 0;}
+  .section-label{font-size:13px; font-weight:700; color:var(--gold); letter-spacing:.06em; margin-bottom:10px;}
+  .section-title{font-size:28px; font-weight:900; max-width:26ch;}
+  .section-lead{color:var(--ink-soft); font-size:15px; margin-top:12px; max-width:64ch;}
+
+  /* who it's for */
+  .fit-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:32px;}
+  .fit-card{background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:22px 20px;}
+  .fit-card .num{font-family:"Zen Kaku Gothic New",sans-serif; color:var(--gold); font-weight:900; font-size:13px;}
+  .fit-card p{font-size:14px; margin-top:8px; color:var(--ink);}
+
+  /* skill modules */
+  .module-section{background:var(--paper);}
+  .module-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:2px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-top:32px;}
+  .module-card{background:var(--paper); padding:22px 24px; border-top:3px solid var(--accent, var(--blue-500));}
+  .module-card .idx{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:12px; color:var(--accent, var(--blue-500));}
+  .module-card h3{font-size:16px; margin-top:6px;}
+  .module-card p{font-size:13px; color:var(--ink-soft); margin-top:6px;}
+
+  /* features */
+  .feature-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; margin-top:32px;}
+  .feature-card{background:var(--grad-soft); border:1px solid var(--line); border-radius:8px; padding:24px 26px;}
+  .feature-card h3{font-size:16px;}
+  .feature-card p{font-size:13.5px; color:var(--ink-soft); margin-top:8px;}
+
+  /* flow */
+  .flow-list{margin-top:32px; display:flex; flex-direction:column; gap:0;}
+  .flow-item{display:flex; gap:20px; padding:20px 0; border-bottom:1px solid var(--line);}
+  .flow-item:last-child{border-bottom:none;}
+  .flow-num{
+    flex-shrink:0; width:36px; height:36px; border-radius:50%; background:var(--navy-900); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:14px;
+  }
+  .flow-text h4{font-size:15px; font-family:"Zen Kaku Gothic New",sans-serif; margin:0 0 4px;}
+  .flow-text p{font-size:13.5px; color:var(--ink-soft); margin:0;}
+
+  /* final CTA */
+  .final-cta{background:var(--navy-950); color:#fff; text-align:center;}
+  .final-cta h2{color:#fff; font-size:30px;}
+  .final-cta p{color:rgba(255,255,255,.75); margin-top:12px; max-width:52ch; margin-left:auto; margin-right:auto;}
+  .final-cta .btn{margin-top:24px;}
+
+  footer{padding:32px 0 56px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
+  footer a{color:var(--blue-500);}
+
+  @media (max-width:680px){
+    .hero h1{font-size:30px;}
+    .fit-grid{grid-template-columns:1fr;}
+    .module-grid{grid-template-columns:1fr;}
+    .feature-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">PdM登竜門 — Product Manager Bootcamp</div>
+    <h1>実践課題とメンタリングで、<br>プロダクトマネジメントを一段深く学ぶ。</h1>
+    <p>事業戦略からグローバル展開まで、PdMに求められる10領域49スキルを体系的にカバー。座学だけでなく、実際のプロダクト課題に取り組みながら、経験豊富なメンターと一緒に力を伸ばしていくプログラムです。</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><b>10</b><span>学習領域</span></div>
+      <div class="hero-stat"><b>49</b><span>カバーするスキル項目</span></div>
+      <div class="hero-stat"><b>1on1</b><span>メンタリング体制</span></div>
+    </div>
+    <a class="btn gold" href="./index.html#apply" id="heroApplyBtn">無料相談・応募はこちら →</a>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label">WHO IS THIS FOR</div>
+    <h2 class="section-title">こんな方におすすめです</h2>
+    <div class="fit-grid">
+      <div class="fit-card"><div class="num">01</div><p>PdMになったばかりで、事業戦略から開発ディレクションまで、何から手をつければいいか整理したい方</p></div>
+      <div class="fit-card"><div class="num">02</div><p>特定領域（開発・事業・マーケなど）には強みがあるが、他の領域にも視野を広げてキャリアの幅を作りたい方</p></div>
+      <div class="fit-card"><div class="num">03</div><p>シニアPdMやCPOを目指す上で、自分の強み・弱みを客観的に把握し、計画的に伸ばしていきたい方</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="module-section">
+  <div class="wrap">
+    <div class="section-label">CURRICULUM</div>
+    <h2 class="section-title">学べる10のスキルセット</h2>
+    <p class="section-lead">PdMスキル診断でも使われている、事業戦略からグローバル展開まで10のカテゴリ・49項目を土台にカリキュラムを構成。自分の診断結果と照らし合わせながら、弱点を優先的に強化できます。</p>
+    <div class="module-grid">
+      <div class="module-card" style="--accent:#16294C;"><div class="idx">01 / 事業戦略</div><h3>事業戦略</h3><p>プロダクトの向かう先と向かい方を定義し、チームを前進させる力を養います。</p></div>
+      <div class="module-card" style="--accent:#1F3D74;"><div class="idx">02 / リサーチ</div><h3>リサーチ</h3><p>顧客にとっての価値と市場からの需要を見極める、調査・分析の技術を学びます。</p></div>
+      <div class="module-card" style="--accent:#28519C;"><div class="idx">03 / ディレクション</div><h3>ディレクション</h3><p>チームで開発を進めるための、ステークホルダーとの調整力を鍛えます。</p></div>
+      <div class="module-card" style="--accent:#3163B0;"><div class="idx">04 / 要件定義</div><h3>要件定義</h3><p>何のために何をやるのか、チームと認識をそろえる力を身につけます。</p></div>
+      <div class="module-card" style="--accent:#3E7FC4;"><div class="idx">05 / 詳細設計</div><h3>詳細設計</h3><p>施策の詳細を設計し、関係者に正しく伝える力を実践課題で磨きます。</p></div>
+      <div class="module-card" style="--accent:#4FA0B8;"><div class="idx">06 / リリース</div><h3>リリース</h3><p>エンジニアやPRチームと協力し、問題なく世に出す力を養成します。</p></div>
+      <div class="module-card" style="--accent:#6C4AB6;"><div class="idx">07 / コミュニケーション</div><h3>コミュニケーション</h3><p>ステークホルダーと適切な関係を築く対人力を、ロールプレイ形式で鍛えます。</p></div>
+      <div class="module-card" style="--accent:#2E8F6C;"><div class="idx">08 / コンサルティング</div><h3>コンサルティング</h3><p>プロダクト開発を組織に根づかせる、伴走の力を学びます。</p></div>
+      <div class="module-card" style="--accent:#3E9B7C;"><div class="idx">09 / カスタマーサクセス</div><h3>カスタマーサクセス</h3><p>導入後の顧客に価値を実感し続けてもらう力を、実例をもとに習得します。</p></div>
+      <div class="module-card" style="--accent:#C0812C;"><div class="idx">10 / グローバル</div><h3>グローバル</h3><p>語学力を武器に、海外展開を推進する力を実践的なケースで鍛えます。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label">FEATURES</div>
+    <h2 class="section-title">プログラムの特徴</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>実践課題中心のカリキュラム</h3>
+        <p>座学だけでなく、実在のプロダクト課題を題材にしたワークを通じて、現場でそのまま使えるスキルを身につけます。</p>
+      </div>
+      <div class="feature-card">
+        <h3>現役PdMによる1on1メンタリング</h3>
+        <p>事業会社・スタートアップで活躍する現役PdMが、あなたの強み・弱みに合わせて個別に伴走します。</p>
+      </div>
+      <div class="feature-card">
+        <h3>診断結果に基づくパーソナライズ</h3>
+        <p>PdMスキルレーダーの診断結果（SWOT分析・弱みを補うアクション）をもとに、優先して学ぶ領域を一緒に設計します。</p>
+      </div>
+      <div class="feature-card">
+        <h3>キャリア相談・転職サポート</h3>
+        <p>スキルアップだけでなく、シニアPdMやCPO、あるいは別の道へのキャリアパス相談にも対応しています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label">HOW IT WORKS</div>
+    <h2 class="section-title">応募から受講開始までの流れ</h2>
+    <div class="flow-list">
+      <div class="flow-item">
+        <div class="flow-num">1</div>
+        <div class="flow-text"><h4>応募フォームを送信</h4><p>お名前・ご連絡先と、簡単なプロフィール（現在の会社・役職）、転職意欲などを教えてください。</p></div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">2</div>
+        <div class="flow-text"><h4>個別ヒアリング（オンライン）</h4><p>現在のスキル状況やキャリアの方向性をヒアリングし、あなたに合った学習プランをご提案します。</p></div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">3</div>
+        <div class="flow-text"><h4>受講開始</h4><p>実践課題とメンタリングを通じて、10領域49スキルのうち優先度の高い領域から学習を進めます。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap">
+    <h2>まずは無料相談から</h2>
+    <p>今のスキルレベルや目指すキャリアについて、気軽にご相談ください。診断結果をお持ちの方は、その内容も踏まえてご案内します。</p>
+    <a class="btn gold" href="./index.html#apply" id="finalApplyBtn">応募フォームへ進む →</a>
+    <div style="margin-top:14px;">
+      <a class="btn outline" href="./index.html">まずは無料でPdMスキルを診断する</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    本ページはPdMスキルレーダーと連携した学習プログラムのご案内です。
+    <a href="./privacy.html">プライバシーポリシー</a>
+  </div>
+</footer>
+
+<script>
+  // 診断結果ページから渡された文脈（pdmType/seniority/hensachi）を、応募フォームへのリンクにそのまま引き継ぐ
+  (function(){
+    const params = new URLSearchParams(window.location.search);
+    if(![...params.keys()].length) return;
+    const suffix = "?" + params.toString();
+    ["heroApplyBtn","finalApplyBtn"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.href = "./index.html" + suffix + "#apply";
+    });
+  })();
+</script>
+
+</body>
+</html>

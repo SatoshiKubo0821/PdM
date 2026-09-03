@@ -2527,7 +2527,7 @@ function renderResults(){
         <h4>もっと体系的にPdMスキルを鍛えたい方へ</h4>
         <p>「PdM登竜門」で、実践的なプロダクトマネジメントを学びませんか。</p>
       </div>
-      <button class="primary cta-btn" id="toryumonBtn">PdM登竜門に応募する →</button>
+      <a class="primary cta-btn" id="toryumonBtn" href="./toryumon.html?pdmType=${typeResult.key}&seniority=${seniorityKey}&hensachi=${hensachi}" target="_blank" rel="noopener">PdM登竜門を見る →</a>
     </div>
 
     ${state.viewingHistory ? `
@@ -2557,12 +2557,6 @@ function renderResults(){
   if(backToHistoryLink){
     backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.screen="history"; render(); window.scrollTo(0,0); };
   }
-
-  document.getElementById("toryumonBtn").onclick = ()=>{
-    state.applyContext = { pdmType: typeResult.key, seniority: seniorityKey, hensachi };
-    state.screen = "apply";
-    render(); window.scrollTo(0,0);
-  };
 
   if(state.viewingHistory){
     document.getElementById("toHistoryBtn").onclick = ()=>{
@@ -2620,6 +2614,17 @@ function renderResults(){
 
 (async function boot(){
   await ensureSession();
+  const params = new URLSearchParams(window.location.search);
+  if(params.has("pdmType") || params.has("seniority") || params.has("hensachi")){
+    state.applyContext = {
+      pdmType: params.get("pdmType") || null,
+      seniority: params.get("seniority") || null,
+      hensachi: params.get("hensachi") ? parseInt(params.get("hensachi"),10) : null,
+    };
+  }
+  if(window.location.hash === "#apply"){
+    state.screen = "apply";
+  }
   render();
 })();
 </script>
