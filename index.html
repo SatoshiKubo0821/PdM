@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PdMスキルレーダー｜35項目セルフ診断</title>
-<meta name="description" content="8カテゴリ・49項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
+<title>PdMスキルレーダー｜49項目セルフ診断</title>
+<meta name="description" content="10カテゴリ・49項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
 
 <!-- favicon: レーダーチャートをモチーフにしたオリジナルの図形（外部ファイル不要のインラインSVG） -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23101C36%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2212%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22%20opacity%3D%220.7%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%236FA0FF%22%20opacity%3D%220.5%22/%3E%3Ccircle%20cx%3D%2242%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23C0812C%22/%3E%3C/svg%3E">
@@ -12,15 +12,15 @@
 <!-- OGP（SNS・チャットでシェアされた際の見え方）。og:image は独自ドメインでの公開後、画像を用意してURLを差し替えてください -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:title" content="PdMスキルレーダー｜35項目セルフ診断">
-<meta property="og:description" content="8カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
+<meta property="og:title" content="PdMスキルレーダー｜49項目セルフ診断">
+<meta property="og:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
 <meta property="og:site_name" content="PdMスキルレーダー">
 <!-- <meta property="og:image" content="https://あなたのドメイン/ogp.png"> -->
 <!-- <meta property="og:url" content="https://あなたのドメイン/"> -->
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PdMスキルレーダー｜35項目セルフ診断">
-<meta name="twitter:description" content="8カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
+<meta name="twitter:title" content="PdMスキルレーダー｜49項目セルフ診断">
+<meta name="twitter:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1710,10 +1710,10 @@ async function renderIntro(){
   const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
 
   app.innerHTML = `
-    <div class="eyebrow">PdM 35スキル診断 <b>／</b> 出典: Goodpatch「PdMスキルマップ」</div>
-    <h1 class="hero-title">自分のPdMスキルを、<br>8つの役割・35項目で見える化する。</h1>
+    <div class="eyebrow">PdM 49スキル診断</div>
+    <h1 class="hero-title">自分のPdMスキルを、<br>10の役割・49項目で見える化する。</h1>
     <p class="hero-lead">
-      事業戦略からコンサルティングまで、プロダクトマネージャーに求められる能力を8カテゴリ35項目に分解。
+      事業戦略からコンサルティングまで、プロダクトマネージャーに求められる能力を10カテゴリ49項目に分解。
       各項目を5段階で自己評価すると、強みと伸びしろがレーダーチャートで見えてくるほか、
       「テックドリブンPdM」「BizDevPdM」「PMM系PdM」「総合型PdM」のどのタイプに近いか、
       経験レベル（ジュニア〜シニア/CPO）や、性格タイプ（MBTI）を掛け合わせた総合分析も行います。所要時間は約5分です。
@@ -1741,9 +1741,7 @@ async function renderIntro(){
     </div>
 
     <footer class="note">
-      本診断はセルフチェック用の簡易ツールです。項目定義は
-      <a href="https://goodpatch.com/blog/2023-12-pdmskillmap" target="_blank" rel="noopener">Goodpatch Blog「PdM（プロダクトマネージャー）の『スキルマップ』を作ってみた」</a>
-      を参考に構成しています。回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
+      本診断はセルフチェック用の簡易ツールです。回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
     </footer>
   `;
 
@@ -2107,7 +2105,7 @@ function renderResults(){
     <div class="score-hero">
       <div>
         <div class="score-num">${avg.toFixed(1)}</div>
-        <div class="score-den">/ 5.0（35項目の平均）</div>
+        <div class="score-den">/ 5.0（49項目の平均）</div>
       </div>
       <div class="score-tags">
         <span class="tag">診断タイプ：${pdmType.label}</span>
@@ -2207,7 +2205,7 @@ function renderResults(){
 
     <div class="section-label">属性タグ × スキルスコアの掛け合わせ分析</div>
     <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
-      MBTIの一般的な傾向（性格的な資質）と、実際の35項目診断のスコア（実務経験）を8カテゴリごとに重ね合わせています。
+      MBTIの一般的な傾向（性格的な資質）と、実際の49項目診断のスコア（実務経験）を10カテゴリごとに重ね合わせています。
       両方が高ければ「鉄板の強み」、資質はあるのにスコアが伴っていなければ「伸びしろ大」、資質的には苦手なのにスコアが高ければ「努力で築いた強み」、
       両方低ければ「要フォロー」として最優先の育成ポイントになります。
     </p>
@@ -2230,7 +2228,7 @@ function renderResults(){
     </div>` : `
     <div class="section-label">属性タグ × スキル分析</div>
     <div class="insight" style="border-left-color:var(--ink-soft);">
-      <p>MBTIを選択すると、性格タイプの属性タグと35項目のスコアを掛け合わせた詳細分析（得意・不得意な日常業務、意思決定スタイル、任せると強い仕事など）が表示されます。結果画面下部の「MBTIを選び直す」からいつでも追加できます。</p>
+      <p>MBTIを選択すると、性格タイプの属性タグと49項目のスコアを掛け合わせた詳細分析（得意・不得意な日常業務、意思決定スタイル、任せると強い仕事など）が表示されます。結果画面下部の「MBTIを選び直す」からいつでも追加できます。</p>
     </div>`}
 
     <div class="section-label">タイプ別スコア内訳</div>
@@ -2372,7 +2370,6 @@ function renderResults(){
       本診断はセルフチェック用の簡易ツールです。半年に一度など定期的に見直すことで、成長やスキルの重心の変化を確認しやすくなります。
       MBTIとの掛け合わせも、公開されている性格類型論の一般的傾向を業務文脈に翻訳した簡易的な分析であり、断定的な適性診断ではありません。
       PdM偏差値・想定年収幅・公開求人も、いずれも参考情報であり、個人の適性や収入を保証するものではありません。
-      項目定義は<a href="https://goodpatch.com/blog/2023-12-pdmskillmap" target="_blank" rel="noopener">Goodpatch Blogの記事</a>を参考に構成しています。
       回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
     </footer>
   `;
