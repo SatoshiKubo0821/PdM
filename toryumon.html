@@ -210,6 +210,31 @@
   .outcome-diff{margin-top:14px; font-size:13px; font-weight:800; color:var(--good, #2E8F6C); font-family:"Zen Kaku Gothic New",sans-serif;}
   .outcome-disclaimer{font-size:11px; color:var(--ink-soft); margin-top:20px; line-height:1.7;}
 
+  /* ---------- 導入企業一覧（ベルトコンベア風ロゴマーキー） ---------- */
+  .logo-section{padding:64px 0;}
+  .logo-marquee-mask{
+    position:relative; overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .logo-track{
+    display:flex; align-items:center; gap:56px; width:max-content;
+    animation:logoScroll 46s linear infinite;
+  }
+  .logo-track img{
+    height:34px; width:auto; object-fit:contain;
+    opacity:.65; filter:grayscale(100%);
+    transition:opacity .2s ease, filter .2s ease;
+  }
+  .logo-track img:hover{opacity:1; filter:grayscale(0%);}
+  @keyframes logoScroll{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .logo-track{animation:none;}
+  }
+
   /* skill modules */
   .module-section{background:var(--paper);}
   .module-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
@@ -647,6 +672,84 @@
       </div>
     </div>
     <p class="outcome-disclaimer">※上記は受講生の実績をもとにした一例です。年収の変化は個人の経験・転職先・タイミング等により異なり、内定・年収を保証するものではありません。</p>
+  </div>
+</section>
+
+<section class="logo-section">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center; margin-left:auto; margin-right:auto;">
+      <span class="eyebrow-pill">TRUSTED BY</span>
+      <h2 class="section-title" style="font-size:24px;">導入企業一覧</h2>
+      <p class="section-lead" style="margin-left:auto; margin-right:auto;">様々な業界の企業様にPdM登竜門をご活用いただいています（※サンプル企業名です）。</p>
+    </div>
+  </div>
+  <div class="logo-marquee-mask">
+    <div class="logo-track" style="animation-direction:normal;">
+          <img src="./assets/logos/logo_01_nexus_ai.png" alt="">
+          <img src="./assets/logos/logo_02_aether_corp.png" alt="">
+          <img src="./assets/logos/logo_03_vanguard_cloud.png" alt="">
+          <img src="./assets/logos/logo_04_apex_global.png" alt="">
+          <img src="./assets/logos/logo_05_omni_dynamics.png" alt="">
+          <img src="./assets/logos/logo_06_starlight_tech.png" alt="">
+          <img src="./assets/logos/logo_07_horizon_labs.png" alt="">
+          <img src="./assets/logos/logo_08_quantum_soft.png" alt="">
+          <img src="./assets/logos/logo_09_cyberpulse.png" alt="">
+          <img src="./assets/logos/logo_10_elevate_edge.png" alt="">
+          <img src="./assets/logos/logo_11_veritas_systems.png" alt="">
+          <img src="./assets/logos/logo_12_zenith_venture.png" alt="">
+          <img src="./assets/logos/logo_13_nova_chain.png" alt="">
+          <img src="./assets/logos/logo_14_aegis_security.png" alt="">
+          <img src="./assets/logos/logo_15_solaria_energy.png" alt="">
+          <img src="./assets/logos/logo_01_nexus_ai.png" alt="">
+          <img src="./assets/logos/logo_02_aether_corp.png" alt="">
+          <img src="./assets/logos/logo_03_vanguard_cloud.png" alt="">
+          <img src="./assets/logos/logo_04_apex_global.png" alt="">
+          <img src="./assets/logos/logo_05_omni_dynamics.png" alt="">
+          <img src="./assets/logos/logo_06_starlight_tech.png" alt="">
+          <img src="./assets/logos/logo_07_horizon_labs.png" alt="">
+          <img src="./assets/logos/logo_08_quantum_soft.png" alt="">
+          <img src="./assets/logos/logo_09_cyberpulse.png" alt="">
+          <img src="./assets/logos/logo_10_elevate_edge.png" alt="">
+          <img src="./assets/logos/logo_11_veritas_systems.png" alt="">
+          <img src="./assets/logos/logo_12_zenith_venture.png" alt="">
+          <img src="./assets/logos/logo_13_nova_chain.png" alt="">
+          <img src="./assets/logos/logo_14_aegis_security.png" alt="">
+          <img src="./assets/logos/logo_15_solaria_energy.png" alt="">
+    </div>
+  </div>
+  <div class="logo-marquee-mask" style="margin-top:20px;">
+    <div class="logo-track" style="animation-direction:reverse;">
+          <img src="./assets/logos/logo_16_orion_data.png" alt="">
+          <img src="./assets/logos/logo_17_prism_interactive.png" alt="">
+          <img src="./assets/logos/logo_18_helix_life.png" alt="">
+          <img src="./assets/logos/logo_19_strata_networks.png" alt="">
+          <img src="./assets/logos/logo_20_titan_robotics.png" alt="">
+          <img src="./assets/logos/logo_21_infinitech.png" alt="">
+          <img src="./assets/logos/logo_22_pulse_digital.png" alt="">
+          <img src="./assets/logos/logo_23_aura_health.png" alt="">
+          <img src="./assets/logos/logo_24_cognitive_works.png" alt="">
+          <img src="./assets/logos/logo_25_matrix_media.png" alt="">
+          <img src="./assets/logos/logo_26_veloce_motors.png" alt="">
+          <img src="./assets/logos/logo_27_synergy_labs.png" alt="">
+          <img src="./assets/logos/logo_28_beacon_financial.png" alt="">
+          <img src="./assets/logos/logo_29_crestline_capital.png" alt="">
+          <img src="./assets/logos/logo_30_terra_form.png" alt="">
+          <img src="./assets/logos/logo_16_orion_data.png" alt="">
+          <img src="./assets/logos/logo_17_prism_interactive.png" alt="">
+          <img src="./assets/logos/logo_18_helix_life.png" alt="">
+          <img src="./assets/logos/logo_19_strata_networks.png" alt="">
+          <img src="./assets/logos/logo_20_titan_robotics.png" alt="">
+          <img src="./assets/logos/logo_21_infinitech.png" alt="">
+          <img src="./assets/logos/logo_22_pulse_digital.png" alt="">
+          <img src="./assets/logos/logo_23_aura_health.png" alt="">
+          <img src="./assets/logos/logo_24_cognitive_works.png" alt="">
+          <img src="./assets/logos/logo_25_matrix_media.png" alt="">
+          <img src="./assets/logos/logo_26_veloce_motors.png" alt="">
+          <img src="./assets/logos/logo_27_synergy_labs.png" alt="">
+          <img src="./assets/logos/logo_28_beacon_financial.png" alt="">
+          <img src="./assets/logos/logo_29_crestline_capital.png" alt="">
+          <img src="./assets/logos/logo_30_terra_form.png" alt="">
+    </div>
   </div>
 </section>
 
