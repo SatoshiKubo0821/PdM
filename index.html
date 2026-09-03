@@ -2140,6 +2140,11 @@ async function renderIntro(){
       経験レベル（ジュニア〜シニア/CPO）や、性格タイプ（MBTI）を掛け合わせた総合分析も行います。
     </p>
 
+    <div class="start-row" style="margin-top:24px;">
+      <button class="primary" id="startBtnTop">${hasSaved ? "続きから診断する" : "診断をはじめる"}</button>
+      ${hasSaved ? `<span class="resume-note">前回の回答（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}項目）が保存されています</span>` : `<span class="resume-note">約5分・登録不要ですぐ結果が見られます</span>`}
+    </div>
+
     <div class="hero-visual">${previewRadarSVG()}</div>
 
     <div class="intro-stat-bar">
@@ -2220,7 +2225,7 @@ async function renderIntro(){
     state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseInt(expVal,10)));
   }
 
-  document.getElementById("startBtn").onclick = async ()=>{
+  async function handleStartClick(){
     if(hasSaved){
       state.answers = saved.answers; state.mbti = saved.mbti || null;
       state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null };
@@ -2232,7 +2237,10 @@ async function renderIntro(){
     state.screen="assess";
     state.pageIndex = firstUnfinishedPage();
     render();
-  };
+  }
+  document.getElementById("startBtn").onclick = handleStartClick;
+  const startBtnTop = document.getElementById("startBtnTop");
+  if(startBtnTop) startBtnTop.onclick = handleStartClick;
   const restartBtn = document.getElementById("restartBtn");
   if(restartBtn){
     restartBtn.onclick = async ()=>{
