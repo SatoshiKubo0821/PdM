@@ -117,8 +117,16 @@ create table if not exists public.leads (
   source text not null,       -- 'resource_download' または 'video_view'
   name text not null,
   email text not null,
-  company text
+  phone text,                 -- 電話番号（任意）
+  company text,                -- 会社名（任意）
+  role text,                   -- 役職・職種（任意）
+  message text                 -- ご興味のある内容・ご質問（任意）
 );
+
+-- 既存プロジェクト用：すでにテーブルがある場合でも安全に追加カラムを反映する
+alter table public.leads add column if not exists phone text;
+alter table public.leads add column if not exists role text;
+alter table public.leads add column if not exists message text;
 
 alter table public.leads enable row level security;
 

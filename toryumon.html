@@ -989,7 +989,10 @@
     <div class="lead-form">
       <input type="text" id="leadName" class="lead-input" placeholder="お名前">
       <input type="email" id="leadEmail" class="lead-input" placeholder="メールアドレス">
+      <input type="tel" id="leadPhone" class="lead-input" placeholder="電話番号（任意）">
       <input type="text" id="leadCompany" class="lead-input" placeholder="会社名（任意）">
+      <input type="text" id="leadRole" class="lead-input" placeholder="役職・職種（任意）">
+      <textarea id="leadMessage" class="lead-input" rows="3" placeholder="ご興味のある内容・ご質問（任意）" style="resize:vertical; font-family:inherit;"></textarea>
       <div class="lead-msg" id="leadMsg"></div>
       <button class="btn primary" id="leadSubmitBtn" style="width:100%; justify-content:center; margin-top:6px;">送信する</button>
     </div>
@@ -1027,7 +1030,10 @@
       : "ご登録いただくと、3分でわかる紹介動画をご覧いただけます。";
     document.getElementById("leadName").value = "";
     document.getElementById("leadEmail").value = "";
+    document.getElementById("leadPhone").value = "";
     document.getElementById("leadCompany").value = "";
+    document.getElementById("leadRole").value = "";
+    document.getElementById("leadMessage").value = "";
     document.getElementById("leadMsg").textContent = "";
     document.getElementById("leadSubmitBtn").textContent = isResource ? "送信してダウンロード" : "送信して視聴する";
     document.getElementById("leadModalOverlay").classList.add("open");
@@ -1049,7 +1055,10 @@
   document.getElementById("leadSubmitBtn").onclick = async ()=>{
     const name = document.getElementById("leadName").value.trim();
     const email = document.getElementById("leadEmail").value.trim();
+    const phone = document.getElementById("leadPhone").value.trim();
     const company = document.getElementById("leadCompany").value.trim();
+    const role = document.getElementById("leadRole").value.trim();
+    const message = document.getElementById("leadMessage").value.trim();
     const msgEl = document.getElementById("leadMsg");
     const btn = document.getElementById("leadSubmitBtn");
 
@@ -1078,7 +1087,10 @@
       const { error } = await supabaseClient.from("leads").insert({
         source: currentLeadSource,
         name, email,
+        phone: phone || null,
         company: company || null,
+        role: role || null,
+        message: message || null,
       });
       if(error){
         msgEl.style.color = "#E14B4B";
