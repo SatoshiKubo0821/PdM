@@ -1461,6 +1461,7 @@ let state = {
   history: [],            // クラウドから取得した過去の診断履歴
   displayOrder: {},       // カテゴリごとにランダム化した設問の表示順（キャッシュ）
   viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
+  applyContext: null,     // 応募フォームに渡す診断結果の参考情報（任意）
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -1570,6 +1571,7 @@ function render(){
   else if(state.screen==="profile") renderProfile();
   else if(state.screen==="history") renderHistory();
   else if(state.screen==="account") renderAccount();
+  else if(state.screen==="apply") renderApply();
   else renderResults();
 }
 
@@ -1727,6 +1729,119 @@ function renderAccount(){
       linkBtn.disabled = false;
     };
   }
+}
+
+/* ---------------- 「PdM登竜門」応募フォーム ---------------- */
+async function submitApplication(fields){
+  if(!supabaseClient) return { ok:false, message:"現在フォームを受け付けられません。時間をおいて再度お試しください。" };
+  try{
+    const ctx = state.applyContext || {};
+    const { error } = await supabaseClient.from("applications").insert({
+      user_id: state.userId || null,
+      name: fields.name,
+      email: fields.email,
+      phone: fields.phone || null,
+      message: fields.message || null,
+      referred_pdm_type: ctx.pdmType || null,
+      referred_seniority: ctx.seniority || null,
+      referred_hensachi: ctx.hensachi ?? null,
+    });
+    if(error) return { ok:false, message:"送信に失敗しました。時間をおいて再度お試しください。" };
+    return { ok:true };
+  }catch(e){
+    return { ok:false, message:"通信エラーが発生しました。時間をおいて再度お試しください。" };
+  }
+}
+
+function renderApply(){
+  const ctx = state.applyContext;
+  app.innerHTML = `
+    <div class="eyebrow">PdM登竜門</div>
+    <h1 class="hero-title" style="font-size:28px;">PdM登竜門に応募する</h1>
+    <p class="hero-lead">
+      実践的なプロダクトマネジメントを体系的に学べる「PdM登竜門」への応募フォームです。
+      いただいた情報をもとに、担当者よりご案内をお送りします。
+    </p>
+    ${ctx ? `
+    <div class="insight fusion">
+      <p>あなたの診断結果（${PDM_TYPES[ctx.pdmType] ? PDM_TYPES[ctx.pdmType].label : ""}／${SENIORITY[ctx.seniority] ? SENIORITY[ctx.seniority].label : ""}／偏差値${ctx.hensachi}）を参考情報として添えて送信します。</p>
+    </div>` : ""}
+
+    <div class="profile-form" id="applyForm">
+      <label class="profile-label" for="applyName">お名前<span style="color:var(--bad);">*</span></label>
+      <input type="text" id="applyName" class="profile-input" placeholder="山田 太郎" required>
+
+      <label class="profile-label" for="applyEmail" style="margin-top:18px;">メールアドレス<span style="color:var(--bad);">*</span></label>
+      <input type="email" id="applyEmail" class="profile-input" placeholder="you@example.com" required>
+
+      <label class="profile-label" for="applyPhone" style="margin-top:18px;">電話番号（任意）</label>
+      <input type="tel" id="applyPhone" class="profile-input" placeholder="090-xxxx-xxxx">
+
+      <label class="profile-label" for="applyMessage" style="margin-top:18px;">ご相談内容・興味のある分野（任意）</label>
+      <textarea id="applyMessage" class="profile-input profile-textarea" rows="4" placeholder="例：BizDev領域を体系的に学びたい、転職も視野に相談したい　など"></textarea>
+
+      <div id="applyMsg" style="font-size:13px; color:var(--bad); margin-top:12px;"></div>
+
+      <div class="start-row" style="margin-top:20px;">
+        <button class="primary" id="applySubmitBtn">応募する</button>
+        <button class="ghost" id="applyBackBtn">戻る</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("applyBackBtn").onclick = ()=>{
+    state.screen = state.viewingHistory || Object.keys(state.answers).length ? "results" : "intro";
+    render(); window.scrollTo(0,0);
+  };
+
+  document.getElementById("applySubmitBtn").onclick = async ()=>{
+    const name = document.getElementById("applyName").value.trim();
+    const email = document.getElementById("applyEmail").value.trim();
+    const phone = document.getElementById("applyPhone").value.trim();
+    const message = document.getElementById("applyMessage").value.trim();
+    const msgEl = document.getElementById("applyMsg");
+
+    if(!name || !email){
+      msgEl.textContent = "お名前とメールアドレスは必須です。";
+      return;
+    }
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailPattern.test(email)){
+      msgEl.textContent = "メールアドレスの形式が正しくありません。";
+      return;
+    }
+
+    const btn = document.getElementById("applySubmitBtn");
+    btn.disabled = true;
+    msgEl.style.color = "var(--ink-soft)";
+    msgEl.textContent = "送信中…";
+
+    const result = await submitApplication({ name, email, phone, message });
+    if(result.ok){
+      renderApplyThanks();
+    }else{
+      msgEl.style.color = "var(--bad)";
+      msgEl.textContent = result.message;
+      btn.disabled = false;
+    }
+  };
+}
+
+function renderApplyThanks(){
+  app.innerHTML = `
+    <div class="eyebrow">PdM登竜門</div>
+    <h1 class="hero-title" style="font-size:28px;">応募ありがとうございました</h1>
+    <div class="insight strong" style="margin-top:20px;">
+      <p>応募内容を受け付けました。担当者よりメールにてご連絡しますので、しばらくお待ちください。</p>
+    </div>
+    <div class="start-row" style="margin-top:32px;">
+      <button class="primary" id="applyThanksBackBtn">診断トップに戻る</button>
+    </div>
+  `;
+  document.getElementById("applyThanksBackBtn").onclick = ()=>{
+    state.screen = "intro";
+    render(); window.scrollTo(0,0);
+  };
 }
 
 async function renderIntro(){
@@ -2383,7 +2498,7 @@ function renderResults(){
         <h4>もっと体系的にPdMスキルを鍛えたい方へ</h4>
         <p>「PdM登竜門」で、実践的なプロダクトマネジメントを学びませんか。</p>
       </div>
-      <a class="primary cta-btn" href="#" id="toryumonBtn" target="_blank" rel="noopener">PdM登竜門に応募する →</a>
+      <button class="primary cta-btn" id="toryumonBtn">PdM登竜門に応募する →</button>
     </div>
 
     ${state.viewingHistory ? `
@@ -2413,6 +2528,12 @@ function renderResults(){
   if(backToHistoryLink){
     backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.screen="history"; render(); window.scrollTo(0,0); };
   }
+
+  document.getElementById("toryumonBtn").onclick = ()=>{
+    state.applyContext = { pdmType: typeResult.key, seniority: seniorityKey, hensachi };
+    state.screen = "apply";
+    render(); window.scrollTo(0,0);
+  };
 
   if(state.viewingHistory){
     document.getElementById("toHistoryBtn").onclick = ()=>{

@@ -72,6 +72,28 @@ $$;
 
 grant execute on function public.get_aggregate_stats() to anon, authenticated;
 
+-- 5) 「PdM登竜門」応募フォームの送信先テーブル
+create table if not exists public.applications (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  user_id uuid references auth.users(id) on delete set null,
+  name text not null,
+  email text not null,
+  phone text,
+  message text,
+  referred_pdm_type text,
+  referred_seniority text,
+  referred_hensachi int
+);
+
+alter table public.applications enable row level security;
+
+-- 誰でも応募フォームから送信できるようにする（読み取りは許可しない＝運営者はダッシュボードから確認）
+drop policy if exists "anyone can submit application" on public.applications;
+create policy "anyone can submit application"
+  on public.applications for insert
+  with check (true);
+
 -- 4) （任意）30日以上放置された匿名ユーザーの掃除用クエリ。
 --    Supabaseダッシュボードから定期的に手動実行するか、pg_cronで自動化できます。
 -- delete from auth.users
