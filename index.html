@@ -864,7 +864,7 @@
   <div class="site-header-inner">
     <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMスキルレーダー</a>
     <nav class="site-nav">
-      <a href="https://chordone.jp/org-culture-diagnosis.html" target="_blank" rel="noopener">組織タイプ診断<span class="ext-badge">外部</span></a>
+      <a href="#" id="navOrgLink">組織タイプ診断</a>
       <a href="#" id="navMypageLink">マイページ</a>
       <span id="navAuthArea"></span>
     </nav>
@@ -1518,6 +1518,107 @@ const CATEGORY_ICON = {
 };
 
 const TOTAL_SKILLS = CATEGORIES.reduce((n,c)=>n+c.skills.length,0);
+const CATEGORY_BY_KEY = {};
+CATEGORIES.forEach(c=>{ CATEGORY_BY_KEY[c.key] = c; });
+
+/* ---------------- 組織タイプ診断（オリジナル） ----------------
+   意思決定・評価軸・リスク姿勢・コミュニケーション文化という、組織文化論で一般的に使われる
+   4つの観点から自社の傾向をセルフチェックする、独自の簡易診断。特定サービスの分類名・設問・
+   結果カードを模したものではなく、ゼロから設計したオリジナルの軸・設問・型付けを使用している。 */
+const ORG_AXES = {
+  decision:      { high:"自律・裁量型", low:"規律・承認型", labelHigh:"自律", labelLow:"規律" },
+  evaluation:    { high:"個人成果型",   low:"チーム成果型", labelHigh:"個人", labelLow:"チーム" },
+  risk:          { high:"挑戦志向型",   low:"安定志向型",   labelHigh:"挑戦", labelLow:"安定" },
+  communication: { high:"率直文化型",   low:"調和文化型",   labelHigh:"率直", labelLow:"調和" },
+};
+const ORG_QUESTIONS = [
+  { axis:"decision",      statement:"現場のメンバーが、上長の承認を待たずに意思決定できる", reverse:false },
+  { axis:"decision",      statement:"重要な判断は、必ず複数の承認プロセスを経てから実行される", reverse:true },
+  { axis:"decision",      statement:"ルールやマニュアルよりも、その場の判断が尊重される", reverse:false },
+  { axis:"evaluation",    statement:"成果は個人の実績として評価されることが多い", reverse:false },
+  { axis:"evaluation",    statement:"チーム全体の成果が、個人の評価より重視される", reverse:true },
+  { axis:"evaluation",    statement:"誰か一人の成果より、チームでの協力が称賛される", reverse:true },
+  { axis:"risk",          statement:"前例のない新しい挑戦が奨励される文化がある", reverse:false },
+  { axis:"risk",          statement:"失敗を避けるため、慎重に検証してから物事を進める", reverse:true },
+  { axis:"risk",          statement:"スピードよりも、確実性を重視する場面が多い", reverse:true },
+  { axis:"communication", statement:"意見の対立があっても、率直に指摘し合う文化がある", reverse:false },
+  { axis:"communication", statement:"場の空気を壊さないよう、意見を控えることがある", reverse:true },
+  { axis:"communication", statement:"本音よりも、その場の調和を優先することが多い", reverse:true },
+];
+
+/* 各軸の傾向を言語化するための素材（融合分析の文章生成に使う） */
+const ORG_AXIS_FRAGMENT = {
+  decision:      { high:"現場が裁量を持って動く自律型の意思決定スタイル", low:"承認プロセスを重視する規律型の意思決定スタイル", mid:"自律と規律のバランスを取る意思決定スタイル" },
+  evaluation:    { high:"個人の成果を重視する評価軸", low:"チーム全体の成果を重視する評価軸", mid:"個人とチームの成果をバランス良く見る評価軸" },
+  risk:          { high:"挑戦を奨励するリスク許容度の高い文化", low:"安定と確実性を重んじる文化", mid:"挑戦と安定のバランスを意識する文化" },
+  communication: { high:"率直に意見をぶつけ合うコミュニケーション文化", low:"調和を重んじるコミュニケーション文化", mid:"率直さと調和のバランスを取るコミュニケーション文化" },
+};
+
+/* 組織文化の各軸が、どのPdMスキルカテゴリの重要度を高めやすいか（両極それぞれ） */
+const ORG_TO_PDM_FOCUS = {
+  decision:      { high:{cats:["direction","strategy"], reason:"自律的に動く組織では、現場でスピーディーに意思決定し、自ら戦略を描く力が特に重要になります。"},
+                   low: {cats:["consulting","requirement"], reason:"承認プロセスを重視する組織では、関係者との丁寧な合意形成や、認識のズレを防ぐ要件定義力が重要になります。"} },
+  evaluation:    { high:{cats:["strategy","global"], reason:"個人成果を重視する組織では、自分の専門性や独自の強みを打ち出す力が評価されやすくなります。"},
+                   low: {cats:["communication","success"], reason:"チーム成果を重視する組織では、チームの協働を促す力や、顧客・チーム双方に寄り添う力が重要になります。"} },
+  risk:          { high:{cats:["strategy","research"], reason:"挑戦志向の組織では、新しい仮説を立てて検証しながら前に進む力が重要になります。"},
+                   low: {cats:["release","design"], reason:"安定志向の組織では、品質を担保しながら緻密に設計・リリースする力が重要になります。"} },
+  communication: { high:{cats:["consulting","communication"], reason:"率直な文化の組織では、対立を恐れずに期待値調整やフィードバックを行う力が重要になります。"},
+                   low: {cats:["success","communication"], reason:"調和を重んじる組織では、関係性を大切にしながら丁寧にコミュニケーションを取る力が重要になります。"} },
+};
+
+function orgQuestionKey(idx){ return "org:"+idx; }
+function orgEffectiveScore(qIndex, raw){
+  if(raw==null) return null;
+  const q = ORG_QUESTIONS[qIndex];
+  return q.reverse ? (6-raw) : raw;
+}
+function computeOrgAxisScores(orgAnswers){
+  const sums = {}, counts = {};
+  ORG_QUESTIONS.forEach((q,i)=>{
+    const raw = orgAnswers[orgQuestionKey(i)];
+    const eff = orgEffectiveScore(i, raw);
+    if(eff==null) return;
+    sums[q.axis] = (sums[q.axis]||0) + eff;
+    counts[q.axis] = (counts[q.axis]||0) + 1;
+  });
+  const result = {};
+  Object.keys(ORG_AXES).forEach(axis=>{
+    result[axis] = counts[axis] ? sums[axis]/counts[axis] : null;
+  });
+  return result;
+}
+function orgAxisPole(score){
+  if(score==null) return "mid";
+  if(score >= 3.5) return "high";
+  if(score <= 2.5) return "low";
+  return "mid";
+}
+function orgAxisLabel(axis, score){
+  const pole = orgAxisPole(score);
+  if(pole==="mid") return "バランス型";
+  return pole==="high" ? ORG_AXES[axis].high : ORG_AXES[axis].low;
+}
+function buildOrgNarrative(orgScores){
+  const parts = Object.keys(ORG_AXES).map(axis=>{
+    const pole = orgAxisPole(orgScores[axis]);
+    return ORG_AXIS_FRAGMENT[axis][pole];
+  });
+  return `御社は、${parts[0]}と、${parts[1]}を持つ組織のようです。${parts[2]}を持ちつつ、${parts[3]}が特徴として見えてきます。`;
+}
+/* 組織文化から見て重要度が上がるPdMスキルカテゴリを抽出（重複は理由文をまとめる） */
+function buildOrgFocusCategories(orgScores){
+  const map = {}; // catKey -> {catKey, reasons:[]}
+  Object.keys(ORG_AXES).forEach(axis=>{
+    const pole = orgAxisPole(orgScores[axis]);
+    if(pole==="mid") return;
+    const focus = ORG_TO_PDM_FOCUS[axis][pole];
+    focus.cats.forEach(catKey=>{
+      if(!map[catKey]) map[catKey] = { catKey, reasons: [] };
+      map[catKey].reasons.push(focus.reason);
+    });
+  });
+  return Object.values(map);
+}
 
 /* ---------------- State ---------------- */
 let state = {
@@ -1533,6 +1634,9 @@ let state = {
   displayOrder: {},       // 全設問のランダム化した表示順（キャッシュ）
   viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
   applyContext: null,     // 応募フォームに渡す診断結果の参考情報（任意）
+  orgAnswers: {},         // 組織タイプ診断の回答（"org:idx" -> 1..5）
+  orgScores: null,        // 診断済みの場合、4軸の平均スコアが入る
+  orgDisplayOrder: null,  // 組織タイプ診断のシャッフル順（メタ回答対策）
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -1552,7 +1656,10 @@ async function loadSaved(){
 }
 async function saveProgress(){
   try{
-    const payload = JSON.stringify({answers:state.answers, mbti:state.mbti, profile:state.profile});
+    const payload = JSON.stringify({
+      answers:state.answers, mbti:state.mbti, profile:state.profile,
+      orgAnswers:state.orgAnswers, orgScores:state.orgScores,
+    });
     if(window.storage && typeof window.storage.set === "function"){
       await window.storage.set(STORAGE_KEY, payload, false);
     }else{
@@ -1653,6 +1760,9 @@ function render(){
   else if(state.screen==="mypage") renderHistory();
   else if(state.screen==="account") renderAccount();
   else if(state.screen==="apply") renderApply();
+  else if(state.screen==="orgIntro") renderOrgIntro();
+  else if(state.screen==="orgAssess") renderOrgAssess();
+  else if(state.screen==="orgResults") renderOrgResults();
   else renderResults();
 }
 
@@ -2075,7 +2185,12 @@ async function renderIntro(){
   }
 
   document.getElementById("startBtn").onclick = async ()=>{
-    if(hasSaved){ state.answers = saved.answers; state.mbti = saved.mbti || null; state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null }; }
+    if(hasSaved){
+      state.answers = saved.answers; state.mbti = saved.mbti || null;
+      state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null };
+      state.orgAnswers = saved.orgAnswers || {};
+      state.orgScores = saved.orgScores || null;
+    }
     captureIntroProfile();
     await saveProgress();
     state.screen="assess";
@@ -2208,6 +2323,180 @@ function renderAssess(){
 }
 
 /* ---------------- MBTI selection screen ---------------- */
+/* ---------------- 組織タイプ診断（スキルレーダー内蔵） ---------------- */
+function renderOrgIntro(){
+  app.innerHTML = `
+    <div class="eyebrow">組織タイプ診断</div>
+    <h1 class="hero-title" style="font-size:30px;">あなたの会社は、<br>どんな組織タイプ？</h1>
+    <p class="hero-lead">
+      「意思決定・評価軸・リスク姿勢・コミュニケーション文化」の4つの観点から、12問・約2分で自社の組織文化の傾向をセルフチェックします。
+      結果はPdMスキル診断とも掛け合わせて、「この組織で求められるPdM像」を分析します。
+    </p>
+    <div class="intro-stat-bar">
+      <div class="intro-stat-item"><div class="intro-stat-num">4</div><div class="intro-stat-label">診断の観点</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">12</div><div class="intro-stat-label">設問数</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">約2分</div><div class="intro-stat-label">所要時間</div></div>
+    </div>
+    <div class="start-row">
+      <button class="primary" id="orgStartBtn">組織タイプ診断をはじめる</button>
+      <button class="ghost" id="orgBackBtn">戻る</button>
+    </div>
+    <footer class="note">
+      本診断は組織文化論で一般的に使われる観点をもとにした、当サイト独自のセルフチェックです。特定の企業・サービスの分類名や設問を再現したものではありません。回答データはお使いのブラウザ内にのみ保存されます。
+    </footer>
+  `;
+  document.getElementById("orgStartBtn").onclick = ()=>{
+    state.screen="orgAssess";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("orgBackBtn").onclick = ()=>{
+    state.screen="intro";
+    render(); window.scrollTo(0,0);
+  };
+}
+
+function shuffledOrgOrder(){
+  if(!state.orgDisplayOrder){
+    const arr = ORG_QUESTIONS.map((_,i)=>i);
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    state.orgDisplayOrder = arr;
+  }
+  return state.orgDisplayOrder;
+}
+
+function renderOrgAssess(){
+  const order = shuffledOrgOrder();
+  const answeredCountOrg = Object.keys(state.orgAnswers).length;
+  const allDone = order.every(idx => state.orgAnswers[orgQuestionKey(idx)] != null);
+  const pct = Math.round(100*answeredCountOrg/ORG_QUESTIONS.length);
+
+  app.innerHTML = `
+    <div class="thin-progress"><i style="width:${pct}%;"></i></div>
+    <div class="q-counter">組織タイプ診断　${answeredCountOrg} / ${ORG_QUESTIONS.length}問</div>
+
+    <div class="q-card-list">
+      ${order.map((idx)=>{
+        const q = ORG_QUESTIONS[idx];
+        const key = orgQuestionKey(idx);
+        const currentVal = state.orgAnswers[key];
+        return `
+        <div class="q-card" data-idx="${idx}">
+          <div class="q-card-statement">${q.statement}</div>
+          ${renderScaleRow(key, currentVal)}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="q-nav q-nav-split">
+      <button class="ghost" id="orgAssessBackBtn">戻る</button>
+      <button class="primary" id="orgAssessNextBtn" ${allDone?"":"disabled style='opacity:.4;cursor:default;'"}>結果を見る →</button>
+    </div>
+  `;
+
+  app.querySelectorAll(".q-card").forEach(card=>{
+    const idx = parseInt(card.getAttribute("data-idx"),10);
+    const key = orgQuestionKey(idx);
+    card.querySelectorAll(".scale-circle-wrap").forEach(wrap=>{
+      wrap.onclick = async ()=>{
+        const v = parseInt(wrap.getAttribute("data-v"),10);
+        state.orgAnswers[key] = v;
+        await saveProgress();
+        renderOrgAssess();
+      };
+    });
+  });
+
+  document.getElementById("orgAssessBackBtn").onclick = ()=>{ state.screen="orgIntro"; render(); window.scrollTo(0,0); };
+  const nextBtn = document.getElementById("orgAssessNextBtn");
+  if(nextBtn && allDone){
+    nextBtn.onclick = async ()=>{
+      state.orgScores = computeOrgAxisScores(state.orgAnswers);
+      await saveProgress();
+      state.screen="orgResults";
+      render(); window.scrollTo(0,0);
+    };
+  }
+}
+
+function renderOrgResults(){
+  const scores = state.orgScores || computeOrgAxisScores(state.orgAnswers);
+  const narrative = buildOrgNarrative(scores);
+  const focusCats = buildOrgFocusCategories(scores);
+  const hasSkillData = answeredCount() === TOTAL_SKILLS;
+
+  app.innerHTML = `
+    <div class="eyebrow">組織タイプ診断　結果</div>
+    <h1 class="hero-title" style="font-size:28px;">御社の組織タイプ</h1>
+
+    <div class="insight fusion" style="margin-top:20px;">
+      <p>${narrative}</p>
+    </div>
+
+    <div class="section-label">4つの軸</div>
+    <div class="result-grid" style="margin-top:14px;">
+      ${Object.keys(ORG_AXES).map(axis=>{
+        const score = scores[axis];
+        const pct = score!=null ? Math.round((score-1)/4*100) : 50;
+        const label = orgAxisLabel(axis, score);
+        return `<div>
+          <div class="result-row-name"><span>${ORG_AXES[axis].labelLow} ／ ${ORG_AXES[axis].labelHigh}</span><b>${label}</b></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="section-label">この組織で求められるPdM像</div>
+    ${focusCats.length===0 ? `
+    <div class="insight" style="margin-top:14px;"><p>各軸がバランス型に近いため、特定のスキルへの偏りは大きくありません。幅広い領域をバランス良く磨くのが向いているようです。</p></div>
+    ` : focusCats.map(f=>{
+      const cat = CATEGORY_BY_KEY[f.catKey];
+      const userScore = hasSkillData ? categoryAverage(cat) : null;
+      return `
+      <div class="insight" style="margin-top:14px;">
+        <h4>${cat.name}${userScore!=null ? ` <b>${userScore.toFixed(1)}</b>` : ""}</h4>
+        <p>${f.reasons[0]}</p>
+        ${userScore!=null ? `<p style="margin-top:6px;">${userScore>=3.5 ? "あなたはすでにこの領域が強みです。この組織で特に活躍しやすいポイントと言えます。" : "あなたのこの領域のスコアはまだ発展途上です。この組織で重視される力なので、優先して伸ばすと良さそうです。"}</p>` : `<p style="margin-top:6px; color:var(--ink-soft);">PdMスキル診断も受けると、あなた自身のこの領域のスコアと突き合わせて分析できます。</p>`}
+      </div>`;
+    }).join("")}
+
+    ${!hasSkillData ? `
+    <div class="cta-card" style="margin-top:32px;">
+      <div class="cta-text">
+        <h4>PdMスキル診断も受けてみませんか</h4>
+        <p>あなた自身のスキルスコアと組織文化を掛け合わせて、より具体的な分析ができます。</p>
+      </div>
+      <button class="primary cta-btn" id="orgToSkillBtn">PdMスキル診断を受ける →</button>
+    </div>` : ""}
+
+    <div class="start-row" style="margin-top:32px;">
+      <button class="ghost" id="orgRetryBtn">回答をやり直す</button>
+      <button class="primary" id="orgBackHomeBtn">${hasSkillData ? "PdM診断結果に戻る" : "診断トップに戻る"}</button>
+    </div>
+  `;
+
+  document.getElementById("orgRetryBtn").onclick = ()=>{
+    state.orgAnswers = {};
+    state.orgScores = null;
+    state.orgDisplayOrder = null;
+    state.screen = "orgAssess";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("orgBackHomeBtn").onclick = ()=>{
+    state.screen = hasSkillData ? "results" : "intro";
+    render(); window.scrollTo(0,0);
+  };
+  const toSkillBtn = document.getElementById("orgToSkillBtn");
+  if(toSkillBtn){
+    toSkillBtn.onclick = ()=>{
+      state.screen = hasSkillData ? "results" : "intro";
+      render(); window.scrollTo(0,0);
+    };
+  }
+}
+
 function renderMbti(){
   app.innerHTML = `
     <div class="eyebrow">最後にもう一つ（任意）</div>
@@ -2669,6 +2958,39 @@ function renderResults(){
         </div>`).join("")}
     </div>
 
+    <div class="section-label">会社の文化から見る、求められるPdM像</div>
+    ${state.orgScores ? `
+    <div class="insight fusion" style="margin-top:14px;">
+      <p>${buildOrgNarrative(state.orgScores)}</p>
+    </div>
+    ${(() => {
+      const focusCats = buildOrgFocusCategories(state.orgScores);
+      if(focusCats.length===0){
+        return `<div class="insight"><p>各軸がバランス型に近いため、特定のスキルへの偏りは大きくありません。幅広い領域をバランス良く磨くのが向いているようです。</p></div>`;
+      }
+      return focusCats.map(f=>{
+        const cat = CATEGORY_BY_KEY[f.catKey];
+        const userScore = categoryAverage(cat);
+        return `
+        <div class="insight ${userScore>=3.5 ? 'strong' : 'weak'}">
+          <h4>${cat.name} <b>${userScore.toFixed(1)}</b></h4>
+          <p>${f.reasons[0]}</p>
+          <p style="margin-top:6px;">${userScore>=3.5 ? "あなたはすでにこの領域が強みです。この組織の文化にフィットしやすいポイントと言えます。" : "この組織で特に重視される力ですが、あなたのスコアはまだ発展途上です。優先して伸ばすと組織にフィットしやすくなります。"}</p>
+        </div>`;
+      }).join("");
+    })()}
+    <div class="start-row" style="margin-top:14px;">
+      <button class="ghost" id="orgRedoLink">組織タイプ診断をやり直す</button>
+    </div>
+    ` : `
+    <div class="insight" style="margin-top:14px;">
+      <p>組織タイプ診断（意思決定・評価軸・リスク姿勢・コミュニケーション文化の4軸で自社の傾向をチェック）を受けると、あなたのスキルと会社の文化を掛け合わせて、この組織で特に求められるPdM像を分析できます。</p>
+    </div>
+    <div class="start-row" style="margin-top:14px;">
+      <button class="primary" id="orgDiagLink">組織タイプ診断を受ける →</button>
+    </div>
+    `}
+
     <div class="section-label">気が合いやすいメンバー</div>
     <div class="insight">
       <h4>スキルタイプの相性</h4>
@@ -2730,6 +3052,13 @@ function renderResults(){
   if(backToHistoryLink){
     backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.screen="history"; render(); window.scrollTo(0,0); };
   }
+  const orgDiagLink = document.getElementById("orgDiagLink");
+  if(orgDiagLink) orgDiagLink.onclick = ()=>{ state.screen="orgIntro"; render(); window.scrollTo(0,0); };
+  const orgRedoLink = document.getElementById("orgRedoLink");
+  if(orgRedoLink) orgRedoLink.onclick = ()=>{
+    state.orgAnswers = {}; state.orgScores = null; state.orgDisplayOrder = null;
+    state.screen="orgAssess"; render(); window.scrollTo(0,0);
+  };
 
   if(state.viewingHistory){
     document.getElementById("toHistoryBtn").onclick = ()=>{
@@ -2799,10 +3128,16 @@ function renderResults(){
     state.screen = "apply";
   }else if(window.location.hash === "#mypage"){
     state.screen = "mypage";
+  }else if(window.location.hash === "#orgculture"){
+    state.screen = "orgIntro";
   }
   const navMypageLink = document.getElementById("navMypageLink");
   if(navMypageLink){
     navMypageLink.onclick = (e)=>{ e.preventDefault(); state.screen="mypage"; render(); window.scrollTo(0,0); };
+  }
+  const navOrgLink = document.getElementById("navOrgLink");
+  if(navOrgLink){
+    navOrgLink.onclick = (e)=>{ e.preventDefault(); state.screen="orgIntro"; render(); window.scrollTo(0,0); };
   }
   renderHeader();
   render();
