@@ -181,10 +181,10 @@
   }
   .instructor-card:hover{transform:translateY(-3px); box-shadow:0 16px 32px -26px rgba(22,33,77,.3);}
   .instructor-avatar{
-    width:64px; height:64px; border-radius:50%; margin:0 auto 14px;
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:22px;
+    width:128px; height:128px; border-radius:24px; margin:0 auto 16px;
+    overflow:hidden; box-shadow:0 12px 28px -16px rgba(22,33,77,.35);
   }
+  .instructor-avatar svg{width:100%; height:100%; display:block;}
   .instructor-card h3{font-size:15px;}
   .instructor-role{font-size:11.5px; color:var(--blue); font-weight:700; margin-top:4px;}
   .instructor-card p{font-size:12.5px; color:var(--ink-soft); margin-top:10px; text-align:left;}
@@ -503,28 +503,87 @@
       <span class="eyebrow-pill">INSTRUCTORS</span>
       <h2 class="section-title">充実した講師陣が、非エンジニアの一歩を支えます</h2>
       <p class="section-lead">事業会社・スタートアップ・コンサルティングファームなど、異なるバックグラウンドを持つ現役PdM・元PdMが講師として在籍。技術的な知識がなくても、実務目線でわかりやすく伴走します。</p>
+      <p style="font-size:11px; color:var(--ink-soft); margin-top:6px;">※アバターはオリジナルのイラストです。</p>
     </div>
     <div class="instructor-grid">
       <div class="instructor-card">
-        <div class="instructor-avatar" style="background:linear-gradient(135deg,#16294C,#3163B0);">田</div>
+        <div class="instructor-avatar">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" rx="28" fill="#EDF1FE"/>
+            <path d="M38 202 Q40 148 100 143 Q160 148 162 202Z" fill="#16294C"/>
+            <path d="M84 152 L100 174 L116 152" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="87" y="118" width="26" height="34" rx="8" fill="#F0C29A"/>
+            <ellipse cx="100" cy="92" rx="44" ry="46" fill="#F5D0A9"/>
+            <path d="M56 96Q52 36 100 34Q148 36 144 96Q144 134 130 146L130 88Q130 62 100 62Q70 62 70 88L70 146Q56 134 56 96Z" fill="#2B2118"/>
+            <circle cx="84" cy="90" r="4" fill="#2B2118"/>
+            <circle cx="116" cy="90" r="4" fill="#2B2118"/>
+            <path d="M78 78Q84 73 90 77" stroke="#2B2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M110 77Q116 73 122 78" stroke="#2B2118" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M88 110Q100 118 112 110" stroke="#B5654A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
         <h3>田中 玲奈</h3>
         <div class="instructor-role">国内大手SaaS企業 元プロダクト責任者</div>
         <p>非エンジニア出身からPdMにキャリアチェンジ。事業戦略・要件定義まわりのメンタリングが得意です。</p>
       </div>
       <div class="instructor-card">
-        <div class="instructor-avatar" style="background:linear-gradient(135deg,#6C4AB6,#9B7CE0);">佐</div>
+        <div class="instructor-avatar">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" rx="28" fill="#F1ECFB"/>
+            <path d="M36 202Q38 146 100 141Q162 146 164 202Z" fill="#6C4AB6"/>
+            <path d="M82 150 L100 168 L118 150" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="86" y="116" width="28" height="36" rx="8" fill="#E8B48A"/>
+            <ellipse cx="100" cy="90" rx="46" ry="47" fill="#EFC199"/>
+            <path d="M55 84Q58 30 100 30Q142 30 145 84Q145 70 130 62Q125 50 100 48Q75 50 70 62Q55 70 55 84Z" fill="#1A1A1A"/>
+            <circle cx="84" cy="92" r="4" fill="#1A1A1A"/>
+            <circle cx="116" cy="92" r="4" fill="#1A1A1A"/>
+            <path d="M76 82Q84 77 92 81" stroke="#1A1A1A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M108 81Q116 77 124 82" stroke="#1A1A1A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M86 112Q100 121 114 112" stroke="#A85138" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
         <h3>佐藤 健一</h3>
         <div class="instructor-role">スタートアップ3社でCPOを歴任</div>
         <p>0→1の事業立ち上げが専門。ディレクションやリリースなど、実行フェーズの伴走に定評があります。</p>
       </div>
       <div class="instructor-card">
-        <div class="instructor-avatar" style="background:linear-gradient(135deg,#2E8F6C,#5FBF9A);">中</div>
+        <div class="instructor-avatar">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" rx="28" fill="#E4F5EE"/>
+            <path d="M38 202Q40 148 100 143Q160 148 162 202Z" fill="#2E8F6C"/>
+            <path d="M84 152 L100 174 L116 152" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="87" y="118" width="26" height="34" rx="8" fill="#F2C9A0"/>
+            <ellipse cx="100" cy="92" rx="43" ry="45" fill="#F7D6AC"/>
+            <path d="M58 92Q54 38 100 36Q146 38 142 92Q142 78 122 74Q124 62 100 60Q76 62 78 74Q58 78 58 92Z" fill="#3A2A1E"/>
+            <path d="M60 88Q52 118 66 140" stroke="#3A2A1E" stroke-width="9" fill="none" stroke-linecap="round"/>
+            <circle cx="83" cy="90" r="4" fill="#3A2A1E"/>
+            <circle cx="117" cy="90" r="4" fill="#3A2A1E"/>
+            <path d="M76 79Q83 74 90 78" stroke="#3A2A1E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M110 78Q117 74 124 79" stroke="#3A2A1E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M87 110Q100 119 113 110" stroke="#B5654A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
         <h3>中村 美咲</h3>
         <div class="instructor-role">外資系IT企業 プロダクトマーケティング責任者</div>
         <p>グローバルGTMやカスタマーサクセス領域が専門。語学力を活かしたキャリア相談も対応します。</p>
       </div>
       <div class="instructor-card">
-        <div class="instructor-avatar" style="background:linear-gradient(135deg,#FF8A3D,#FFB877);">山</div>
+        <div class="instructor-avatar">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" rx="28" fill="#FFEDDD"/>
+            <path d="M36 202Q38 146 100 141Q162 146 164 202Z" fill="#C05A1E"/>
+            <path d="M82 150 L100 168 L118 150" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="86" y="116" width="28" height="36" rx="8" fill="#E4A876"/>
+            <ellipse cx="100" cy="90" rx="45" ry="46" fill="#EEB584"/>
+            <path d="M56 84Q60 34 100 33Q140 34 144 84Q144 70 128 62Q136 46 100 44Q64 46 72 62Q56 70 56 84Z" fill="#241C16"/>
+            <circle cx="84" cy="92" r="14" fill="none" stroke="#241C16" stroke-width="3"/>
+            <circle cx="116" cy="92" r="14" fill="none" stroke="#241C16" stroke-width="3"/>
+            <path d="M98 92h4" stroke="#241C16" stroke-width="3"/>
+            <circle cx="84" cy="92" r="3.2" fill="#241C16"/>
+            <circle cx="116" cy="92" r="3.2" fill="#241C16"/>
+            <path d="M87 116Q100 124 113 116" stroke="#A8593A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
         <h3>山本 直樹</h3>
         <div class="instructor-role">コンサルティングファーム出身 事業戦略アドバイザー</div>
         <p>非エンジニアからのキャリアチェンジ支援が豊富。未経験者の疑問に寄り添った指導が持ち味です。</p>
