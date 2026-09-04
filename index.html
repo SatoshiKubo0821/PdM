@@ -53,11 +53,14 @@
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20800%20600%22%3E%0A%3Cdefs%3E%0A%3Cpattern%20id%3D%22g%22%20width%3D%2216%22%20height%3D%2216%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%234A934A%22/%3E%0A%3Crect%20width%3D%228%22%20height%3D%228%22%20fill%3D%22%23458C45%22/%3E%0A%3Crect%20x%3D%228%22%20y%3D%228%22%20width%3D%228%22%20height%3D%228%22%20fill%3D%22%23458C45%22/%3E%0A%3C/pattern%3E%0A%3Cpattern%20id%3D%22s%22%20width%3D%2224%22%20height%3D%2216%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%3Crect%20width%3D%2224%22%20height%3D%2216%22%20fill%3D%22%233D6FE0%22/%3E%0A%3Cpath%20d%3D%22M0%208h24%22%20stroke%3D%22%235B8AF0%22%20stroke-width%3D%222%22/%3E%0A%3C/pattern%3E%0A%3Cpattern%20id%3D%22f%22%20width%3D%2216%22%20height%3D%2216%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%232D6B2D%22/%3E%0A%3Ccircle%20cx%3D%228%22%20cy%3D%228%22%20r%3D%225%22%20fill%3D%22%23245A24%22/%3E%0A%3C/pattern%3E%0A%3C/defs%3E%0A%3Crect%20width%3D%22800%22%20height%3D%22600%22%20fill%3D%22url%28%23g%29%22/%3E%0A%3Crect%20x%3D%22560%22%20y%3D%22380%22%20width%3D%22260%22%20height%3D%22220%22%20fill%3D%22url%28%23s%29%22/%3E%0A%3Crect%20x%3D%22-10%22%20y%3D%22-10%22%20width%3D%22200%22%20height%3D%22170%22%20fill%3D%22url%28%23f%29%22/%3E%0A%3Crect%20x%3D%22600%22%20y%3D%22-10%22%20width%3D%22220%22%20height%3D%22140%22%20fill%3D%22url%28%23f%29%22/%3E%0A%3Cpath%20d%3D%22M90%20610%20Q210%20470%20330%20420%20T610%20300%22%20stroke%3D%22%23C9A468%22%20stroke-width%3D%2226%22%20fill%3D%22none%22%20opacity%3D%220.75%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cg%20transform%3D%22translate%28380%2C250%29%22%3E%0A%3Crect%20x%3D%22-22%22%20y%3D%224%22%20width%3D%2244%22%20height%3D%2230%22%20fill%3D%22%239A9A9A%22/%3E%0A%3Crect%20x%3D%22-22%22%20y%3D%224%22%20width%3D%2244%22%20height%3D%226%22%20fill%3D%22%237A7A7A%22/%3E%0A%3Cpolygon%20points%3D%22-30%2C4%2030%2C4%2022%2C-18%20-22%2C-18%22%20fill%3D%22%23A85B32%22/%3E%0A%3Cpolygon%20points%3D%22-30%2C4%2030%2C4%2022%2C-18%20-22%2C-18%22%20fill%3D%22none%22%20stroke%3D%22%237A3E1F%22%20stroke-width%3D%222%22/%3E%0A%3Crect%20x%3D%22-5%22%20y%3D%2214%22%20width%3D%2210%22%20height%3D%2220%22%20fill%3D%22%234A2C14%22/%3E%0A%3C/g%3E%0A%3Cg%20transform%3D%22translate%28140%2C470%29%22%3E%0A%3Ccircle%20r%3D%2210%22%20fill%3D%22%23D8D8D8%22/%3E%0A%3Ccircle%20r%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22%23A0A0A0%22%20stroke-width%3D%222%22/%3E%0A%3C/g%3E%0A%3C/svg%3E");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-color: var(--bg);
+    background:
+      radial-gradient(1.5px 1.5px at 20px 30px, #ffffff44, transparent),
+      radial-gradient(1.5px 1.5px at 80px 90px, #ffffff33, transparent),
+      radial-gradient(1.5px 1.5px at 140px 50px, #ffffff22, transparent),
+      radial-gradient(1.5px 1.5px at 200px 120px, #ffffff33, transparent),
+      radial-gradient(1.5px 1.5px at 260px 20px, #ffffff22, transparent),
+      #000000;
+    background-size:300px 300px;
     color:var(--ink);
     font-family:var(--pixel-font);
     line-height:1.8;
@@ -1261,18 +1264,46 @@ const CAREER_BRANCHES = [
   { label:"起業・独立", salary:"変動大（0円〜青天井）", desc:"自らプロダクトを立ち上げ、事業オーナーとしてリスクを取りながら成長を追う道。" },
 ];
 /* ---------------- ドラクエ風ステータス計算 ---------------- */
-function buildRPGStats(){
-  const avg = overallAverage();
-  const strategyAvg = categoryAverage(CATEGORY_BY_KEY.strategy);
-  const researchAvg = categoryAverage(CATEGORY_BY_KEY.research);
-  const directionAvg = categoryAverage(CATEGORY_BY_KEY.direction);
-  const releaseAvg = categoryAverage(CATEGORY_BY_KEY.release);
-  const consultingAvg = categoryAverage(CATEGORY_BY_KEY.consulting);
+/* ---------------- 体力・AI活用力の設問（HP・MP算出専用、10領域のスキル評価とは別枠） ---------------- */
+const VITALS_QUESTIONS = [
+  { kind:"stamina", statement:"急な残業や長時間の作業になっても、体力的に踏ん張れる方だ", reverse:false },
+  { kind:"stamina", statement:"少し無理をすると、すぐに体調を崩してしまう", reverse:true },
+  { kind:"ai",      statement:"ChatGPTなどの生成AIツールを、日常業務で使いこなしている", reverse:false },
+  { kind:"ai",      statement:"AI技術の活用可能性を踏まえてプロダクトを企画するのが苦手だ", reverse:true },
+];
+function vitalsQuestionKey(idx){ return "vitals:"+idx; }
+function vitalsEffectiveScore(qIndex, raw){
+  if(raw==null) return null;
+  const q = VITALS_QUESTIONS[qIndex];
+  return q.reverse ? (6-raw) : raw;
+}
+function computeVitalsScores(vitalsAnswers){
+  const sums={}, counts={};
+  VITALS_QUESTIONS.forEach((q,i)=>{
+    const raw = vitalsAnswers[vitalsQuestionKey(i)];
+    const eff = vitalsEffectiveScore(i, raw);
+    if(eff==null) return;
+    sums[q.kind] = (sums[q.kind]||0) + eff;
+    counts[q.kind] = (counts[q.kind]||0) + 1;
+  });
+  return {
+    stamina: counts.stamina ? sums.stamina/counts.stamina : null,
+    ai: counts.ai ? sums.ai/counts.ai : null,
+  };
+}
 
-  const lv = Math.max(1, Math.min(99, Math.round((avg-1)/4*98)+1));
-  const hp = Math.max(10, Math.round(((directionAvg+releaseAvg+consultingAvg)/3) * 40));
+function buildRPGStats(){
+  const vitals = computeVitalsScores(state.vitalsAnswers || {});
+  const staminaAvg = vitals.stamina != null ? vitals.stamina : 3;
+  const aiAvg = vitals.ai != null ? vitals.ai : 3;
+
+  const age = state.profile.age;
+  const lv = (age != null && age > 0)
+    ? Math.max(1, Math.min(99, Math.round(age)))
+    : Math.max(1, Math.min(99, Math.round((overallAverage()-1)/4*98)+1));
+  const hp = Math.max(10, Math.round(staminaAvg * 40));
   const maxHp = 200;
-  const mp = Math.max(5, Math.round(((strategyAvg+researchAvg)/2) * 30));
+  const mp = Math.max(5, Math.round(aiAvg * 30));
   const maxMp = 150;
 
   return { lv, hp, maxHp, mp, maxMp };
@@ -1829,7 +1860,7 @@ let state = {
   pageIndex: 0,       // 現在の設問ページ番号（1ページ10問、カテゴリ横断でシャッフル済み）
   answers: {},        // "catKey:skillName" -> 1..5
   mbti: null,         // "INTJ" 等、または null（未選択／わからない）
-  profile: { toeic: null, certifications: "", nickname: "", experienceYears: null },
+  profile: { toeic: null, certifications: "", nickname: "", experienceYears: null, age: null },
   userId: null,           // Supabaseの匿名/永久ユーザーID
   userEmail: null,        // メール連携済みの場合のみ入る
   savedThisResult: false, // 今回の診断結果をクラウドに保存済みか（二重保存防止）
@@ -1840,6 +1871,8 @@ let state = {
   orgAnswers: {},         // 組織タイプ診断の回答（"org:idx" -> 1..5）
   orgScores: null,        // 診断済みの場合、4軸の平均スコアが入る
   orgDisplayOrder: null,  // 組織タイプ診断のシャッフル順（メタ回答対策）
+  vitalsAnswers: {},       // 体力・AI設問の回答（"vitals:idx" -> 1..5）。HP/MP算出専用
+  vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -1862,6 +1895,7 @@ async function saveProgress(){
     const payload = JSON.stringify({
       answers:state.answers, mbti:state.mbti, profile:state.profile,
       orgAnswers:state.orgAnswers, orgScores:state.orgScores,
+      vitalsAnswers:state.vitalsAnswers,
     });
     if(window.storage && typeof window.storage.set === "function"){
       await window.storage.set(STORAGE_KEY, payload, false);
@@ -1958,6 +1992,7 @@ function render(){
   if(state.screen==="intro") renderIntro();
   else if(state.screen==="assess") renderAssess();
   else if(state.screen==="mbti") renderMbti();
+  else if(state.screen==="vitals") renderVitals();
   else if(state.screen==="profile") renderProfile();
   else if(state.screen==="history") renderHistory();
   else if(state.screen==="mypage") renderHistory();
@@ -2356,7 +2391,10 @@ async function renderIntro(){
     </div>
 
     <div class="profile-form" style="max-width:520px;">
-      <label class="profile-label" for="nicknameInput">ニックネーム（任意）</label>
+      <label class="profile-label" for="ageInput">年齢（任意・ステータス画面のLvに使われます）</label>
+      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="例：28" value="${state.profile.age ?? ''}">
+
+      <label class="profile-label" for="nicknameInput" style="margin-top:18px;">ニックネーム（任意）</label>
       <input type="text" id="nicknameInput" class="profile-input" placeholder="例：たなか" maxlength="30" value="${state.profile.nickname || ''}">
 
       <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdM経験年数（任意）</label>
@@ -2423,16 +2461,19 @@ async function renderIntro(){
   function captureIntroProfile(){
     const nickname = document.getElementById("nicknameInput").value.trim();
     const expVal = document.getElementById("expYearsInput").value;
+    const ageVal = document.getElementById("ageInput").value;
     state.profile.nickname = nickname;
     state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseInt(expVal,10)));
+    state.profile.age = ageVal === "" ? null : Math.max(1, Math.min(99, parseInt(ageVal,10)));
   }
 
   async function handleStartClick(){
     if(hasSaved){
       state.answers = saved.answers; state.mbti = saved.mbti || null;
-      state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null };
+      state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
       state.orgAnswers = saved.orgAnswers || {};
       state.orgScores = saved.orgScores || null;
+      state.vitalsAnswers = saved.vitalsAnswers || {};
     }
     captureIntroProfile();
     await saveProgress();
@@ -2776,7 +2817,7 @@ function renderMbti(){
     <div class="mbti-preview" id="mbtiPreview"></div>
 
     <div class="start-row" style="margin-top:28px;">
-      <button class="primary" id="toResultsBtn">次へ（語学・資格）</button>
+      <button class="primary" id="toResultsBtn">次へ（体力・AI）</button>
     </div>
   `;
 
@@ -2803,9 +2844,72 @@ function renderMbti(){
   });
 
   document.getElementById("toResultsBtn").onclick = ()=>{
-    state.screen="profile";
+    state.screen="vitals";
     render(); window.scrollTo(0,0);
   };
+}
+
+/* ---------------- 体力・AI活用力の設問（HP/MP算出用） ---------------- */
+function shuffledVitalsOrder(){
+  if(!state.vitalsDisplayOrder){
+    const arr = VITALS_QUESTIONS.map((_,i)=>i);
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    state.vitalsDisplayOrder = arr;
+  }
+  return state.vitalsDisplayOrder;
+}
+function renderVitals(){
+  const order = shuffledVitalsOrder();
+  const answeredCountVitals = Object.keys(state.vitalsAnswers).length;
+  const allDone = order.every(idx => state.vitalsAnswers[vitalsQuestionKey(idx)] != null);
+
+  app.innerHTML = `
+    <div class="eyebrow">最後にもう二つ（HP・MP算出用）</div>
+    <h1 class="hero-title" style="font-size:28px;">体力とAI活用力について</h1>
+    <p class="hero-lead">
+      ここでの回答は、ステータス画面のHP（体力）とMP（AI活用力）の算出にのみ使われ、スキルスコアやタイプ判定には影響しません。
+    </p>
+
+    <div class="q-card-list" style="margin-top:24px;">
+      ${order.map((idx)=>{
+        const q = VITALS_QUESTIONS[idx];
+        const key = vitalsQuestionKey(idx);
+        const currentVal = state.vitalsAnswers[key];
+        return `
+        <div class="q-card" data-idx="${idx}">
+          <div class="q-card-statement">${q.statement}</div>
+          ${renderScaleRow(key, currentVal)}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="q-nav q-nav-split">
+      <button class="ghost" id="vitalsBackBtn">戻る</button>
+      <button class="primary" id="vitalsNextBtn" ${allDone?"":"disabled style='opacity:.4;cursor:default;'"}>次へ（語学・資格）</button>
+    </div>
+  `;
+
+  app.querySelectorAll(".q-card").forEach(card=>{
+    const idx = parseInt(card.getAttribute("data-idx"),10);
+    const key = vitalsQuestionKey(idx);
+    card.querySelectorAll(".scale-circle-wrap").forEach(wrap=>{
+      wrap.onclick = async ()=>{
+        const v = parseInt(wrap.getAttribute("data-v"),10);
+        state.vitalsAnswers[key] = v;
+        await saveProgress();
+        renderVitals();
+      };
+    });
+  });
+
+  document.getElementById("vitalsBackBtn").onclick = ()=>{ state.screen="mbti"; render(); window.scrollTo(0,0); };
+  const nextBtn = document.getElementById("vitalsNextBtn");
+  if(nextBtn && allDone){
+    nextBtn.onclick = ()=>{ state.screen="profile"; render(); window.scrollTo(0,0); };
+  }
 }
 
 /* ---------------- 語学力・資格の入力画面 ---------------- */
@@ -3378,7 +3482,7 @@ function renderResults(){
       state.answers = {};
       state.mbti = null;
       state.displayOrder = {};
-      state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null };
+      state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
       state.savedThisResult = false;
       state.screen="intro";
       render(); window.scrollTo(0,0);
@@ -3413,7 +3517,7 @@ function renderResults(){
     state.answers = {};
     state.mbti = null;
     state.displayOrder = {};
-    state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null };
+    state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
     state.savedThisResult = false;
     await saveProgress();
     state.screen="intro";
