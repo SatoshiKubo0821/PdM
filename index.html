@@ -603,6 +603,8 @@
     padding:18px 20px;
   }
   .metric-label{font-size:12px; color:var(--ink-soft); font-weight:600;}
+  .hensachi-bell-wrap{margin-top:12px;}
+  .hensachi-bell-svg{width:100%; height:auto; display:block;}
   .metric-value{
     font-family:"Zen Kaku Gothic New",sans-serif;
     font-size:32px;
@@ -961,6 +963,7 @@
       <a href="./events.html">イベントカレンダー</a>
       <a href="#" id="navOrgLink">組織タイプ診断</a>
       <a href="#" id="navMypageLink">マイページ</a>
+      <a href="https://discord.gg/YOUR-INVITE-CODE" target="_blank" rel="noopener" title="コミュニティDiscordにJOIN"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:-3px;"><path d="M20.3 4.4A19.8 19.8 0 0015.6 3l-.3.5a13.9 13.9 0 016.1 3.1 18.5 18.5 0 00-15.9 0 13.9 13.9 0 016.1-3.1L11.3 3a19.8 19.8 0 00-4.7 1.4C3.6 8 2.8 11.5 3.1 15c1.6 1.2 3.2 1.9 4.7 2.4l.7-1.2c-.8-.3-1.6-.7-2.3-1.2l.4-.3c3.3 1.5 6.9 1.5 10.2 0l.4.3c-.7.5-1.5.9-2.3 1.2l.7 1.2c1.5-.5 3.1-1.2 4.7-2.4.4-4-.7-7.4-3.1-10.6zM9.7 13.4c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7zm5 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7z"/></svg> Discord</a>
       <span id="navAuthArea"></span>
     </nav>
   </div>
@@ -1290,6 +1293,52 @@ function hensachiComment(h){
   if(h >= 50) return "平均以上。実務を安定して回せる水準に達しています。";
   if(h >= 40) return "平均的〜成長中。経験を積むほど大きく伸びる時期です。";
   return "これから力をつけていくフェーズ。基礎固めが最優先です。";
+}
+
+/* 偏差値の位置を正規分布の釣鐘曲線上にプロットするSVGを生成する（白背景の指標タイル内に表示） */
+function hensachiBellCurveSVG(h){
+  const w = 320, ht = 140, padX = 20, padY = 16;
+  const mean = 50, sd = 10;
+  const xMin = 20, xMax = 80;
+  const xScale = (x) => padX + (x - xMin) / (xMax - xMin) * (w - padX*2);
+  const gaussian = (x) => Math.exp(-0.5 * Math.pow((x - mean)/sd, 2));
+  const yScale = (density) => (ht - padY) - density * (ht - padY*2);
+
+  let pathPoints = [];
+  for(let x = xMin; x <= xMax; x += 2){
+    pathPoints.push(`${xScale(x)},${yScale(gaussian(x))}`);
+  }
+  const pathD = "M" + pathPoints.join(" L");
+
+  const hClamped = Math.max(xMin, Math.min(xMax, h));
+  const markerX = xScale(hClamped);
+  const markerY = yScale(gaussian(hClamped));
+
+  const ticks = [30,40,50,60,70].map(t=>{
+    const x = xScale(t);
+    return `<line x1="${x}" y1="${ht-padY}" x2="${x}" y2="${ht-padY+4}" stroke="#16171A" stroke-width="1" opacity="0.4"/>
+      <text x="${x}" y="${ht-2}" font-size="9" fill="#5B5D66" text-anchor="middle" font-family="DotGothic16">${t}</text>`;
+  }).join("");
+
+  return `<svg viewBox="0 0 ${w} ${ht}" class="hensachi-bell-svg">
+    <line x1="${padX}" y1="${ht-padY}" x2="${w-padX}" y2="${ht-padY}" stroke="#16171A" stroke-width="1" opacity="0.3"/>
+    <path d="${pathD}" fill="none" stroke="#1C1D21" stroke-width="2"/>
+    <path d="${pathD} L${w-padX},${ht-padY} L${padX},${ht-padY} Z" fill="#1C1D21" opacity="0.08"/>
+    ${ticks}
+    <line x1="${markerX}" y1="${ht-padY}" x2="${markerX}" y2="${markerY}" stroke="#E8792A" stroke-width="2" stroke-dasharray="3,2"/>
+    <circle cx="${markerX}" cy="${markerY}" r="5" fill="#E8792A" stroke="#fff" stroke-width="1.5"/>
+    <text x="${markerX}" y="${markerY-10}" font-size="12" fill="#E8792A" text-anchor="middle" font-weight="bold" font-family="DotGothic16">${h}</text>
+  </svg>`;
+}
+
+/* ---------------- 次に身につけると良いスキル（1件）＋リスキリングのアイデア ---------------- */
+function buildNextSkillRecommendation(){
+  const flat = allSkillsFlat();
+  if(flat.length === 0) return null;
+  const lowest = [...flat].sort((a,b)=>a.v-b.v)[0];
+  const cat = CATEGORIES.find(c=>c.skills.some(sk=>sk[0]===lowest.name));
+  const remedy = cat ? GROWTH_REMEDY[cat.key] : null;
+  return { skill: lowest, catName: cat ? cat.name : "", remedy };
 }
 
 /* ---------------- TOEICスコアのコメント ---------------- */
@@ -3177,6 +3226,7 @@ function renderResults(){
   const salaryBand = SALARY_BANDS[seniorityKey];
   const matchedJobs = matchJobs(typeResult.key, seniorityKey);
   const swot = buildSwot(strengthCats, growthCats, matrix);
+  const nextSkill = buildNextSkillRecommendation();
   const careerPath = buildCareerPath(seniorityKey);
   const toeicNote = toeicComment(state.profile.toeic);
   const rpg = buildRPGStats();
@@ -3283,6 +3333,7 @@ function renderResults(){
         <div class="metric-label">PdM偏差値</div>
         <div class="metric-value">${hensachi}</div>
         <div class="metric-note">${hensachiComment(hensachi)}<br>※本ツール内の自己評価をもとにした簡易換算値（平均50・SD10）で、公的な統計調査による偏差値ではありません。</div>
+        <div class="hensachi-bell-wrap">${hensachiBellCurveSVG(hensachi)}</div>
       </div>
       <div class="metric-tile">
         <div class="metric-label">想定年収幅（${seniority.label}クラス）</div>
@@ -3433,6 +3484,18 @@ function renderResults(){
       ${topSkills.map(s=>`<span class="pill strong"><b>${s.v}</b> ${s.name}</span>`).join("")}
       ${bottomSkills.map(s=>`<span class="pill weak"><b>${s.v}</b> ${s.name}</span>`).join("")}
     </div>
+
+    ${nextSkill ? `
+    <div class="section-label">次に身につけると良いスキル</div>
+    <div class="insight fusion" style="margin-top:10px;">
+      <h4>${nextSkill.skill.name} <b>${nextSkill.skill.v}</b></h4>
+      <p style="font-size:12px; color:var(--ink-soft); margin-bottom:8px;">「${nextSkill.catName}」領域の中で、現時点で最もスコアが低い項目です。ここを伸ばすと、全体のバランスが底上げされやすくなります。</p>
+      ${nextSkill.remedy ? `
+      <p><b style="color:var(--ink);">リスキリングのアイデア：</b>${nextSkill.remedy.training}</p>
+      <p style="margin-top:4px;"><b style="color:var(--ink);">実践のヒント：</b>${nextSkill.remedy.task}</p>
+      ` : ""}
+    </div>
+    ` : ""}
 
     <div class="section-label">弱みを補うアクション</div>
     <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
