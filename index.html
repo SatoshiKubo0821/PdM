@@ -124,6 +124,20 @@
   .dq-persona{font-family:var(--pixel-font); font-size:12.5px; margin-top:14px; padding-top:12px; border-top:1px dashed rgba(255,255,255,.35);}
   .dq-persona-desc{font-size:11px; color:rgba(255,255,255,.75); line-height:1.8;}
 
+  .dq-status-grid{display:grid; grid-template-columns:1fr 1.3fr; gap:20px; margin-top:16px; padding-top:14px; border-top:1px dashed rgba(255,255,255,.35);}
+  .dq-mini-label{font-family:var(--pixel-font); font-size:11px; color:var(--gold); margin-bottom:8px;}
+  .dq-equip-row{display:flex; align-items:baseline; gap:8px; padding:4px 0; font-family:var(--pixel-font); font-size:12px;}
+  .dq-equip-slot{color:rgba(255,255,255,.6); flex-shrink:0; width:44px;}
+  .dq-equip-name{color:#fff;}
+  .dq-num-grid{display:grid; grid-template-columns:1fr 1fr; gap:4px 14px;}
+  .dq-num-cell{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--pixel-font); font-size:11.5px; padding:3px 0; border-bottom:1px dotted rgba(255,255,255,.2);}
+  .dq-num-cell span{color:rgba(255,255,255,.75);}
+  .dq-num-cell b{color:var(--gold); font-size:13px; margin-left:8px; flex-shrink:0;}
+  @media (max-width:480px){
+    .dq-status-grid{grid-template-columns:1fr;}
+    .dq-num-grid{grid-template-columns:1fr 1fr;}
+  }
+
   .dq-stat-row{display:flex; align-items:center; gap:10px; padding:6px 0;}
   .dq-stat-name{font-family:var(--pixel-font); font-size:12px; width:150px; flex-shrink:0;}
   .dq-stat-name small{font-size:9px; color:rgba(255,255,255,.6); display:block; margin-top:2px;}
@@ -1129,6 +1143,20 @@ const STAT_FLAVOR = {
   global:        "せかいりょく",
 };
 
+/* カテゴリごとの「そうび」（武器・防具）風フレーバー名。得意カテゴリ上位4件を装備欄に表示する */
+const CATEGORY_EQUIPMENT = {
+  strategy:      { slot:"ぶき",     name:"せんりゃくのけん" },
+  research:      { slot:"ぶき",     name:"かんさつのつえ" },
+  direction:     { slot:"たて",     name:"とうそつのたて" },
+  requirement:   { slot:"かぶと",   name:"げんみつのかぶと" },
+  design:        { slot:"よろい",   name:"せっけいのよろい" },
+  release:       { slot:"たて",     name:"ひんしつのたて" },
+  communication: { slot:"そうしょく", name:"わじゅつのゆびわ" },
+  consulting:    { slot:"ぶき",     name:"せっとくのつえ" },
+  success:       { slot:"そうしょく", name:"きずなのペンダント" },
+  global:        { slot:"よろい",   name:"せかいのマント" },
+};
+
 /* MBTI→せいかく（オリジナルの16パターン。既存ゲームの固有の性格名・成長システムを模したものではない） */
 const MBTI_DQ_PERSONA = {
   INTJ:{ title:"ちりゃくか", desc:"ひとりで黙々と計画を練り、静かに勝算を積み上げるタイプ。" },
@@ -1256,6 +1284,20 @@ function buildRPGStats(){
   const maxMp = 150;
 
   return { lv, hp, maxHp, mp, maxMp };
+}
+
+/* カテゴリスコア(1〜5)を、ドラクエ3風の能力値スケール(1〜255)に変換する */
+function toDQStatValue(score){
+  return Math.max(1, Math.min(255, Math.round((score-1)/4*254)+1));
+}
+
+/* 得意カテゴリ上位4件を「そうび」（武器・防具）として表示するリストを作る */
+function buildEquipment(){
+  const sorted = [...CATEGORIES].sort((a,b)=>categoryAverage(b)-categoryAverage(a)).slice(0,4);
+  return sorted.map(c=>{
+    const eq = CATEGORY_EQUIPMENT[c.key];
+    return { slot:eq.slot, name:eq.name, catName:c.name, v:categoryAverage(c) };
+  });
 }
 
 /* 得意スキル上位5件を、とくぎ・じゅもんとして表示するためのリストを作る */
@@ -2940,6 +2982,7 @@ function renderResults(){
   const jobClass = JOB_CLASS[typeResult.key];
   const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
   const techniques = buildSkillTechniques();
+  const equipment = buildEquipment();
 
   saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi });
 
@@ -2961,32 +3004,41 @@ function renderResults(){
           <div class="dq-lv">Lv ${rpg.lv}</div>
         </div>
       </div>
-      <div class="dq-bar-row">
-        <span class="dq-bar-label">HP</span>
-        <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:${Math.min(100, rpg.hp/rpg.maxHp*100)}%;"></div></div>
-        <span class="dq-bar-num">${rpg.hp}/${rpg.maxHp}</span>
-      </div>
-      <div class="dq-bar-row">
-        <span class="dq-bar-label">MP</span>
-        <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill mp" style="width:${Math.min(100, rpg.mp/rpg.maxMp*100)}%;"></div></div>
-        <span class="dq-bar-num">${rpg.mp}/${rpg.maxMp}</span>
-      </div>
-      <div class="dq-persona">せいかく：${persona.title}<br><span class="dq-persona-desc">${persona.desc}</span></div>
-    </div>
 
-    <div class="section-label" style="margin-top:28px;">のうりょくパラメーター</div>
-    <div class="dq-window" style="margin-top:10px;">
-      ${CATEGORIES.map(c=>{
-        const v = categoryAverage(c);
-        const pct = Math.round((v-1)/4*100);
-        const num = Math.round((v-1)/4*99)+1;
-        return `
-        <div class="dq-stat-row">
-          <span class="dq-stat-name">${STAT_FLAVOR[c.key]}<small>（${c.name}）</small></span>
-          <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:${pct}%;"></div></div>
-          <span class="dq-stat-num">${num}</span>
-        </div>`;
-      }).join("")}
+      <div class="dq-status-grid">
+        <div class="dq-status-col">
+          <div class="dq-mini-label">そうび</div>
+          ${equipment.map(eq=>`
+            <div class="dq-equip-row">
+              <span class="dq-equip-slot">${eq.slot}</span>
+              <span class="dq-equip-name">${eq.name}</span>
+            </div>`).join("")}
+          <div class="dq-persona">せいかく：${persona.title}<br><span class="dq-persona-desc">${persona.desc}</span></div>
+        </div>
+        <div class="dq-status-col">
+          <div class="dq-bar-row">
+            <span class="dq-bar-label">HP</span>
+            <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:${Math.min(100, rpg.hp/rpg.maxHp*100)}%;"></div></div>
+            <span class="dq-bar-num">${rpg.hp}/${rpg.maxHp}</span>
+          </div>
+          <div class="dq-bar-row">
+            <span class="dq-bar-label">MP</span>
+            <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill mp" style="width:${Math.min(100, rpg.mp/rpg.maxMp*100)}%;"></div></div>
+            <span class="dq-bar-num">${rpg.mp}/${rpg.maxMp}</span>
+          </div>
+          <div class="dq-mini-label" style="margin-top:14px;">のうりょく値（さいだい255）</div>
+          <div class="dq-num-grid">
+            ${CATEGORIES.map(c=>{
+              const v = toDQStatValue(categoryAverage(c));
+              return `<div class="dq-num-cell"><span>${STAT_FLAVOR[c.key]}</span><b>${v}</b></div>`;
+            }).join("")}
+          </div>
+          <div class="dq-num-grid" style="margin-top:8px;">
+            <div class="dq-num-cell"><span>そうごうりょく</span><b>${toDQStatValue(avg)}</b></div>
+            <div class="dq-num-cell"><span>きゅうよレンジ</span><b style="font-size:11px;">${salaryBand.range}</b></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="section-label" style="margin-top:28px;">おぼえている とくぎ・じゅもん</div>
