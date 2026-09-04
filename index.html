@@ -1182,6 +1182,59 @@ const MBTI_DQ_PERSONA = {
 };
 
 /* スキルを「とくぎ（実行系）」か「じゅもん（知略系）」に分類するカテゴリ判定 */
+/* 全49スキル名のひらがな読み（「おぼえているとくぎ・じゅもん」表示用） */
+const SKILL_NAME_HIRAGANA = {
+  "プロダクトビジョン策定":"ぷろだくとびじょんさくてい",
+  "短期ロードマップ作成":"たんきろーどまっぷさくせい",
+  "中長期ロードマップ作成":"ちゅうちょうきろーどまっぷさくせい",
+  "プロダクト戦略":"ぷろだくとせんりゃく",
+  "マーケティング戦略立案":"まーけてぃんぐせんりゃくりつあん",
+  "KPI管理":"けーぴーあいかんり",
+  "プライシング戦略":"ぷらいしんぐせんりゃく",
+  "パートナーシップ・アライアンス戦略":"ぱーとなーしっぷあらいあんすせんりゃく",
+  "競合調査":"きょうごうちょうさ",
+  "市場調査":"しじょうちょうさ",
+  "定量分析":"ていりょうぶんせき",
+  "ユーザーリサーチ":"ゆーざーりさーち",
+  "ユーザー検証":"ゆーざーけんしょう",
+  "TAM/SAM/SOM算出":"たむさむそむさんしゅつ",
+  "業界動向・トレンド分析":"ぎょうかいどうこうとれんどぶんせき",
+  "施策優先度管理":"しさくゆうせんどかんり",
+  "スケジュール見積もり":"すけじゅーるみつもり",
+  "リソース調整":"りそーすちょうせい",
+  "開発ディレクション":"かいはつでぃれくしょん",
+  "UIデザインのディレクション":"ゆーあいでざいんのでぃれくしょん",
+  "ユーザー価値定義":"ゆーざーかちていぎ",
+  "要求への落とし込み":"ようきゅうへのおとしこみ",
+  "プロダクト要件定義の作成":"ぷろだくとようけんていぎのさくせい",
+  "フィジビリティ確認":"ふぃじびりてぃかくにん",
+  "仕様詳細のドキュメント化":"しようしょうさいのどきゅめんとか",
+  "プロトタイプ作成":"ぷろとたいぷさくせい",
+  "ユーザー体験設計":"ゆーざーたいけんせっけい",
+  "影響範囲の確認":"えいきょうはんいのかくにん",
+  "技術アーキテクチャの理解":"ぎじゅつあーきてくちゃのりかい",
+  "リリース戦略設計":"りりーすせんりゃくせっけい",
+  "ABテスト":"えーびーてすと",
+  "QA対応":"きゅーえーたいおう",
+  "リリースタスクマネジメント":"りりーすたすくまねじめんと",
+  "テスト計画・品質基準の設計":"てすとけいかくひんしつきじゅんのせっけい",
+  "フィードバックの受け取りと提供":"ふぃーどばっくのうけとりとていきょう",
+  "プレゼンテーション":"ぷれぜんてーしょん",
+  "チーム内コミュニケーション":"ちーむないこみゅにけーしょん",
+  "ドキュメンテーション":"どきゅめんてーしょん",
+  "ネゴシエーション":"ねごしえーしょん",
+  "ファシリテーション":"ふぁしりてーしょん",
+  "プロジェクトの要件設計、管理":"ぷろじぇくとのようけんせっけいかんり",
+  "販売チャネル戦略":"はんばいちゃねるせんりゃく",
+  "コンテンツ・ブランディング戦略":"こんてんつぶらんでぃんぐせんりゃく",
+  "オンボーディング設計":"おんぼーでぃんぐせっけい",
+  "チャーン分析・防止":"ちゃーんぶんせきぼうし",
+  "アップセル・クロスセル戦略":"あっぷせるくろすせるせんりゃく",
+  "英語での開発チーム牽引":"えいごでのかいはつちーむけんいん",
+  "英語でのグローバルGTM展開":"えいごでのぐろーばるじーてぃーえむてんかい",
+  "各国に応じたGTM戦略の実行":"かっこくにおうじたじーてぃーえむせんりゃくのじっこう",
+};
+
 const SKILL_KIND_BY_CATEGORY = {
   strategy:"じゅもん", research:"じゅもん", direction:"とくぎ", requirement:"じゅもん",
   design:"とくぎ", release:"とくぎ", communication:"とくぎ", consulting:"じゅもん",
@@ -1295,7 +1348,6 @@ function computeVitalsScores(vitalsAnswers){
 function buildRPGStats(){
   const vitals = computeVitalsScores(state.vitalsAnswers || {});
   const staminaAvg = vitals.stamina != null ? vitals.stamina : 3;
-  const aiAvg = vitals.ai != null ? vitals.ai : 3;
 
   const age = state.profile.age;
   const lv = (age != null && age > 0)
@@ -1303,8 +1355,12 @@ function buildRPGStats(){
     : Math.max(1, Math.min(99, Math.round((overallAverage()-1)/4*98)+1));
   const hp = Math.max(10, Math.round(staminaAvg * 40));
   const maxHp = 200;
-  const mp = Math.max(5, Math.round(aiAvg * 30));
   const maxMp = 150;
+  // MPはランダムに決定する。診断のたびに毎回変わらないよう、一度決めたらstateにキャッシュする
+  if(state.rpgMp == null){
+    state.rpgMp = Math.floor(Math.random() * (maxMp - 5 + 1)) + 5;
+  }
+  const mp = state.rpgMp;
 
   return { lv, hp, maxHp, mp, maxMp };
 }
@@ -1315,12 +1371,21 @@ function toDQStatValue(score){
 }
 
 /* 得意カテゴリ上位4件を「そうび」（武器・防具）として表示するリストを作る */
-function buildEquipment(){
-  const sorted = [...CATEGORIES].sort((a,b)=>categoryAverage(b)-categoryAverage(a)).slice(0,4);
-  return sorted.map(c=>{
+function buildEquipment(mbtiCode){
+  const sorted = [...CATEGORIES].sort((a,b)=>categoryAverage(b)-categoryAverage(a)).slice(0,3);
+  const list = sorted.map(c=>{
     const eq = CATEGORY_EQUIPMENT[c.key];
     return { slot:eq.slot, name:eq.name, catName:c.name, v:categoryAverage(c) };
   });
+  if(mbtiCode && mbtiCode!=="unknown"){
+    const group = MBTI_GROUPS[mbtiGroupOf(mbtiCode)];
+    const style = group ? STYLE_BY_MBTI_GROUP[group.name] : null;
+    if(style){
+      list.push({ slot:"ふく", name:style.clothes, catName:"せいかく", v:null });
+      list.push({ slot:"こもの", name:style.accessory, catName:"せいかく", v:null });
+    }
+  }
+  return list;
 }
 
 /* 得意スキル上位5件を、とくぎ・じゅもんとして表示するためのリストを作る */
@@ -1330,7 +1395,8 @@ function buildSkillTechniques(){
     const cat = CATEGORIES.find(c=>c.skills.some(sk=>sk[0]===s.name));
     const kind = cat ? SKILL_KIND_BY_CATEGORY[cat.key] : "とくぎ";
     const cost = Math.max(1, 6 - s.v); // スコアが高いほど「MP消費が少ない=使い慣れている」という表現
-    return { name:s.name, kind, cost, v:s.v, catName:s.catName };
+    const displayName = SKILL_NAME_HIRAGANA[s.name] || s.name;
+    return { name:displayName, kind, cost, v:s.v, catName:s.catName };
   });
 }
 
@@ -1854,6 +1920,43 @@ function buildOrgFocusCategories(orgScores){
   return Object.values(map);
 }
 
+/* ---------------- そしき（組織）タイプ判定 ----------------
+   組織タイプ診断（4軸）の結果から、6種類のオリジナルな「組織タイプ」に分類する。
+   ステータス画面の「そしき」欄で、どんな会社に所属しているかを表現するために使う。 */
+const ORG_TYPE_DEFS = {
+  guild:     { name:"ぼうけんしゃギルド", desc:"自由と挑戦を重んじる、機動力のある組織。" },
+  knights:   { name:"きしだん",           desc:"規律とチームワークで大きな成果を狙う、統率された組織。" },
+  mercenary: { name:"ようへいだん",       desc:"個人の実力がものを言う、実力主義の組織。" },
+  commune:   { name:"きょうどうたい",     desc:"仲間との調和を大切にする、あたたかい組織。" },
+  freecity:  { name:"じゆうとし",         desc:"特定の色に染まらない、バランス型の組織。" },
+  alliance:  { name:"しょうにんれんごう", desc:"実利を重視し、状況に応じて柔軟に動く組織。" },
+};
+function determineOrgType(orgScores){
+  if(!orgScores) return null;
+  const dPole = orgAxisPole(orgScores.decision);
+  const ePole = orgAxisPole(orgScores.evaluation);
+  const rPole = orgAxisPole(orgScores.risk);
+  const cPole = orgAxisPole(orgScores.communication);
+
+  if(dPole==="high" && rPole==="high") return { key:"guild", ...ORG_TYPE_DEFS.guild };
+  if(dPole==="low" && rPole==="low") return { key:"knights", ...ORG_TYPE_DEFS.knights };
+  if(ePole==="high" && cPole==="high") return { key:"mercenary", ...ORG_TYPE_DEFS.mercenary };
+  if(ePole==="low" && cPole==="low") return { key:"commune", ...ORG_TYPE_DEFS.commune };
+  const midCount = [dPole,ePole,rPole,cPole].filter(p=>p==="mid").length;
+  if(midCount>=3) return { key:"freecity", ...ORG_TYPE_DEFS.freecity };
+  return { key:"alliance", ...ORG_TYPE_DEFS.alliance };
+}
+
+/* ---------------- せいかく由来のファッションスタイル（そうびの「ふく・こもの」に反映） ----------------
+   MBTIの4グループ（アナリスト/ディプロマット/セ ンチネル/エクスプローラー）ごとに、
+   オリジナルのスタイル系統と装備アイテム名を割り当てる。 */
+const STYLE_BY_MBTI_GROUP = {
+  "アナリスト":     { style:"ミニマリスト", clothes:"くろいふく", accessory:"くろいずぼん" },
+  "ディプロマット": { style:"ナチュラル系", clothes:"リネンのふく", accessory:"あさのバッグ" },
+  "センチネル":     { style:"フォーマル系", clothes:"きちんとしたスーツ", accessory:"かわのかばん" },
+  "エクスプローラー": { style:"はで系", clothes:"ハイブラなふく", accessory:"ハイブラバッグ" },
+};
+
 /* ---------------- State ---------------- */
 let state = {
   screen: "intro",   // intro | assess | mbti | profile | results | history | account
@@ -1873,6 +1976,7 @@ let state = {
   orgDisplayOrder: null,  // 組織タイプ診断のシャッフル順（メタ回答対策）
   vitalsAnswers: {},       // 体力・AI設問の回答（"vitals:idx" -> 1..5）。HP/MP算出専用
   vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
+  rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -1895,7 +1999,7 @@ async function saveProgress(){
     const payload = JSON.stringify({
       answers:state.answers, mbti:state.mbti, profile:state.profile,
       orgAnswers:state.orgAnswers, orgScores:state.orgScores,
-      vitalsAnswers:state.vitalsAnswers,
+      vitalsAnswers:state.vitalsAnswers, rpgMp:state.rpgMp,
     });
     if(window.storage && typeof window.storage.set === "function"){
       await window.storage.set(STORAGE_KEY, payload, false);
@@ -2474,6 +2578,7 @@ async function renderIntro(){
       state.orgAnswers = saved.orgAnswers || {};
       state.orgScores = saved.orgScores || null;
       state.vitalsAnswers = saved.vitalsAnswers || {};
+      state.rpgMp = saved.rpgMp ?? null;
     }
     captureIntroProfile();
     await saveProgress();
@@ -3078,7 +3183,8 @@ function renderResults(){
   const jobClass = JOB_CLASS[typeResult.key];
   const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
   const techniques = buildSkillTechniques();
-  const equipment = buildEquipment();
+  const equipment = buildEquipment(state.mbti);
+  const orgType = determineOrgType(state.orgScores);
 
   saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi });
 
@@ -3109,7 +3215,8 @@ function renderResults(){
               <span class="dq-equip-slot">${eq.slot}</span>
               <span class="dq-equip-name">${eq.name}</span>
             </div>`).join("")}
-          <div class="dq-persona">せいかく：${persona.title}<br><span class="dq-persona-desc">${persona.desc}</span></div>
+          <div class="dq-persona">せいかく：${hasMbti ? state.mbti : "みかいめい"}（${persona.title}）<br><span class="dq-persona-desc">${persona.desc}</span></div>
+          <div class="dq-persona" style="margin-top:10px; padding-top:10px;">そしき：${orgType ? orgType.name : "みかいめい"}${orgType ? "" : ""}<br><span class="dq-persona-desc">${orgType ? orgType.desc : "組織タイプ診断を受けると、所属する組織のタイプが分かります。"}</span></div>
         </div>
         <div class="dq-status-col">
           <div class="dq-bar-row">
