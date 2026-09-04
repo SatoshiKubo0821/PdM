@@ -109,15 +109,17 @@
   .pixel-bar-fill.mp{background:repeating-linear-gradient(90deg, #4696F0 0, #4696F0 3px, #2E7CD6 3px, #2E7CD6 6px);}
 
   /* ---------- DQ status window components ---------- */
-  .dq-status-top{display:flex; align-items:center; gap:16px; margin-bottom:16px;}
+  .dq-status-top{display:flex; align-items:center; gap:20px; margin-bottom:16px; flex-wrap:wrap;}
   .dq-job-icon{
-    width:56px; height:56px; background:rgba(255,255,255,.12); border:2px solid #fff; flex-shrink:0;
+    width:140px; height:140px; background:rgba(255,255,255,.08); border:3px solid #fff;
+    box-shadow:0 0 0 3px var(--navy-950), 4px 4px 0 rgba(0,0,0,.3);
+    flex-shrink:0; overflow:hidden;
     display:flex; align-items:center; justify-content:center;
   }
-  .dq-job-icon svg{width:36px; height:36px;}
-  .dq-name{font-family:var(--pixel-font); font-size:16px; font-weight:700;}
-  .dq-job{font-family:var(--pixel-font); font-size:12px; margin-top:4px; color:var(--gold-soft);}
-  .dq-lv{font-family:var(--pixel-font); font-size:14px; margin-top:4px; color:var(--gold);}
+  .dq-job-icon img{width:100%; height:100%; object-fit:cover; image-rendering:pixelated;}
+  .dq-name{font-family:var(--pixel-font); font-size:18px; font-weight:700;}
+  .dq-job{font-family:var(--pixel-font); font-size:13px; margin-top:6px; color:var(--gold-soft);}
+  .dq-lv{font-family:var(--pixel-font); font-size:16px; margin-top:6px; color:var(--gold);}
   .dq-bar-row{display:flex; align-items:center; gap:10px; margin-top:8px;}
   .dq-bar-label{font-family:var(--pixel-font); font-size:12px; width:28px; flex-shrink:0;}
   .dq-bar-num{font-family:var(--pixel-font); font-size:11px; width:64px; text-align:right; flex-shrink:0;}
@@ -136,6 +138,7 @@
   @media (max-width:480px){
     .dq-status-grid{grid-template-columns:1fr;}
     .dq-num-grid{grid-template-columns:1fr 1fr;}
+    .dq-job-icon{width:100px; height:100px;}
   }
 
   .dq-stat-row{display:flex; align-items:center; gap:10px; padding:6px 0;}
@@ -1125,7 +1128,7 @@ const CLUSTER_OF = {
 const JOB_CLASS = {
   tech:    { name:"まほうつかい", en:"MAGE", desc:"知略と技術で局面を切り拓く、知力特化の職業。", icon:"mage" },
   bizdev:  { name:"せんし",       en:"WARRIOR", desc:"事業という名の戦場を、力づくで前進させる職業。", icon:"warrior" },
-  pmm:     { name:"しょうにん",   en:"MERCHANT", desc:"市場を読み、価値を届けることに長けた職業。", icon:"merchant" },
+  pmm:     { name:"そうりょ",     en:"PRIEST", desc:"市場と顧客に寄り添い、価値を届け支える職業。", icon:"priest" },
   general: { name:"ゆうしゃ",     en:"HERO", desc:"どんな戦場でも戦える、バランス型の主人公職。", icon:"hero" },
 };
 
@@ -1183,14 +1186,6 @@ const SKILL_KIND_BY_CATEGORY = {
   strategy:"じゅもん", research:"じゅもん", direction:"とくぎ", requirement:"じゅもん",
   design:"とくぎ", release:"とくぎ", communication:"とくぎ", consulting:"じゅもん",
   success:"とくぎ", global:"じゅもん",
-};
-
-/* 職業アイコン（オリジナルのドット絵風SVG） */
-const JOB_ICON_SVG = {
-  mage: `<rect x="10" y="2" width="4" height="4" fill="#F8C630"/><path d="M6 10h12l-2 6H8z" fill="#4646D6"/><rect x="4" y="16" width="16" height="6" fill="#2E2E8C"/><rect x="9" y="16" width="6" height="6" fill="#F5D7A8"/><rect x="10" y="18" width="1" height="1" fill="#000"/><rect x="13" y="18" width="1" height="1" fill="#000"/>`,
-  warrior: `<rect x="8" y="2" width="8" height="6" fill="#F5D7A8"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="14" y="4" width="1" height="1" fill="#000"/><rect x="4" y="8" width="16" height="8" fill="#C0392B"/><rect x="2" y="9" width="4" height="10" fill="#8C8C8C"/><rect x="18" y="9" width="4" height="10" fill="#8C8C8C"/><rect x="8" y="16" width="8" height="6" fill="#7A7A7A"/>`,
-  merchant: `<rect x="8" y="2" width="8" height="6" fill="#F5D7A8"/><rect x="6" y="8" width="12" height="4" fill="#38C172"/><rect x="4" y="12" width="16" height="10" fill="#8C5A2B"/><rect x="9" y="15" width="6" height="5" fill="#F8C630"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="14" y="4" width="1" height="1" fill="#000"/>`,
-  hero: `<rect x="8" y="2" width="8" height="6" fill="#F5D7A8"/><rect x="6" y="0" width="12" height="3" fill="#F8C630"/><rect x="4" y="8" width="16" height="8" fill="#4646D6"/><rect x="2" y="9" width="4" height="12" fill="#E6432E"/><rect x="8" y="16" width="8" height="6" fill="#2E2E8C"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="14" y="4" width="1" height="1" fill="#000"/>`,
 };
 
 const PDM_TYPES = {
@@ -2997,7 +2992,7 @@ function renderResults(){
 
     <div class="dq-window" style="margin-top:20px;">
       <div class="dq-status-top">
-        <div class="dq-job-icon"><svg viewBox="0 0 24 24">${JOB_ICON_SVG[jobClass.icon]}</svg></div>
+        <div class="dq-job-icon"><img src="./assets/jobs/${jobClass.icon}.png" alt="${jobClass.name}"></div>
         <div>
           <div class="dq-name">${state.profile.nickname || "ぼうけんしゃ"}</div>
           <div class="dq-job">しょくぎょう：${jobClass.name}（${jobClass.en}）</div>
