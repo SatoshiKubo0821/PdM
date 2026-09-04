@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PdMイベントカレンダー｜PdM登竜門</title>
+<meta name="description" content="connpassなどに掲載されているプロダクトマネージャー・PM関連のイベント・勉強会を集約したカレンダーです。毎日自動更新。">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%232952E3%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-width%3D%222.5%22%20opacity%3D%22.9%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23FF8A3D%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2952E3; --blue-dark:#16244D; --blue-soft:#EDF1FE;
+    --orange:#FF8A3D; --orange-soft:#FFEDDD;
+    --ink:#16213D; --ink-soft:#5D6B8A; --line:#E3E8F5;
+    --paper:#FFFFFF; --bg:#F7F9FE;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:"Noto Sans JP", sans-serif; line-height:1.75;}
+  h1,h2,h3{font-family:"Zen Kaku Gothic New", sans-serif; margin:0; color:var(--ink);}
+  .wrap{max-width:800px; margin:0 auto; padding:0 24px;}
+  a{color:var(--blue);}
+
+  .site-header-tory{background:var(--blue); position:sticky; top:0; z-index:40;}
+  .topbar{padding:16px 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+  .brand{display:flex; align-items:center; gap:8px; font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:17px; color:#fff; text-decoration:none;}
+  .brand .dot{width:10px; height:10px; border-radius:50%; background:var(--orange);}
+  .topbar nav{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
+  .topbar nav a{color:rgba(255,255,255,.85); font-size:13px; font-weight:600; text-decoration:none;}
+  .topbar nav a:hover{color:#fff;}
+
+  .eyebrow-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--blue-soft); color:var(--blue); font-weight:800; font-size:12.5px;
+    letter-spacing:.04em; padding:6px 14px; border-radius:20px; font-family:"Zen Kaku Gothic New",sans-serif;
+  }
+  .page-title{font-size:28px; font-weight:900; margin-top:16px;}
+  .page-lead{font-size:14.5px; color:var(--ink-soft); margin-top:14px; max-width:64ch;}
+  .updated-note{font-size:12px; color:var(--ink-soft); margin-top:10px;}
+
+  .other-source-bar{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 18px; margin-top:24px;
+  }
+  .other-source-bar b{font-size:13px;}
+  .other-source-bar a{
+    font-size:12.5px; font-weight:700; background:var(--blue-soft); color:var(--blue);
+    padding:5px 12px; border-radius:20px; text-decoration:none;
+  }
+
+  .event-list{margin-top:32px; display:flex; flex-direction:column; gap:14px;}
+  .event-date-header{
+    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:800; font-size:13px; color:var(--orange);
+    margin-top:28px; margin-bottom:4px;
+  }
+  .event-date-header:first-child{margin-top:0;}
+  .event-card{
+    display:block; background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px 20px;
+    text-decoration:none; color:inherit; transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .event-card:hover{transform:translateY(-2px); box-shadow:0 14px 28px -22px rgba(22,33,77,.35);}
+  .event-time-row{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--ink-soft);}
+  .event-type-badge{
+    font-size:10.5px; font-weight:800; padding:2px 9px; border-radius:12px;
+    background:var(--blue-soft); color:var(--blue);
+  }
+  .event-type-badge.offline{background:var(--orange-soft); color:var(--orange);}
+  .event-title{font-size:15px; font-weight:700; margin-top:8px; line-height:1.5;}
+  .event-meta{font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+
+  .empty-state{
+    background:#fff; border:1px dashed var(--line); border-radius:16px; padding:48px 24px; text-align:center; margin-top:32px;
+  }
+  .empty-state p{color:var(--ink-soft); font-size:13.5px; margin-top:10px;}
+
+  footer{padding:40px 0 60px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
+  footer a{color:var(--blue);}
+</style>
+</head>
+<body>
+
+<header class="site-header-tory">
+  <div class="wrap topbar">
+    <a class="brand" href="./toryumon.html"><span class="dot"></span>PdM登竜門</a>
+    <nav>
+      <a href="./index.html">PdMスキル診断</a>
+      <a href="./toryumon.html">登竜門トップ</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap" style="padding-top:40px; padding-bottom:40px;">
+  <span class="eyebrow-pill">EVENT CALENDAR</span>
+  <h1 class="page-title">PdMイベントカレンダー</h1>
+  <p class="page-lead">connpassに掲載されているプロダクトマネージャー・PM関連のイベント・勉強会を集約しています。毎日自動更新（現在はconnpassのみに対応。他プラットフォームは順次対応予定）。</p>
+  <p class="updated-note" id="updatedNote">読み込み中…</p>
+
+  <div class="other-source-bar">
+    <b>他のプラットフォームでも探す：</b>
+    <a href="https://techplay.jp/search?q=%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%A3%E3%83%BC" target="_blank" rel="noopener">TECH PLAYで探す ↗</a>
+    <a href="https://connpass.com/search/?q=%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%83%9E%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%A3%E3%83%BC" target="_blank" rel="noopener">connpassで探す ↗</a>
+  </div>
+
+  <div id="eventListArea"></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <a href="./index.html">PdMスキル診断はこちら</a> ／
+    <a href="./toryumon.html">PdM登竜門</a> ／
+    <a href="./privacy.html">プライバシーポリシー</a>
+  </div>
+</footer>
+
+<script>
+  function formatUpdated(iso){
+    if(!iso) return "まだ自動更新が実行されていません。";
+    const d = new Date(iso);
+    return "最終更新：" + d.toLocaleString("ja-JP", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+  }
+  function formatEventTime(iso){
+    const d = new Date(iso);
+    return d.toLocaleString("ja-JP", { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit", weekday:"short" });
+  }
+  function dateKey(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString("ja-JP", { year:"numeric", month:"long", day:"numeric", weekday:"short" });
+  }
+
+  async function loadEvents(){
+    const listArea = document.getElementById("eventListArea");
+    const updatedNote = document.getElementById("updatedNote");
+    try{
+      const res = await fetch("./events.json", { cache: "no-store" });
+      const data = await res.json();
+      updatedNote.textContent = formatUpdated(data.updatedAt);
+
+      if(!data.events || data.events.length === 0){
+        listArea.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size:32px;">🗓️</div>
+            <h3 style="margin-top:10px;">準備中です</h3>
+            <p>connpass APIキーの設定・初回の自動更新が完了すると、ここにイベント一覧が表示されます。<br>それまでは、上の「他のプラットフォームでも探す」リンクをご利用ください。</p>
+          </div>`;
+        return;
+      }
+
+      let lastDateKey = null;
+      let html = "";
+      data.events.forEach(ev=>{
+        const dk = dateKey(ev.startedAt);
+        if(dk !== lastDateKey){
+          html += `<div class="event-date-header">${dk}</div>`;
+          lastDateKey = dk;
+        }
+        const isOnline = ev.eventType === "online";
+        html += `
+          <a class="event-card" href="${ev.url}" target="_blank" rel="noopener">
+            <div class="event-time-row">
+              <span>${formatEventTime(ev.startedAt)}〜</span>
+              <span class="event-type-badge ${isOnline?'':'offline'}">${isOnline ? "オンライン" : "オフライン"}</span>
+            </div>
+            <div class="event-title">${ev.title}</div>
+            <div class="event-meta">${ev.organizer ? ev.organizer + "　" : ""}${ev.place || ""}${ev.accepted!=null && ev.limit ? `　参加：${ev.accepted}/${ev.limit}` : ""}</div>
+          </a>`;
+      });
+      listArea.innerHTML = `<div class="event-list">${html}</div>`;
+    }catch(e){
+      updatedNote.textContent = "";
+      listArea.innerHTML = `
+        <div class="empty-state">
+          <p>イベント情報の読み込みに失敗しました。時間をおいて再度お試しください。</p>
+        </div>`;
+    }
+  }
+  loadEvents();
+</script>
+
+</body>
+</html>

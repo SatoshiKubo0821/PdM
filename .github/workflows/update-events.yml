@@ -1,0 +1,39 @@
+name: Update PdM Event Calendar
+
+on:
+  schedule:
+    # 毎日 21:00 UTC（日本時間 朝6:00）に実行
+    - cron: "0 21 * * *"
+  workflow_dispatch: {} # 手動実行もできるようにする
+
+permissions:
+  contents: write
+
+jobs:
+  update-events:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch events from connpass
+        env:
+          CONNPASS_API_KEY: ${{ secrets.CONNPASS_API_KEY }}
+        run: node scripts/fetch-events.js
+
+      - name: Commit updated events.json (if changed)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- events.json; then
+            echo "events.json に変更はありません。"
+          else
+            git add events.json
+            git commit -m "chore: PdMイベントカレンダーを自動更新"
+            git push
+          fi
