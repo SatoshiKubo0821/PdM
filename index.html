@@ -3272,6 +3272,18 @@ function renderMonsterBattle(){
       }, REVEAL_DELAY);
       return true;
     }
+    // かみのごかご：あらゆる致命傷から一度だけHP1でふっかつ。でんせつのゆうしゃも、ぎゃっきょうのちからを使い切ったあとはこちらを使える
+    if(!graceRevived){
+      graceRevived = true;
+      pHp = 1;
+      setTimeout(()=>{
+        battleLog.textContent = "かみの　ごかごが　くだり、HP1で　いきかえった！";
+        hpNum.textContent = pHp;
+        updateHpColor(hpNum, pHp, maxHp);
+        setTimeout(afterRevive, REACTION_DELAY);
+      }, REVEAL_DELAY);
+      return true;
+    }
     return false;
   }
 
@@ -3332,21 +3344,8 @@ function renderMonsterBattle(){
           return;
         }
 
-        // ふっかつ判定：でんせつのゆうしゃ＞つうじょうのゆうしゃ（かみのごかご）の順
-        if(isLegendary && !legendaryRevived){
-          if(tryRevive(next)) return;
-        }
-        if(!graceRevived){
-          graceRevived = true;
-          pHp = 1;
-          setTimeout(()=>{
-            battleLog.textContent = "かみの　ごかごが　くだり、HP1で　いきかえった！";
-            hpNum.textContent = pHp;
-            updateHpColor(hpNum, pHp, maxHp);
-            setTimeout(next, REACTION_DELAY);
-          }, REVEAL_DELAY);
-          return;
-        }
+        // ふっかつ判定：でんせつのゆうしゃのぎゃっきょうのちから→かみのごかご、の順で試みる
+        if(tryRevive(next)) return;
         setTimeout(()=>endBattle(false), REACTION_DELAY);
         return;
       }
