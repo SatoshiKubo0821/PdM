@@ -1439,12 +1439,12 @@ function computePlayerBattleStats(){
 /* こうげき／じゅもん／とくぎの命中判定つきダメージ計算。30%でミスし、ダメージ0になる。 */
 const BATTLE_MISS_RATE = 0.30;
 const BATTLE_CRITICAL_RATE = 0.20;
-function rollDamage(attackerPower, moveMult, defenderDef){
+function rollDamage(attackerPower, moveMult, defenderDef, forceCritical){
   if(Math.random() < BATTLE_MISS_RATE) return { dmg:0, missed:true, critical:false };
   const raw = attackerPower * moveMult - defenderDef * 0.5;
   const base = Math.max(6, raw);
   const jitter = 0.85 + Math.random()*0.3;
-  const isCritical = Math.random() < BATTLE_CRITICAL_RATE;
+  const isCritical = forceCritical || (Math.random() < BATTLE_CRITICAL_RATE);
   const critMult = isCritical ? 1.8 : 1.0;
   return { dmg: Math.round(base*jitter*critMult), missed:false, critical:isCritical };
 }
@@ -1504,7 +1504,7 @@ function buildLegendarySkills(){
     { name:"ピーエムエフのはどう",   kind:"こゆう", desc:"市場の求める形を見抜き、一撃で顧客の心をつかむ" },
     { name:"じょうじょうせいこう",   kind:"こゆう", desc:"事業を大きく育て上げ、株式市場という大舞台に立たせる" },
   ];
-  if(toeicOk) skills.push({ name:"ワールドワイド・コミュニケーション", kind:"こゆう", desc:"言葉の壁を越え、世界じゅうのなかまと心を通わせる" });
+  if(toeicOk) skills.push({ name:"せかいのげんごをあやつる", kind:"こゆう", desc:"言葉の壁を越え、世界じゅうのなかまと心を通わせる" });
   if(aiOk) skills.push({ name:"こうどAIくどうかいはつ", kind:"こゆう", desc:"AIを駆使し、常人には見えぬ速さで開発をやりとげる" });
   return skills;
 }
@@ -3234,13 +3234,17 @@ function renderMonsterBattle(){
 
   function playerTurn(next){
     const action = myTechniques[Math.floor(Math.random()*myTechniques.length)];
-    battleLog.textContent = `${heroName}の　${action.name}！`;
+    // ぎゃっきょうのちから発動後、HPが30%以下になると、ミス以外はすべて会心の一撃になる
+    const desperateMode = legendaryRevived && pHp <= maxHp * 0.3;
+    battleLog.textContent = desperateMode
+      ? `${heroName}は　さいごのちからをふりしぼって　プロダクトを　よに　だそうとしている`
+      : `${heroName}の　${action.name}！`;
     shakeAndFlash();
     spawnHitSpark(45+Math.random()*10, 35+Math.random()*10);
 
     setTimeout(()=>{
       const moveMult = 0.7 + (action.v/5)*0.6;
-      const { dmg, missed, critical } = rollDamage(playerAtk, moveMult, mStats.def);
+      const { dmg, missed, critical } = rollDamage(playerAtk, moveMult, mStats.def, desperateMode);
       if(!missed){ mHp = Math.max(0, mHp - Math.min(mHp, dmg)); }
       battleLog.textContent = missed
         ? "しかし　こうげきは　はずれた！"
