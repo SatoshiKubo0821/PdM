@@ -2681,6 +2681,7 @@ async function submitApplication(fields){
    「まおう」という一般的なファンタジーの記号を、オリジナルのドット絵で表現したもの。 */
 function renderBattleDefeat(){
   const maxHp = 200;
+  const heroName = state.profile.nickname && state.profile.nickname.trim() ? state.profile.nickname.trim() : "ぼうけんしゃ";
   app.innerHTML = `
     <div class="battle-scene">
       <div class="battle-status-box">
@@ -2688,7 +2689,7 @@ function renderBattleDefeat(){
           <span>なまえ</span><span>LV</span><span>HP</span><span>MP</span>
         </div>
         <div class="status-row">
-          <span>ぼうけんしゃ</span><span>12</span><span id="battleHpNum">${maxHp}</span><span>8</span>
+          <span>${heroName}</span><span>12</span><span id="battleHpNum">${maxHp}</span><span>8</span>
         </div>
       </div>
 
@@ -2787,7 +2788,7 @@ function renderBattleDefeat(){
         setTimeout(()=>{
           const overlay = document.getElementById("battleDeathOverlay");
           overlay.style.display = "flex";
-          typeMessage(document.getElementById("battleDeathText1"), "ぼうけんしゃは　しんでしまった。", ()=>{
+          typeMessage(document.getElementById("battleDeathText1"), `${heroName}は　しんでしまった。`, ()=>{
             typeMessage(document.getElementById("battleDeathText2"), "しんでしまうとは　なさけない。まじめに　せんたくしを　えらぶのじゃ。", ()=>{
               document.getElementById("battleDeathChoice").style.display = "block";
             });
@@ -2931,6 +2932,17 @@ async function renderIntro(){
       そのうえ「まほうつかい」「せんし」「そうりょ」「ゆうしゃ」のどのけいとうに　ちかいか、けいけんレベル（しょきゅうしょく〜じょうきゅうしょく／CPO）や、せいかく（MBTI）を　かけあわせた　そうごうぶんせきも　おこなう。
     </p>
 
+    <div class="profile-form" style="max-width:520px; margin-top:28px;">
+      <label class="profile-label" for="nicknameInput">なまえ（にんい・バトルがめんの　ぼうけんしゃめいに　つかわれます）</label>
+      <input type="text" id="nicknameInput" class="profile-input" placeholder="れい：たなか" maxlength="30" value="${state.profile.nickname || ''}">
+
+      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう（にんい）</label>
+      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="れい：3" value="${state.profile.experienceYears ?? ''}">
+
+      <label class="profile-label" for="ageInput" style="margin-top:18px;">ねんれい（にんい・ステータスがめんの Lv に つかわれます）</label>
+      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="れい：28" value="${state.profile.age ?? ''}">
+    </div>
+
     <div class="start-row" style="margin-top:24px;">
       <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
       ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
@@ -2942,17 +2954,6 @@ async function renderIntro(){
       <div class="intro-stat-item"><div class="intro-stat-num">10</div><div class="intro-stat-label">ぞくせい</div></div>
       <div class="intro-stat-item"><div class="intro-stat-num">49</div><div class="intro-stat-label">とくぎ</div></div>
       <div class="intro-stat-item"><div class="intro-stat-num">やく5ふん</div><div class="intro-stat-label">しょようじかん</div></div>
-    </div>
-
-    <div class="profile-form" style="max-width:520px;">
-      <label class="profile-label" for="ageInput">ねんれい（にんい・ステータスがめんの Lv に つかわれます）</label>
-      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="れい：28" value="${state.profile.age ?? ''}">
-
-      <label class="profile-label" for="nicknameInput" style="margin-top:18px;">なまえ（にんい）</label>
-      <input type="text" id="nicknameInput" class="profile-input" placeholder="れい：たなか" maxlength="30" value="${state.profile.nickname || ''}">
-
-      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう（にんい）</label>
-      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="れい：3" value="${state.profile.experienceYears ?? ''}">
     </div>
 
     <div class="cat-list">
