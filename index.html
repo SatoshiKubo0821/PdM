@@ -233,6 +233,8 @@
   .battle-flash{background:#3a0000 !important;}
   .battle-log{
     font-family:var(--pixel-font); color:#fff; font-size:15px; text-align:center; min-height:24px;
+    border:3px solid #fff; box-shadow:0 0 0 3px #000; background:#000;
+    padding:16px 20px; width:100%; max-width:420px; box-sizing:border-box;
   }
 
   .battle-death-overlay{
@@ -1308,7 +1310,8 @@ const MONSTERS = [
   { key:"chimera",    name:"えんじょうキメラ",   theme:"リード開発",                     requiredTier:2, icon:"chimera" },
   { key:"dragon",     name:"ゼロイチドラゴン",   theme:"新規プロダクト開発",             requiredTier:2, icon:"dragon" },
   { key:"orochi",     name:"ピーエムエフおろち", theme:"プロダクトマーケットフィット実現", requiredTier:3, icon:"orochi" },
-  { key:"demonking",  name:"アイピーまおう",     theme:"IPO実現",                        requiredTier:4, icon:"demonking" },
+  { key:"demonking",  name:"アイピーまおう",     theme:"IPO実現",                        requiredTier:4, icon:"demonking", unlockRequires:"orochi" },
+  { key:"psycho",     name:"サイコパスけいえいしゃ", theme:"？？？",                     requiredTier:99, icon:"demonking", unlockRequires:"demonking" },
 ];
 /* モンスターごとの基礎ステータス（HP・こうげきりょく・ぼうぎょりょく） */
 const MONSTER_STATS = {
@@ -1317,15 +1320,25 @@ const MONSTER_STATS = {
   dragon:    { hp:155, atk:33, def:15 },
   orochi:    { hp:200, atk:46, def:21 },
   demonking: { hp:250, atk:58, def:26 },
+  psycho:    { hp:99999, atk:90, def:10 }, // でんせつのゆうしゃでも絶対に勝てない、実質無敵のラスボス
 };
 /* モンスターごとの攻撃こうげき名のプール（確率で抽選する）。各わざには威力倍率がある。
-   しめつのいちげきのみ instantKill:true とし、命中すれば必ずHPをゼロにする。 */
+   しめつのいちげきのみ instantKill:true とし、命中すれば必ずHPをゼロにする。
+   サイコパスけいえいしゃの わざは customMsg（{hero}をなまえに置換）を持ち、noRevival:true のわざはふっかつも許さない。 */
 const MONSTER_ATTACK_POOL = {
   slime:     [ { name:"こうげき", weight:1, mult:1.0 } ],
   chimera:   [ { name:"えんじょう", weight:0.5, mult:1.35 }, { name:"こうげき", weight:0.5, mult:0.9 } ],
   dragon:    [ { name:"だいえんじょう", weight:0.5, mult:1.5 }, { name:"とうそつりょくていか", weight:0.25, mult:0.85 }, { name:"さらなるおいうち", weight:0.25, mult:1.15 } ],
   orochi:    [ { name:"しきんショート", weight:0.25, mult:1.1 }, { name:"たいりょうたいしょく", weight:0.25, mult:1.2 }, { name:"えむえーゆーが　のびない", weight:0.25, mult:1.0 }, { name:"とどめの　いちげき", weight:0.25, mult:1.6 } ],
   demonking: [ { name:"とうしかの　いかり", weight:0.25, mult:1.2 }, { name:"かんさの　れんごく", weight:0.25, mult:1.35 }, { name:"ならない　かね", weight:0.25, mult:1.1 }, { name:"しめつの　いちげき", weight:0.25, mult:null, instantKill:true } ],
+  psycho: [
+    { name:"はしごを　はずす",     weight:0.19, mult:3.5, customMsg:"{hero}は　かいはつから　はしごを　はずされた！" },
+    { name:"しきんの　こかつ",     weight:0.19, mult:3.5, customMsg:"プロダクトの　かいはつが　すすめられない！" },
+    { name:"こうかいしょけい",     weight:0.19, mult:3.5, customMsg:"{hero}は　ぜんしゃいんの　まえで　ハラスメントを　うけた！" },
+    { name:"きゅうよみばらい",     weight:0.19, mult:3.5, customMsg:"しゃいんの　きゅうよが　はらわれない！" },
+    { name:"ふさいぼうちょう",     weight:0.19, mult:3.5, customMsg:"かいしゃの　しゃっきんが　ふくらんでいる！" },
+    { name:"ちょうかいかいこ",     weight:0.05, mult:null, instantKill:true, noRevival:true, customMsg:"{hero}は　かいこされてしまった。" },
+  ],
 };
 function pickMonsterMove(monsterKey){
   const pool = MONSTER_ATTACK_POOL[monsterKey] || MONSTER_ATTACK_POOL.slime;
@@ -1347,12 +1360,15 @@ function computePlayerBattleStats(){
 }
 /* こうげき／じゅもん／とくぎの命中判定つきダメージ計算。30%でミスし、ダメージ0になる。 */
 const BATTLE_MISS_RATE = 0.30;
+const BATTLE_CRITICAL_RATE = 0.20;
 function rollDamage(attackerPower, moveMult, defenderDef){
-  if(Math.random() < BATTLE_MISS_RATE) return { dmg:0, missed:true };
+  if(Math.random() < BATTLE_MISS_RATE) return { dmg:0, missed:true, critical:false };
   const raw = attackerPower * moveMult - defenderDef * 0.5;
   const base = Math.max(6, raw);
   const jitter = 0.85 + Math.random()*0.3;
-  return { dmg: Math.round(base*jitter), missed:false };
+  const isCritical = Math.random() < BATTLE_CRITICAL_RATE;
+  const critMult = isCritical ? 1.8 : 1.0;
+  return { dmg: Math.round(base*jitter*critMult), missed:false, critical:isCritical };
 }
 function getCurrentTierRank(){
   const avg = overallAverage();
@@ -2423,6 +2439,7 @@ let state = {
   vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
   rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
   selectedMonster: null,   // モンスターとたたかう機能で選択中のモンスターkey
+  defeatedMonsters: {},    // 撃破済みモンスター（かくれモンスターの解放条件に使用）
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -2446,6 +2463,7 @@ async function saveProgress(){
       answers:state.answers, mbti:state.mbti, profile:state.profile,
       orgAnswers:state.orgAnswers, orgScores:state.orgScores,
       vitalsAnswers:state.vitalsAnswers, rpgMp:state.rpgMp,
+      defeatedMonsters:state.defeatedMonsters,
     });
     if(window.storage && typeof window.storage.set === "function"){
       await window.storage.set(STORAGE_KEY, payload, false);
@@ -2822,20 +2840,22 @@ async function submitApplication(fields){
    「まおう」という一般的なファンタジーの記号を、オリジナルのドット絵で表現したもの。 */
 /* ---------------- モンスターせんたく画面 ---------------- */
 function renderMonsterSelect(){
+  const defeated = state.defeatedMonsters || {};
+  const visibleMonsters = MONSTERS.filter(m => !m.unlockRequires || defeated[m.unlockRequires]);
   app.innerHTML = `
     <div class="eyebrow">モンスターと　たたかう</div>
     <h1 class="hero-title" style="font-size:28px;">いどむ　あいてを　えらんでほしい</h1>
     <p class="hero-lead">きみの　しんだんけっかにより、たたかいの　ゆくえは　すでに　きまっている。じぶんの　ランクを　ためしてみよう。</p>
 
     <div class="monster-select-grid">
-      ${MONSTERS.map(m=>`
+      ${visibleMonsters.map(m=>`
         <div class="monster-select-card" data-key="${m.key}">
           <div class="monster-select-icon">
             <img src="./assets/monsters/${m.icon}.png" alt="${m.name}">
           </div>
           <div class="monster-select-name">${m.name}</div>
           <div class="monster-select-theme">${m.theme}</div>
-          <div class="monster-select-req">かちめ：${TIER_RANK_LABEL[m.requiredTier]}</div>
+          <div class="monster-select-req">かちめ：${m.requiredTier>=99 ? "？？？" : TIER_RANK_LABEL[m.requiredTier]}</div>
         </div>`).join("")}
     </div>
 
@@ -2953,6 +2973,9 @@ function renderMonsterBattle(){
       const overlay = document.getElementById("battleDeathOverlay");
       overlay.style.display = "flex";
       if(win){
+        state.defeatedMonsters = state.defeatedMonsters || {};
+        state.defeatedMonsters[monster.key] = true;
+        saveProgress();
         typeMessage(document.getElementById("battleDeathText1"), `${monster.name}を　たおした！`, ()=>{
           typeMessage(document.getElementById("battleDeathText2"), `${heroName}は　レベルアップした！`, ()=>{
             document.getElementById("battleDeathChoice").style.display = "block";
@@ -2976,9 +2999,13 @@ function renderMonsterBattle(){
 
     setTimeout(()=>{
       const moveMult = 0.7 + (action.v/5)*0.6;
-      const { dmg, missed } = rollDamage(playerAtk, moveMult, mStats.def);
+      const { dmg, missed, critical } = rollDamage(playerAtk, moveMult, mStats.def);
       if(!missed){ mHp = Math.max(0, mHp - Math.min(mHp, dmg)); }
-      battleLog.textContent = missed ? "しかし　こうげきは　はずれた！" : `${monster.name}は　${dmg}の　ダメージを　うけた！`;
+      battleLog.textContent = missed
+        ? "しかし　こうげきは　はずれた！"
+        : critical
+          ? `かいしんの　いちげき！　${monster.name}は　${dmg}の　ダメージを　うけた！`
+          : `${monster.name}は　${dmg}の　ダメージを　うけた！`;
       monsterHpNum.textContent = mHp;
       updateHpColor(monsterHpNum, mHp, mStats.hp);
 
@@ -3010,11 +3037,18 @@ function renderMonsterBattle(){
 
     setTimeout(()=>{
       if(move.instantKill){
-        // しめつのいちげき：命中すれば問答無用でHPがゼロになる
         pHp = 0;
-        battleLog.textContent = `${heroName}は　ぜんしんに　うけられぬ　いちげきを　うけた！`;
+        battleLog.textContent = move.customMsg
+          ? move.customMsg.replace("{hero}", heroName)
+          : `${heroName}は　ぜんしんに　うけられぬ　いちげきを　うけた！`;
         hpNum.textContent = pHp;
         updateHpColor(hpNum, pHp, maxHp);
+
+        if(move.noRevival){
+          // ちょうかいかいこ：いかなるふっかつも許さない、絶対の即死
+          setTimeout(()=>endBattle(false), REACTION_DELAY);
+          return;
+        }
 
         // ふっかつ判定：でんせつのゆうしゃ＞つうじょうのゆうしゃ（かみのごかご）の順
         if(isLegendary && !legendaryRevived){
@@ -3035,9 +3069,15 @@ function renderMonsterBattle(){
         return;
       }
 
-      const { dmg, missed } = rollDamage(mStats.atk, move.mult, playerDef);
+      const { dmg, missed, critical } = rollDamage(mStats.atk, move.mult, playerDef);
       if(!missed){ pHp = Math.max(0, pHp - Math.min(pHp, dmg)); }
-      battleLog.textContent = missed ? "しかし　こうげきは　はずれた！" : `${heroName}は　${dmg}の　ダメージを　うけた！`;
+      battleLog.textContent = missed
+        ? "しかし　こうげきは　はずれた！"
+        : move.customMsg
+          ? move.customMsg.replace("{hero}", heroName)
+          : critical
+            ? `かいしんの　いちげき！　${heroName}は　${dmg}の　ダメージを　うけた！`
+            : `${heroName}は　${dmg}の　ダメージを　うけた！`;
       hpNum.textContent = pHp;
       updateHpColor(hpNum, pHp, maxHp);
 
@@ -3052,10 +3092,11 @@ function renderMonsterBattle(){
 
   function nextTurn(){
     turnCount++;
+    if(monster.key === "psycho" && pHp<=0){ endBattle(false); return; } // ぜったいに かてない ラスボス
     if(mHp<=0){ endBattle(true); return; }
     if(pHp<=0){ endBattle(false); return; }
     if(turnCount > MAX_TURNS){
-      endBattle((pHp/maxHp) >= (mHp/mStats.hp));
+      endBattle(monster.key === "psycho" ? false : (pHp/maxHp) >= (mHp/mStats.hp));
       return;
     }
     playerTurn(()=>{
@@ -3495,6 +3536,7 @@ async function renderIntro(){
       state.orgScores = saved.orgScores || null;
       state.vitalsAnswers = saved.vitalsAnswers || {};
       state.rpgMp = saved.rpgMp ?? null;
+      state.defeatedMonsters = saved.defeatedMonsters || {};
     }
     state.screen = "profileEntry";
     render(); window.scrollTo(0,0);
@@ -4190,6 +4232,12 @@ function renderResults(){
         </div>`).join("")}
     </div>
 
+    <div class="section-label" style="margin-top:28px;">モンスターと　たたかう</div>
+    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">きみの　しんだんけっかを　たずさえて、モンスターに　いどんでみよう。</p>
+    <div class="start-row" style="margin-top:14px;">
+      <button class="primary" id="monsterFightBtn">モンスターと　たたかう</button>
+    </div>
+
     <div class="score-hero">
       <div>
         <div class="score-num">${avg.toFixed(1)}</div>
@@ -4527,12 +4575,6 @@ function renderResults(){
       <button class="ghost" id="resetBtn">最初からやり直す</button>
     </div>
     `}
-
-    <div class="section-label" style="margin-top:44px;">モンスターと　たたかう</div>
-    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">きみの　しんだんけっかを　たずさえて、5しゅるいの　モンスターに　いどんでみよう。</p>
-    <div class="start-row" style="margin-top:14px;">
-      <button class="primary" id="monsterFightBtn">モンスターと　たたかう</button>
-    </div>
 
     <footer class="note">
       本診断はセルフチェック用の簡易ツールです。半年に一度など定期的に見直すことで、成長やスキルの重心の変化を確認しやすくなります。
