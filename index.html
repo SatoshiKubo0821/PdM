@@ -343,18 +343,18 @@
     position:sticky; top:0; z-index:50;
   }
   .site-header-inner{
-    max-width:780px; margin:0 auto; padding:16px 24px;
+    max-width:960px; margin:0 auto; padding:16px 24px;
     display:flex; flex-direction:column; gap:10px;
   }
   .site-header-row2{
-    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:nowrap;
   }
   .site-logo{
     display:flex; align-items:center; gap:8px; text-decoration:none;
     font-family:var(--pixel-font); font-weight:700; font-size:15px; color:#fff;
   }
   .site-logo-dot{width:9px; height:9px; background:var(--gold);}
-  .site-nav{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
+  .site-nav{display:flex; align-items:center; gap:16px; flex-wrap:wrap; min-width:0;}
   .site-nav a{
     color:rgba(255,255,255,.85); font-size:13px; font-weight:600; text-decoration:none;
     display:inline-flex; align-items:center; gap:6px; font-family:var(--pixel-font);
@@ -363,9 +363,10 @@
   .ext-badge{
     font-size:10px; background:rgba(255,255,255,.15); color:#fff; padding:1px 6px; font-weight:700;
   }
+  #navAuthArea{flex-shrink:0;}
   .auth-pill{
     display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.15); padding:5px 6px 5px 12px;
-    font-size:12.5px; color:#fff; font-weight:600; font-family:var(--pixel-font);
+    font-size:12.5px; color:#fff; font-weight:600; font-family:var(--pixel-font); white-space:nowrap;
   }
   .auth-pill button{
     border:none; background:var(--paper); color:var(--ink-soft); font-size:11.5px; font-weight:700;
@@ -374,13 +375,14 @@
   .google-btn{
     display:inline-flex; align-items:center; gap:8px; background:#fff; border:2px solid var(--navy-950);
     padding:7px 14px 7px 8px; font-size:12.5px; font-weight:700; color:var(--ink);
-    cursor:pointer; font-family:var(--pixel-font);
+    cursor:pointer; font-family:var(--pixel-font); white-space:nowrap;
   }
   .google-btn:hover{border-color:var(--gold);}
   .google-btn svg{width:16px; height:16px;}
-  @media (max-width:600px){
+  @media (max-width:700px){
     .site-header-row2{flex-direction:column; align-items:flex-start; gap:10px;}
     .site-nav{width:100%; justify-content:space-between;}
+    #navAuthArea{align-self:flex-end;}
   }
   h1,h2,h3{
     font-family:var(--pixel-font);
