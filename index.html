@@ -2820,7 +2820,8 @@ async function renderHistory(){
       const date = new Date(r.created_at).toLocaleDateString("ja-JP", {year:"numeric", month:"short", day:"numeric"});
       const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
       const seniorityLabel = SENIORITY[r.seniority] ? SENIORITY[r.seniority].label : r.seniority;
-      const jobClass = r.is_legendary === true ? LEGENDARY_HERO_DATA : getJobClass(r.pdm_type, r.seniority);
+      const isLegendaryRow = r.is_legendary === true || (r.pdm_type === "general" && r.seniority === "senior" && r.experience_years != null && r.experience_years >= 7 && r.toeic != null && r.toeic >= 900);
+      const jobClass = isLegendaryRow ? LEGENDARY_HERO_DATA : getJobClass(r.pdm_type, r.seniority);
       return `
       <div class="history-row-card" data-id="${r.id}">
         <div class="history-row-icon"><img src="./assets/jobs/${jobClass.icon}.png" alt="${jobClass.name}"></div>
@@ -2872,8 +2873,13 @@ async function renderHistory(){
       };
       state.savedThisResult = true; // 過去の結果を開いただけなので、新規保存はしない
       state.viewingHistory = row.created_at;
-      // でんせつのゆうしゃだった記録は、履歴から呼び出した際も必ずそのまま再現する
-      state.viewingHistoryIsLegendary = row.is_legendary === true;
+      // でんせつのゆうしゃだった記録は、履歴から呼び出した際も必ずそのまま再現する。
+      // is_legendary列を追加する前に保存された記録は、既定値でfalseになってしまっているため、
+      // 保存済みの他の情報（TOEIC・経験年数・タイプ・ランク）から推測して補完する（AI活用力のみで条件を満たしていた記録は復元不可）。
+      const heroBaseOk = row.pdm_type === "general" && row.seniority === "senior";
+      const expYearsOk = row.experience_years != null && row.experience_years >= 7;
+      const toeicOk = row.toeic != null && row.toeic >= 900;
+      state.viewingHistoryIsLegendary = row.is_legendary === true || (heroBaseOk && expYearsOk && toeicOk);
       state.screen = "results";
       render(); window.scrollTo(0,0);
     };
@@ -3093,7 +3099,7 @@ function renderMonsterBattle(){
   let legendaryRevived = false, graceRevived = false;
   const TURN_DELAY = 1500, REVEAL_DELAY = 700, REACTION_DELAY = 1700;
   let turnCount = 0;
-  const MAX_TURNS = 8; // 安全装置：長引きすぎた場合は残りHP割合の高い方を勝者とする
+  const SAFETY_MAX_TURNS = 500; // ここまでは基本的に到達しない、無限ループ防止のための安全装置
 
   function endBattle(win){
     setTimeout(()=>{
@@ -3295,7 +3301,8 @@ function renderMonsterBattle(){
     if(monster.key === "psycho" && pHp<=0){ endBattle(false); return; } // ぜったいに かてない ラスボス
     if(mHp<=0){ endBattle(true); return; }
     if(pHp<=0){ endBattle(false); return; }
-    if(turnCount > MAX_TURNS){
+    if(turnCount > SAFETY_MAX_TURNS){
+      // 通常はここまで届かない安全装置。万一の無限ループ防止のみが目的で、たたかいは基本的にHPが尽きるまで続く。
       endBattle(monster.key === "psycho" ? false : (pHp/maxHp) >= (mHp/mStats.hp));
       return;
     }
