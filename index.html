@@ -2879,16 +2879,13 @@ async function linkEmail(email){
    匿名セッション中なら linkIdentity() で同じuser_idのまま永久アカウントに昇格（履歴を引き継ぐ）。
    すでに永久アカウントの場合は signInWithOAuth() で通常ログイン。 */
 async function signInWithGoogle(returnHash){
-  if(!supabaseClient) return;
+  if(!supabaseClient) return false;
   const redirectTo = window.location.origin + window.location.pathname + (returnHash || "#mypage");
   try{
-    const { data:{ session } } = await supabaseClient.auth.getSession();
-    if(session && session.user && session.user.is_anonymous){
-      await supabaseClient.auth.linkIdentity({ provider:"google", options:{ redirectTo } });
-    }else{
-      await supabaseClient.auth.signInWithOAuth({ provider:"google", options:{ redirectTo } });
-    }
-  }catch(e){ /* リダイレクトに失敗した場合は何もしない */ }
+    const { error } = await supabaseClient.auth.signInWithOAuth({ provider:"google", options:{ redirectTo } });
+    if(error) return false;
+    return true; // ここでGoogleへリダイレクトされる
+  }catch(e){ return false; }
 }
 async function signOutUser(){
   if(!supabaseClient) return;
@@ -3942,8 +3939,9 @@ async function renderIntro(){
     // Googleでまだログインしていない場合は、なまえ・けいけん入力の前にSSOをはさむ
     if(supabaseClient && !state.userEmail){
       await saveProgress(); // OAuthリダイレクトでページが再読み込みされる前に、いまの回答をローカルへ保存しておく
-      await signInWithGoogle("#profileEntry");
-      return;
+      const redirected = await signInWithGoogle("#profileEntry");
+      if(redirected) return; // ここでGoogleへ遷移する
+      // Googleログインが開始できなかった場合は、詰まらせずそのまま入力へ進む
     }
     state.screen = "profileEntry";
     render(); window.scrollTo(0,0);
