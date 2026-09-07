@@ -2411,6 +2411,7 @@ const app = document.getElementById("app");
 
 function render(){
   if(state.screen==="intro") renderIntro();
+  else if(state.screen==="profileEntry") renderProfileEntry();
   else if(state.screen==="assess") renderAssess();
   else if(state.screen==="mbti") renderMbti();
   else if(state.screen==="vitals") renderVitals();
@@ -2919,6 +2920,51 @@ function renderApplyThanks(){
   };
 }
 
+/* ---------------- なまえ・けいけんねんすう・ねんれいの入力画面（診断開始の直前） ---------------- */
+function renderProfileEntry(){
+  app.innerHTML = `
+    <div class="eyebrow">さいしょに　おしえてください</div>
+    <h1 class="hero-title" style="font-size:28px;">なまえと、いままでの　けいけんを　きかせてほしい</h1>
+    <p class="hero-lead">
+      ここでの　なまえは、バトルがめんの　ぼうけんしゃめいにも　つかわれる。すべて　にんいで、あとから　へんこうもできる。
+    </p>
+
+    <div class="profile-form" style="max-width:520px; margin-top:28px;">
+      <label class="profile-label" for="nicknameInput">なまえ（にんい）</label>
+      <input type="text" id="nicknameInput" class="profile-input" placeholder="れい：たなか" maxlength="30" value="${state.profile.nickname || ''}">
+
+      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう（にんい）</label>
+      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="れい：3" value="${state.profile.experienceYears ?? ''}">
+
+      <label class="profile-label" for="ageInput" style="margin-top:18px;">ねんれい（にんい・ステータスがめんの Lv に つかわれます）</label>
+      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="れい：28" value="${state.profile.age ?? ''}">
+    </div>
+
+    <div class="start-row" style="margin-top:24px;">
+      <button class="ghost" id="profileBackBtn">もどる</button>
+      <button class="primary" id="profileNextBtn">しんだんへ　すすむ</button>
+    </div>
+  `;
+
+  document.getElementById("profileBackBtn").onclick = ()=>{
+    state.screen = "intro";
+    render(); window.scrollTo(0,0);
+  };
+
+  document.getElementById("profileNextBtn").onclick = async ()=>{
+    const nickname = document.getElementById("nicknameInput").value.trim();
+    const expVal = document.getElementById("expYearsInput").value;
+    const ageVal = document.getElementById("ageInput").value;
+    state.profile.nickname = nickname;
+    state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseInt(expVal,10)));
+    state.profile.age = ageVal === "" ? null : Math.max(1, Math.min(99, parseInt(ageVal,10)));
+    await saveProgress();
+    state.screen = "assess";
+    state.pageIndex = firstUnfinishedPage();
+    render(); window.scrollTo(0,0);
+  };
+}
+
 async function renderIntro(){
   const saved = await loadSaved();
   const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
@@ -2931,17 +2977,6 @@ async function renderIntro(){
       かくとくぎを　5だんかいで　じこひょうかすると、つよみと　のびしろが　のうりょくレーダーに　うかびあがる。
       そのうえ「まほうつかい」「せんし」「そうりょ」「ゆうしゃ」のどのけいとうに　ちかいか、けいけんレベル（しょきゅうしょく〜じょうきゅうしょく／CPO）や、せいかく（MBTI）を　かけあわせた　そうごうぶんせきも　おこなう。
     </p>
-
-    <div class="profile-form" style="max-width:520px; margin-top:28px;">
-      <label class="profile-label" for="nicknameInput">なまえ（にんい・バトルがめんの　ぼうけんしゃめいに　つかわれます）</label>
-      <input type="text" id="nicknameInput" class="profile-input" placeholder="れい：たなか" maxlength="30" value="${state.profile.nickname || ''}">
-
-      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう（にんい）</label>
-      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="れい：3" value="${state.profile.experienceYears ?? ''}">
-
-      <label class="profile-label" for="ageInput" style="margin-top:18px;">ねんれい（にんい・ステータスがめんの Lv に つかわれます）</label>
-      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="れい：28" value="${state.profile.age ?? ''}">
-    </div>
 
     <div class="start-row" style="margin-top:24px;">
       <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
@@ -3031,15 +3066,6 @@ async function renderIntro(){
     };
   }
 
-  function captureIntroProfile(){
-    const nickname = document.getElementById("nicknameInput").value.trim();
-    const expVal = document.getElementById("expYearsInput").value;
-    const ageVal = document.getElementById("ageInput").value;
-    state.profile.nickname = nickname;
-    state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseInt(expVal,10)));
-    state.profile.age = ageVal === "" ? null : Math.max(1, Math.min(99, parseInt(ageVal,10)));
-  }
-
   async function handleStartClick(){
     if(hasSaved){
       state.answers = saved.answers; state.mbti = saved.mbti || null;
@@ -3049,11 +3075,8 @@ async function renderIntro(){
       state.vitalsAnswers = saved.vitalsAnswers || {};
       state.rpgMp = saved.rpgMp ?? null;
     }
-    captureIntroProfile();
-    await saveProgress();
-    state.screen="assess";
-    state.pageIndex = firstUnfinishedPage();
-    render();
+    state.screen = "profileEntry";
+    render(); window.scrollTo(0,0);
   }
   document.getElementById("startBtn").onclick = handleStartClick;
   const startBtnTop = document.getElementById("startBtnTop");
@@ -3064,14 +3087,11 @@ async function renderIntro(){
       state.answers = {};
       state.mbti = null;
       state.displayOrder = {};
-      captureIntroProfile();
       state.profile.toeic = null;
       state.profile.certifications = "";
       state.savedThisResult = false;
-      await saveProgress();
-      state.screen="assess";
-      state.pageIndex = 0;
-      render();
+      state.screen = "profileEntry";
+      render(); window.scrollTo(0,0);
     };
   }
   const historyBtn = document.getElementById("historyBtn");
