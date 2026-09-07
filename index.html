@@ -2579,10 +2579,34 @@ async function saveProgress(){
 }
 
 /* シュタインズ・ゲートの真エンディング：ユーザーのすべてのデータ（クラウドの診断履歴＋ローカルの保存内容）を消去し、まっさらな状態でトップへ戻す */
+/* サイコパスけいえいしゃへの挑戦回数と、シュタインズ・ゲート（真エンディング）到達を記録する。
+   boss_challengesテーブル（user_id, psycho_attempts, steins_gate_achieved_at, updated_at）を使う。
+   テーブルや列が無い環境でも壊れないよう、失敗時は静かに諦める。 */
+async function recordPsychoAttempt(){
+  if(!supabaseClient || !state.userId) return;
+  try{
+    const { data } = await supabaseClient.from("boss_challenges").select("psycho_attempts").eq("user_id", state.userId).maybeSingle();
+    const nextCount = (data && data.psycho_attempts != null ? data.psycho_attempts : 0) + 1;
+    await supabaseClient.from("boss_challenges").upsert({ user_id: state.userId, psycho_attempts: nextCount, updated_at: new Date().toISOString() });
+  }catch(e){ /* 記録できなくても、たたかい自体は続行する */ }
+}
+async function recordSteinsGateAchieved(){
+  if(!supabaseClient || !state.userId) return;
+  try{
+    await supabaseClient.from("boss_challenges").upsert({ user_id: state.userId, steins_gate_achieved_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+  }catch(e){ /* 記録できなくても、演出自体は続行する */ }
+}
+
 async function deleteAllUserData(){
-  // クラウド側の診断履歴をすべて削除
+  // クラウド側の診断履歴は物理削除せず、論理削除（deleted_atを立てる）にとどめる
   if(supabaseClient && state.userId){
-    try{ await supabaseClient.from("diagnoses").delete().eq("user_id", state.userId); }catch(e){ /* 失敗しても続行 */ }
+    try{
+      const { error } = await supabaseClient.from("diagnoses").update({ deleted_at: new Date().toISOString() }).eq("user_id", state.userId);
+      if(error){
+        // deleted_at列がまだ存在しない場合（マイグレーション未実施）は、フラグ的に別カラムへ試みるか、それも無ければ何もしない
+        await supabaseClient.from("diagnoses").update({ is_deleted: true }).eq("user_id", state.userId);
+      }
+    }catch(e){ /* 失敗しても続行 */ }
   }
   // ローカル保存の診断データを削除
   try{
@@ -2779,18 +2803,20 @@ async function saveDiagnosisToCloud(payload){
 
 async function fetchHistory(){
   if(!supabaseClient || !state.userId) return [];
-  const selects = [
-    "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary, rpg_stats",
-    "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary",
-    "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications",
+  const colsFull = "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary, rpg_stats";
+  const colsMid = "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary";
+  const colsBase = "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications";
+  // deleted_at列があればそれで論理削除済みの記録を除外し、無ければ列なしのままフォールバックする
+  const attempts = [
+    { cols: colsFull, filterDeleted:true }, { cols: colsFull, filterDeleted:false },
+    { cols: colsMid,  filterDeleted:true }, { cols: colsMid,  filterDeleted:false },
+    { cols: colsBase, filterDeleted:true }, { cols: colsBase, filterDeleted:false },
   ];
   try{
-    for(const cols of selects){
-      const { data, error } = await supabaseClient
-        .from("diagnoses")
-        .select(cols)
-        .order("created_at", { ascending:false })
-        .limit(20);
+    for(const a of attempts){
+      let q = supabaseClient.from("diagnoses").select(a.cols);
+      if(a.filterDeleted) q = q.is("deleted_at", null);
+      const { data, error } = await q.order("created_at", { ascending:false }).limit(20);
       if(!error) return data || [];
     }
     return [];
@@ -3071,6 +3097,8 @@ function renderMonsterBattle(){
   const mStats = MONSTER_STATS[monster.key] || MONSTER_STATS.slime;
   const { atk: playerAtk, def: playerDef } = computePlayerBattleStats();
 
+  if(monster.key === "psycho"){ recordPsychoAttempt(); }
+
   app.innerHTML = `
     <div class="battle-scene">
       <div class="battle-status-box">
@@ -3178,6 +3206,7 @@ function renderMonsterBattle(){
       overlay.style.display = "flex";
       if(win && monster.key === "psycho"){
         // 0.05%の奇跡：サイコパスけいえいしゃを撃破した唯一の結末
+        recordSteinsGateAchieved();
         typeMessage(document.getElementById("battleDeathText1"), "おめでとうございます。", ()=>{
           typeMessage(document.getElementById("battleDeathText2"), "シュタインズ・ゲートが　ひらかれました。", ()=>{
             document.getElementById("battleTrueEndChoice").style.display = "block";
