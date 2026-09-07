@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PdMスキルクエスト｜ドット絵で見る49の力</title>
+<title>PdMクエスト（PdM診断）｜ドット絵で見る49の力</title>
 <meta name="description" content="10カテゴリ・49項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
 
 <!-- favicon: レーダーチャートをモチーフにしたオリジナルの図形（外部ファイル不要のインラインSVG） -->
@@ -12,14 +12,14 @@
 <!-- OGP（SNS・チャットでシェアされた際の見え方）。og:image は独自ドメインでの公開後、画像を用意してURLを差し替えてください -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:title" content="PdMスキルクエスト｜ドット絵で見る49の力">
+<meta property="og:title" content="PdMクエスト（PdM診断）｜ドット絵で見る49の力">
 <meta property="og:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
-<meta property="og:site_name" content="PdMスキルクエスト">
+<meta property="og:site_name" content="PdMクエスト（PdM診断）">
 <!-- <meta property="og:image" content="https://あなたのドメイン/ogp.png"> -->
 <!-- <meta property="og:url" content="https://あなたのドメイン/"> -->
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PdMスキルクエスト｜ドット絵で見る49の力">
+<meta name="twitter:title" content="PdMクエスト（PdM診断）｜ドット絵で見る49の力">
 <meta name="twitter:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -239,17 +239,16 @@
   /* イントロ画面の実績バー（バクラク風の大きい数字） */
   .intro-stat-bar{
     display:flex;
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:16px;
+    background:#000;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000, 6px 6px 0 rgba(0,0,0,.5);
     overflow:hidden;
     margin:32px 0;
-    box-shadow:0 16px 32px -26px rgba(22,33,77,.25);
   }
-  .intro-stat-item{flex:1; text-align:center; padding:20px 10px; border-right:1px solid var(--line);}
+  .intro-stat-item{flex:1; text-align:center; padding:20px 10px; border-right:1px dashed rgba(255,255,255,.3);}
   .intro-stat-item:last-child{border-right:none;}
-  .intro-stat-num{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:26px; color:var(--gold);}
-  .intro-stat-label{font-size:11px; color:var(--ink-soft); margin-top:2px; font-weight:600;}
+  .intro-stat-num{font-family:var(--pixel-font); font-weight:700; font-size:26px; color:var(--gold);}
+  .intro-stat-label{font-size:11px; color:#fff; margin-top:4px; font-weight:600; font-family:var(--pixel-font);}
 
   .cat-list{
     margin-top:24px;
@@ -258,27 +257,28 @@
     gap:10px;
   }
   .cat-list a, .cat-list div.cat-card{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:14px;
+    background:#000;
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px #000, 3px 3px 0 rgba(0,0,0,.4);
     padding:14px 16px;
     font-size:13.5px;
+    font-family:var(--pixel-font);
     display:flex;
     align-items:center;
     gap:12px;
     text-decoration:none;
-    color:var(--ink);
-    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    color:#fff;
+    transition:transform .12s ease;
   }
-  .cat-list a:hover, .cat-list div.cat-card:hover{transform:translateY(-2px); box-shadow:0 12px 24px -20px rgba(22,33,77,.35); border-color:var(--blue-300);}
+  .cat-list a:hover, .cat-list div.cat-card:hover{transform:translate(2px,2px); box-shadow:0 0 0 2px #000, 1px 1px 0 rgba(0,0,0,.4);}
   .cat-icon{
-    flex-shrink:0; width:34px; height:34px; border-radius:10px;
+    flex-shrink:0; width:34px; height:34px; border:1px solid #fff;
     display:flex; align-items:center; justify-content:center;
   }
   .cat-icon svg{width:17px; height:17px;}
   .cat-card-text{flex:1;}
-  .cat-card-num{font-size:10.5px; color:var(--ink-soft); font-weight:700; display:block;}
-  .cat-card-count{color:var(--ink-soft); font-variant-numeric:tabular-nums; font-size:12px; flex-shrink:0;}
+  .cat-card-num{font-size:10.5px; color:var(--gold); font-weight:700; display:block;}
+  .cat-card-count{color:#fff; font-variant-numeric:tabular-nums; font-size:12px; flex-shrink:0;}
 
   /* 12職業ショーケース（イントロ画面） */
   .job-showcase-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
@@ -515,17 +515,19 @@
     font-weight:600;
     color:#C9CDF5;
     margin-bottom:8px;
+    font-family:var(--pixel-font);
   }
   .profile-input{
-    border:1px solid var(--line);
-    border-radius:var(--radius);
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px #000;
     padding:12px 14px;
     font-size:15px;
-    font-family:"Noto Sans JP",sans-serif;
-    color:var(--ink);
-    background:var(--paper);
+    font-family:var(--pixel-font);
+    color:#fff;
+    background:#000;
   }
-  .profile-input:focus{outline:2px solid var(--gold-soft); border-color:var(--gold);}
+  .profile-input::placeholder{color:rgba(255,255,255,.4);}
+  .profile-input:focus{outline:none; border-color:var(--gold);}
   .profile-textarea{resize:vertical; font-family:inherit;}
 
   @media (max-width:600px){
@@ -977,7 +979,7 @@
 <body>
 <header class="site-header" id="siteHeader">
   <div class="site-header-inner">
-    <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMスキルクエスト</a>
+    <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMクエスト（PdM診断）</a>
     <nav class="site-nav">
       <a href="./toryumon.html">PdM登竜門</a>
       <a href="./events.html">イベントカレンダー</a>
@@ -1143,7 +1145,7 @@ const CLUSTER_OF = {
   "アップセル・クロスセル戦略":"bizdev",
 };
 
-/* ---------------- PdMスキルクエスト：ドラクエ風RPGデータ ----------------
+/* ---------------- PdMクエスト：ドラクエ風RPGデータ ----------------
    PdMタイプ→職業、カテゴリ→ステータス名、MBTI→せいかく、というオリジナルの対応表。
    特定のゲームタイトルの固有名詞・具体的な数値バランスを模したものではなく、
    ドット絵RPGで一般的に見られる「職業・ステータス・せいかく」という表現手法を
@@ -2591,37 +2593,36 @@ async function renderIntro(){
   const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
 
   app.innerHTML = `
-    <div class="eyebrow">PdM 49スキル診断</div>
-    <h1 class="hero-title">自分のPdMスキルを、<br>10の役割・49項目で見える化する。</h1>
+    <div class="eyebrow">PdMクエスト（PdM診断）</div>
+    <h1 class="hero-title">きみの　PdMとしての　ちからを、<br>しょくぎょう・のうりょく値で　あきらかにする。</h1>
     <p class="hero-lead">
-      事業戦略からコンサルティングまで、プロダクトマネージャーに求められる能力を10カテゴリ49項目に分解。
-      各項目を5段階で自己評価すると、強みと伸びしろがレーダーチャートで見えてくるほか、
-      「テックドリブンPdM」「BizDevPdM」「PMM系PdM」「総合型PdM」のどのタイプに近いか、
-      経験レベル（ジュニア〜シニア/CPO）や、性格タイプ（MBTI）を掛け合わせた総合分析も行います。
+      じぎょうせんりゃくから　こうしょうじゅつまで、プロダクトマネージャーに　もとめられる　ちからを　10のぞくせい・49のとくぎに　ぶんかい。
+      かくとくぎを　5だんかいで　じこひょうかすると、つよみと　のびしろが　のうりょくレーダーに　うかびあがる。
+      そのうえ「まほうつかい」「せんし」「そうりょ」「ゆうしゃ」のどのけいとうに　ちかいか、けいけんレベル（しょきゅうしょく〜じょうきゅうしょく／CPO）や、せいかく（MBTI）を　かけあわせた　そうごうぶんせきも　おこなう。
     </p>
 
     <div class="start-row" style="margin-top:24px;">
-      <button class="primary" id="startBtnTop">${hasSaved ? "続きから診断する" : "診断をはじめる"}</button>
-      ${hasSaved ? `<span class="resume-note">前回の回答（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}項目）が保存されています</span>` : `<span class="resume-note">約5分・登録不要ですぐ結果が見られます</span>`}
+      <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
+      ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
     </div>
 
     <div class="hero-visual">${previewRadarSVG()}</div>
 
     <div class="intro-stat-bar">
-      <div class="intro-stat-item"><div class="intro-stat-num">10</div><div class="intro-stat-label">カテゴリ</div></div>
-      <div class="intro-stat-item"><div class="intro-stat-num">49</div><div class="intro-stat-label">スキル項目</div></div>
-      <div class="intro-stat-item"><div class="intro-stat-num">約5分</div><div class="intro-stat-label">所要時間</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">10</div><div class="intro-stat-label">ぞくせい</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">49</div><div class="intro-stat-label">とくぎ</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">やく5ふん</div><div class="intro-stat-label">しょようじかん</div></div>
     </div>
 
     <div class="profile-form" style="max-width:520px;">
-      <label class="profile-label" for="ageInput">年齢（任意・ステータス画面のLvに使われます）</label>
-      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="例：28" value="${state.profile.age ?? ''}">
+      <label class="profile-label" for="ageInput">ねんれい（にんい・ステータスがめんの Lv に つかわれます）</label>
+      <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="れい：28" value="${state.profile.age ?? ''}">
 
-      <label class="profile-label" for="nicknameInput" style="margin-top:18px;">ニックネーム（任意）</label>
-      <input type="text" id="nicknameInput" class="profile-input" placeholder="例：たなか" maxlength="30" value="${state.profile.nickname || ''}">
+      <label class="profile-label" for="nicknameInput" style="margin-top:18px;">なまえ（にんい）</label>
+      <input type="text" id="nicknameInput" class="profile-input" placeholder="れい：たなか" maxlength="30" value="${state.profile.nickname || ''}">
 
-      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdM経験年数（任意）</label>
-      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="例：3" value="${state.profile.experienceYears ?? ''}">
+      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう（にんい）</label>
+      <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="れい：3" value="${state.profile.experienceYears ?? ''}">
     </div>
 
     <div class="cat-list">
@@ -2629,12 +2630,12 @@ async function renderIntro(){
         <div class="cat-card">
           <div class="cat-icon" style="background:${CATEGORY_COLOR[c.key]};"><svg viewBox="0 0 24 24">${CATEGORY_ICON[c.key]}</svg></div>
           <div class="cat-card-text"><span class="cat-card-num">0${i+1}</span>${c.name}</div>
-          <span class="cat-card-count">${c.skills.length}項目</span>
+          <span class="cat-card-count">${c.skills.length}こう</span>
         </div>`).join("")}
     </div>
 
-    <div class="section-label" style="margin-top:44px;">診断でわかる12の職業</div>
-    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">4つのPdMタイプ × ジュニア／ミドル／シニアの3ランクで、あなたの職業が決まります。</p>
+    <div class="section-label" style="margin-top:44px;">しんだんで　わかる　12の　しょくぎょう</div>
+    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">4つの　PdMけいとう × ジュニア／ミドル／シニアの　3ランクで、きみの　しょくぎょうが　きまる。</p>
     <div class="job-showcase-grid">
       ${["tech","bizdev","pmm","general"].map(typeKey=>`
         <div class="job-showcase-col">
@@ -2655,32 +2656,32 @@ async function renderIntro(){
     <div class="insight fusion" style="margin-top:32px;">
       ${state.userEmail ? `
         <h4>ログイン中</h4>
-        <p>${state.userEmail} でログインしています。診断結果はこのアカウントに保存され、どの端末からでも見られます。</p>
+        <p>${state.userEmail} で　ログインしています。しんだんの　きろくは　この　ぼうけんのしょに　ほぞんされ、どの　たんまつからでも　みられます。</p>
       ` : `
-        <h4>診断前にアカウントを作成する（任意）</h4>
-        <p style="margin-bottom:14px;">アカウントを作っておくと、診断結果をどの端末からでも見られるようになります。作らずに進めることもできます。</p>
+        <h4>しんだんまえに　ぼうけんのしょを　つくる（にんい）</h4>
+        <p style="margin-bottom:14px;">ぼうけんのしょを　つくっておくと、しんだんの　きろくを　どの　たんまつからでも　みられるようになる。つくらずに　すすむことも　できる。</p>
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <button class="google-btn" id="introGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>Googleでアカウント作成</button>
+          <button class="google-btn" id="introGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>Googleで　ぼうけんのしょを　つくる</button>
           <span style="color:var(--ink-soft); font-size:12px;">または</span>
         </div>
         <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
           <input type="email" id="introEmailInput" class="profile-input" placeholder="メールアドレス" style="flex:1; min-width:200px;">
-          <button class="ghost" id="introEmailBtn" style="white-space:nowrap;">メールで登録</button>
+          <button class="ghost" id="introEmailBtn" style="white-space:nowrap;">メールで　とうろく</button>
         </div>
         <div id="introAccountMsg" style="font-size:12.5px; color:var(--ink-soft); margin-top:8px;"></div>
       `}
     </div>` : ""}
 
     <div class="start-row">
-      <button class="primary" id="startBtn">${hasSaved ? "続きから診断する" : "診断をはじめる"}</button>
-      ${hasSaved ? `<button class="ghost" id="restartBtn">最初からやり直す</button>` : ""}
-      ${supabaseClient ? `<button class="ghost" id="historyBtn">マイページを見る</button>` : ""}
-      ${hasSaved ? `<span class="resume-note">前回の回答（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}項目）が保存されています</span>` : ""}
+      <button class="primary" id="startBtn">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
+      ${hasSaved ? `<button class="ghost" id="restartBtn">さいしょから　やりなおす</button>` : ""}
+      ${supabaseClient ? `<button class="ghost" id="historyBtn">ぼうけんのしょを　みる</button>` : ""}
+      ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : ""}
     </div>
 
     <footer class="note">
-      本診断はセルフチェック用の簡易ツールです。回答データはお使いのブラウザ内にのみ保存されます。詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
-      もっと体系的に学びたい方は<a href="./toryumon.html">PdM登竜門</a>もご覧ください。
+      この　しんだんは　セルフチェックようの　かんいツールだ。かいとうデータは　きみの　ブラウザないにのみ　ほぞんされる。くわしくは<a href="./privacy.html">プライバシーポリシー</a>を　みてほしい。
+      もっと　たいけいてきに　まなびたい　ぼうけんしゃは<a href="./toryumon.html">PdM登竜門</a>も　のぞいてみよう。
     </footer>
   `;
 
@@ -3328,7 +3329,7 @@ function renderResults(){
 
   app.innerHTML = `
     <div class="eyebrow">診断結果</div>
-    <h1 class="hero-title" style="font-size:30px;">${state.profile.nickname ? `${state.profile.nickname}さんの` : "あなたの"}PdMスキルクエスト</h1>
+    <h1 class="hero-title" style="font-size:30px;">${state.profile.nickname ? `${state.profile.nickname}さんの` : "あなたの"}PdMクエスト</h1>
     ${state.profile.experienceYears!=null ? `<p style="font-size:13px; color:#B8BEFF; margin-top:4px;">PdM経験年数：${state.profile.experienceYears}年</p>` : ""}
     ${state.viewingHistory ? `
     <div class="insight fusion" style="margin-top:14px;">
