@@ -156,6 +156,7 @@
     font-family:var(--pixel-font); font-size:10px; background:var(--gold); color:#000; padding:2px 8px; flex-shrink:0; min-width:52px; text-align:center;
   }
   .dq-tech-kind.spell{background:#4696F0; color:#fff;}
+  .dq-tech-kind.legendary{background:linear-gradient(90deg,#F8C630,#B06BD9); color:#000;}
   .dq-tech-body{flex:1; min-width:0;}
   .dq-tech-name-row{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
   .dq-tech-name{font-family:var(--pixel-font); font-size:12.5px;}
@@ -181,6 +182,13 @@
   .status-row span:nth-child(3){width:3.5em;}
   .status-row span:nth-child(4){width:2.5em;}
   .status-header{border-bottom:1px dashed rgba(255,255,255,.4); margin-bottom:4px; padding-bottom:6px; color:#fff;}
+  #battleHpNum.hp-yellow{color:#F8C630;}
+  #battleHpNum.hp-red{color:#E6432E;}
+  .battle-status-effect{min-height:22px; padding-top:6px;}
+  .status-badge{
+    display:inline-block; font-family:var(--pixel-font); font-size:11px; color:#000;
+    background:#B06BD9; padding:2px 10px; border:1px solid #fff;
+  }
   .battle-center{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:24px; min-height:50vh; padding:24px 0;
@@ -1272,6 +1280,35 @@ function getJobClass(typeKey, seniorityKey){
   const iconKey = (JOB_CLASS_TIERS[typeKey] ? typeKey : "general") + "_" + seniorityKey;
   return { ...data, icon: iconKey, tier: seniorityKey, tierLabel: JOB_TIER_LABEL[seniorityKey] || JOB_TIER_LABEL.junior };
 }
+
+/* ---------------- でんせつのゆうしゃ（かくれ職業） ----------------
+   ゆうしゃの条件に加え、TOEIC・PdM経験年数・AI活用力・けいけんちのすべてが高水準に達した場合にのみ解放される特別な職業。
+   AI活用力とけいけんちのしきい値は、诊断内の他の指標とのバランスを見てAIが設定したもの。 */
+const LEGENDARY_HERO_DATA = {
+  name:"でんせつのゆうしゃ", en:"LEGENDARY HERO",
+  desc:"あらゆる力を極めた、伝説にのみ語られる至高の職業。",
+  icon:"general_legendary", tier:"legendary", tierLabel:"でんせつ職",
+};
+const LEGENDARY_AI_THRESHOLD = 4;      // 5段階中4以上（AIで設定）
+const LEGENDARY_EXP_THRESHOLD = 150000; // けいけんちの水準（AIで設定）
+function checkLegendaryHero(typeResultKey, seniorityKey, rpg){
+  const isHeroBase = typeResultKey === "general" && seniorityKey === "senior";
+  if(!isHeroBase) return false;
+  const toeicOk = state.profile.toeic != null && state.profile.toeic >= 900;
+  const expYearsOk = state.profile.experienceYears != null && state.profile.experienceYears >= 7;
+  const vitals = computeVitalsScores(state.vitalsAnswers || {});
+  const aiOk = vitals.ai != null && vitals.ai >= LEGENDARY_AI_THRESHOLD;
+  const expPointsOk = rpg.exp >= LEGENDARY_EXP_THRESHOLD;
+  return toeicOk && expYearsOk && aiOk && expPointsOk;
+}
+/* でんせつのゆうしゃ専用の固有スキル（スコアに関係なく、常にこの5つを表示する） */
+const LEGENDARY_UNIQUE_SKILLS = [
+  { name:"こうどAIくどうかいはつ", kind:"こゆう", desc:"AIを駆使し、常人には見えぬ速さで開発をやりとげる" },
+  { name:"ぶいじかいふく",         kind:"こゆう", desc:"どん底の状況すら、するどく反転させ立て直す" },
+  { name:"プロダクトそしきこうちく", kind:"こゆう", desc:"つよい組織を築き、なかまの力を最大限に引き出す" },
+  { name:"ワールドワイド・コミュニケーション", kind:"こゆう", desc:"言葉の壁を越え、世界じゅうのなかまと心を通わせる" },
+  { name:"ピーエムエフのはどう",   kind:"こゆう", desc:"市場の求める形を見抜き、一撃で顧客の心をつかむ" },
+];
 
 /* カテゴリ→ドラクエ風ステータス名（元のカテゴリ名も併記して表示する） */
 const STAT_FLAVOR = {
@@ -2690,8 +2727,9 @@ function renderBattleDefeat(){
           <span>なまえ</span><span>LV</span><span>HP</span><span>MP</span>
         </div>
         <div class="status-row">
-          <span>${heroName}</span><span>12</span><span id="battleHpNum">${maxHp}</span><span>8</span>
+          <span id="battleHeroName">${heroName}</span><span>12</span><span id="battleHpNum">${maxHp}</span><span>8</span>
         </div>
+        <div class="battle-status-effect" id="battleStatusEffect"></div>
       </div>
 
       <div class="battle-center">
@@ -2718,6 +2756,7 @@ function renderBattleDefeat(){
   const battleLog = document.getElementById("battleLog");
   const enemyImg = document.getElementById("battleEnemyImg");
   const effectLayer = document.getElementById("battleEffectLayer");
+  const statusEffect = document.getElementById("battleStatusEffect");
 
   // 3回のこうげきで HP がゼロになる。それぞれ「PdMあるある」な社会的こうげきをテーマにしている。
   const ATTACKS = [
@@ -2725,6 +2764,12 @@ function renderBattleDefeat(){
     { name:"きゅうよみばらい",         ratio:0.33, effect:"salary" },
     { name:"えんじにあのたいりょうたいしょく", ratio:0, effect:"exodus" },
   ];
+
+  function updateHpColor(hp){
+    hpNum.classList.remove("hp-yellow","hp-red");
+    if(hp === 0){ hpNum.classList.add("hp-red"); }
+    else if(hp <= maxHp/2){ hpNum.classList.add("hp-yellow"); }
+  }
 
   function spawnFloatIcon(html, x, y, cls){
     const el = document.createElement("div");
@@ -2738,10 +2783,11 @@ function renderBattleDefeat(){
 
   function playAttackEffect(type){
     if(type === "funding"){
-      // 資金調達失敗：コインが宙に浮かんでは消えていく
+      // 資金調達失敗：コインが宙に浮かんでは消えていく。ステータスに「まひ」を付与する
       for(let i=0;i<6;i++){
         setTimeout(()=>spawnFloatIcon("¥", 15+i*13, 20+((i%2)*10), "coin-fall"), i*80);
       }
+      statusEffect.innerHTML = `<span class="status-badge">まひ</span>`;
     }else if(type === "salary"){
       // 給与未払い：大きな¥マークに取り消し線が入る
       spawnFloatIcon('<span class="salary-yen">¥</span><span class="salary-strike"></span>', 42, 30, "salary-pop");
@@ -2782,10 +2828,11 @@ function renderBattleDefeat(){
       playAttackEffect(atk.effect);
       const hp = Math.round(maxHp * atk.ratio);
       hpNum.textContent = hp;
+      updateHpColor(hp);
       document.querySelector(".battle-scene").classList.add("battle-flash");
       setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
 
-      if(atk.ratio === 0){
+      if(atk.effect === "exodus"){
         setTimeout(()=>{
           const overlay = document.getElementById("battleDeathOverlay");
           overlay.style.display = "flex";
@@ -2794,7 +2841,7 @@ function renderBattleDefeat(){
               document.getElementById("battleDeathChoice").style.display = "block";
             });
           });
-        }, 900);
+        }, 2500);
       }
     }, (idx+1) * 1500);
   });
@@ -2926,18 +2973,20 @@ function renderProfileEntry(){
     <div class="eyebrow">さいしょに　おしえてください</div>
     <h1 class="hero-title" style="font-size:28px;">なまえと、いままでの　けいけんを　きかせてほしい</h1>
     <p class="hero-lead">
-      ここでの　なまえは、バトルがめんの　ぼうけんしゃめいにも　つかわれる。すべて　にんいで、あとから　へんこうもできる。
+      ここでの　なまえは、バトルがめんの　ぼうけんしゃめいにも　つかわれる。3つとも　かならず　にゅうりょくしてほしい。
     </p>
 
     <div class="profile-form" style="max-width:520px; margin-top:28px;">
-      <label class="profile-label" for="nicknameInput">なまえ（にんい）</label>
+      <label class="profile-label" for="nicknameInput">なまえ<span style="color:#E6432E;">＊ひっす</span></label>
       <input type="text" id="nicknameInput" class="profile-input" placeholder="れい：たなか" maxlength="30" value="${state.profile.nickname || ''}">
 
-      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう（にんい）</label>
+      <label class="profile-label" for="expYearsInput" style="margin-top:18px;">PdMとしての　けいけんねんすう<span style="color:#E6432E;">＊ひっす</span></label>
       <input type="number" id="expYearsInput" class="profile-input" min="0" max="50" step="1" placeholder="れい：3" value="${state.profile.experienceYears ?? ''}">
 
-      <label class="profile-label" for="ageInput" style="margin-top:18px;">ねんれい（にんい・ステータスがめんの Lv に つかわれます）</label>
+      <label class="profile-label" for="ageInput" style="margin-top:18px;">ねんれい（ステータスがめんの Lv に つかわれます）<span style="color:#E6432E;">＊ひっす</span></label>
       <input type="number" id="ageInput" class="profile-input" min="1" max="99" step="1" placeholder="れい：28" value="${state.profile.age ?? ''}">
+
+      <div id="profileEntryError" style="color:#E6432E; font-size:12.5px; margin-top:14px; font-family:var(--pixel-font); min-height:1.4em;"></div>
     </div>
 
     <div class="start-row" style="margin-top:24px;">
@@ -2955,9 +3004,16 @@ function renderProfileEntry(){
     const nickname = document.getElementById("nicknameInput").value.trim();
     const expVal = document.getElementById("expYearsInput").value;
     const ageVal = document.getElementById("ageInput").value;
+    const errorEl = document.getElementById("profileEntryError");
+
+    if(!nickname || expVal === "" || ageVal === ""){
+      errorEl.textContent = "なまえ・けいけんねんすう・ねんれいは　すべて　にゅうりょくしてほしい。";
+      return;
+    }
+
     state.profile.nickname = nickname;
-    state.profile.experienceYears = expVal === "" ? null : Math.max(0, Math.min(50, parseInt(expVal,10)));
-    state.profile.age = ageVal === "" ? null : Math.max(1, Math.min(99, parseInt(ageVal,10)));
+    state.profile.experienceYears = Math.max(0, Math.min(50, parseInt(expVal,10)));
+    state.profile.age = Math.max(1, Math.min(99, parseInt(ageVal,10)));
     await saveProgress();
     state.screen = "assess";
     state.pageIndex = firstUnfinishedPage();
@@ -3683,9 +3739,12 @@ function renderResults(){
   const careerPath = buildCareerPath(seniorityKey);
   const toeicNote = toeicComment(state.profile.toeic);
   const rpg = buildRPGStats();
-  const jobClass = getJobClass(typeResult.key, seniorityKey);
+  const isLegendaryHero = checkLegendaryHero(typeResult.key, seniorityKey, rpg);
+  const jobClass = isLegendaryHero ? LEGENDARY_HERO_DATA : getJobClass(typeResult.key, seniorityKey);
   const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
-  const techniques = buildSkillTechniques();
+  const techniques = isLegendaryHero
+    ? LEGENDARY_UNIQUE_SKILLS.map(s=>({ name:s.name, kind:s.kind, cost:0, v:5, catName:"でんせつ", desc:s.desc }))
+    : buildSkillTechniques();
   const equipment = buildEquipment(state.mbti);
   const orgType = determineOrgType(state.orgScores);
 
@@ -3747,13 +3806,19 @@ function renderResults(){
       </div>
     </div>
 
-    <div class="section-label" style="margin-top:28px;">おぼえている とくぎ・じゅもん</div>
+    ${isLegendaryHero ? `
+    <div class="insight fusion" style="margin-top:28px; text-align:center;">
+      <h4 style="justify-content:center;">✨ でんせつのゆうしゃが　かいほうされた ✨</h4>
+      <p>ゆうしゃの条件・TOEIC900点以上・PdM経験7年以上・高いAI活用力・十分なけいけんちを　すべて　みたした証。</p>
+    </div>` : ""}
+
+    <div class="section-label" style="margin-top:28px;">${isLegendaryHero ? "でんせつのゆうしゃの　こゆうスキル" : "おぼえている とくぎ・じゅもん"}</div>
     <div class="dq-window" style="margin-top:10px;">
       ${techniques.map(t=>`
         <div class="dq-tech-row">
-          <span class="dq-tech-kind ${t.kind==='じゅもん'?'spell':''}">${t.kind}</span>
+          <span class="dq-tech-kind ${t.kind==='じゅもん'?'spell':(t.kind==='こゆう'?'legendary':'')}">${t.kind}</span>
           <div class="dq-tech-body">
-            <div class="dq-tech-name-row"><span class="dq-tech-name">${t.name}</span><span class="dq-tech-cost">MP${t.cost}</span></div>
+            <div class="dq-tech-name-row"><span class="dq-tech-name">${t.name}</span>${isLegendaryHero ? "" : `<span class="dq-tech-cost">MP${t.cost}</span>`}</div>
             ${t.desc ? `<div class="dq-tech-desc">${t.desc}</div>` : ""}
           </div>
         </div>`).join("")}
