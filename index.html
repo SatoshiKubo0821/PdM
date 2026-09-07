@@ -3373,12 +3373,17 @@ function renderMonsterBattle(){
         updateHpColor(hpNum, pHp, maxHp);
         flashRedScreen(400);
 
-        if(pHp<=0){
-          if(tryRevive(next)) return;
-          setTimeout(()=>endBattle(false), REACTION_DELAY);
-          return;
-        }
-        setTimeout(next, REACTION_DELAY);
+        // ワンテンポおいて、実際のダメージ数値を表示する
+        setTimeout(()=>{
+          battleLog.textContent = `${heroName}は　${dmg}の　ダメージを　うけた！`;
+
+          if(pHp<=0){
+            if(tryRevive(next)) return;
+            setTimeout(()=>endBattle(false), REACTION_DELAY);
+            return;
+          }
+          setTimeout(next, REACTION_DELAY);
+        }, 900);
         return;
       }
 
