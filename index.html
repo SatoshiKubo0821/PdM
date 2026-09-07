@@ -242,6 +242,36 @@
   .battle-death-window{max-width:480px; width:100%;}
   .battle-death-window p{font-family:var(--pixel-font); font-size:14px; color:#fff; line-height:1.9; min-height:1.9em;}
   .battle-death-choice{margin-top:20px; text-align:center;}
+
+  /* ---------- モンスターせんたく画面 ---------- */
+  .monster-select-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:20px;}
+  .monster-select-card{
+    background:#000; border:2px solid #fff; box-shadow:0 0 0 2px #000;
+    padding:16px 14px; text-align:center; cursor:pointer; transition:transform .12s ease;
+  }
+  .monster-select-card:hover{transform:translate(2px,2px);}
+  .monster-select-icon{width:80px; height:80px; margin:0 auto;}
+  .monster-select-icon img, .monster-select-icon svg{width:100%; height:100%; object-fit:contain; image-rendering:pixelated;}
+  .monster-select-name{font-family:var(--pixel-font); font-size:14px; color:#fff; margin-top:8px; font-weight:700;}
+  .monster-select-theme{font-family:var(--pixel-font); font-size:10.5px; color:#B8BEFF; margin-top:4px;}
+  .monster-select-req{font-family:var(--pixel-font); font-size:10px; color:#8A8EC4; margin-top:8px;}
+  .monster-select-outcome{font-family:var(--pixel-font); font-size:11px; margin-top:6px; font-weight:700;}
+  .monster-select-outcome.win{color:var(--good);}
+  .monster-select-outcome.lose{color:var(--bad);}
+  @media (max-width:560px){
+    .monster-select-grid{grid-template-columns:repeat(2,1fr);}
+  }
+
+  .monster-hp-box{
+    position:absolute; top:24px; right:24px; border:2px solid #fff; box-shadow:0 0 0 2px #000;
+    background:#000; padding:8px 16px; text-align:right;
+  }
+  .monster-hp-name{font-family:var(--pixel-font); color:#fff; font-size:12px;}
+  .monster-hp-num{font-family:var(--pixel-font); color:#fff; font-size:13px; margin-top:2px;}
+  #monsterHpNum.hp-yellow{color:#F8C630;}
+  #monsterHpNum.hp-red{color:#E6432E;}
+  .monster-svg-icon{width:220px; height:220px;}
+  .battle-float-icon.hit-spark{color:#F8C630; font-size:28px; animation:coinFall 0.5s ease-out forwards;}
   @media (max-width:480px){
     .dq-stat-name{width:110px; font-size:11px;}
   }
@@ -1273,6 +1303,56 @@ const JOB_CLASS_TIERS = {
     senior: { name:"ゆうしゃ",         en:"HERO",            desc:"どんな戦場でも戦える、バランス型の主人公職。" },
   },
 };
+/* ---------------- モンスターとたたかう ----------------
+   診断で得た現在のランク（ジュニア〜でんせつのゆうしゃ）によって、勝敗があらかじめ決まる5種類のモンスター。 */
+const TIER_RANK = { junior:1, middle:2, senior:3, legendary:4 };
+const TIER_RANK_LABEL = { 1:"ジュニア以上", 2:"ミドル以上", 3:"シニア以上", 4:"でんせつのゆうしゃ以上" };
+const MONSTERS = [
+  { key:"slime",      name:"スライム",         theme:"通常開発",                       requiredTier:1, icon:"slime" },
+  { key:"chimera",    name:"キメラ",           theme:"リード開発",                     requiredTier:2, icon:"chimera" },
+  { key:"dragon",     name:"グレートドラゴン", theme:"新規プロダクト開発",             requiredTier:2, icon:"dragon" },
+  { key:"orochi",     name:"やまたのおろち",   theme:"プロダクトマーケットフィット実現", requiredTier:3, icon:"orochi" },
+  { key:"demonking",  name:"まおう",           theme:"IPO実現",                        requiredTier:4, icon:"demonking" },
+];
+const MONSTER_ICON_SVG = {
+  slime: `<ellipse cx="50" cy="62" rx="36" ry="26" fill="#4696F0"/>
+    <path d="M16 62 Q22 84 36 68 Q44 90 50 70 Q56 90 64 68 Q78 84 84 62" fill="#4696F0"/>
+    <ellipse cx="38" cy="56" rx="6" ry="8" fill="#fff"/><ellipse cx="62" cy="56" rx="6" ry="8" fill="#fff"/>
+    <circle cx="38" cy="59" r="3" fill="#0a1f3d"/><circle cx="62" cy="59" r="3" fill="#0a1f3d"/>
+    <path d="M40 70 Q50 77 60 70" stroke="#1a3a6b" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
+  chimera: `<ellipse cx="52" cy="70" rx="32" ry="18" fill="#B8860B"/>
+    <circle cx="34" cy="42" r="17" fill="#D2A441"/>
+    <path d="M20 30 L14 12 L29 24 Z" fill="#D2A441"/><path d="M48 30 L54 12 L40 24 Z" fill="#D2A441"/>
+    <circle cx="29" cy="40" r="2.5" fill="#1a0f00"/><circle cx="39" cy="40" r="2.5" fill="#1a0f00"/>
+    <path d="M28 48 Q34 52 40 48" stroke="#5a3a00" stroke-width="2" fill="none"/>
+    <circle cx="72" cy="46" r="11" fill="#8B4513"/><path d="M65 38 L60 26 L72 34 Z" fill="#8B4513"/>
+    <circle cx="68" cy="44" r="1.8" fill="#000"/><circle cx="76" cy="44" r="1.8" fill="#000"/>
+    <path d="M84 62 Q98 55 92 42" stroke="#B22222" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
+  dragon: `<ellipse cx="50" cy="62" rx="27" ry="23" fill="#C0392B"/>
+    <path d="M50 28 L38 8 L56 18 Z" fill="#C0392B"/>
+    <path d="M14 46 Q-2 28 10 10 Q22 32 32 40 Z" fill="#922B21"/>
+    <path d="M86 46 Q102 28 90 10 Q78 32 68 40 Z" fill="#922B21"/>
+    <circle cx="41" cy="54" r="3.5" fill="#FFEB3B"/><circle cx="59" cy="54" r="3.5" fill="#FFEB3B"/>
+    <path d="M36 70Q50 78 64 70" stroke="#5c1a12" stroke-width="2.5" fill="none"/>
+    <path d="M68 78 Q90 88 96 104" stroke="#922B21" stroke-width="7" fill="none" stroke-linecap="round"/>`,
+  orochi: `<path d="M30 78 Q18 46 34 22" stroke="#4B0082" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <path d="M50 82 Q50 46 50 14" stroke="#5A0FA0" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <path d="M70 78 Q82 46 66 22" stroke="#4B0082" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <circle cx="34" cy="19" r="9" fill="#6A0DAD"/><circle cx="50" cy="11" r="9" fill="#7A1DC0"/><circle cx="66" cy="19" r="9" fill="#6A0DAD"/>
+    <circle cx="31" cy="17" r="1.6" fill="#FF3030"/><circle cx="37" cy="17" r="1.6" fill="#FF3030"/>
+    <circle cx="47" cy="9" r="1.6" fill="#FF3030"/><circle cx="53" cy="9" r="1.6" fill="#FF3030"/>
+    <circle cx="63" cy="17" r="1.6" fill="#FF3030"/><circle cx="69" cy="17" r="1.6" fill="#FF3030"/>
+    <ellipse cx="50" cy="90" rx="26" ry="14" fill="#4B0082"/>`,
+};
+function getCurrentTierRank(){
+  const avg = overallAverage();
+  const typeResult = determinePdmType();
+  const seniorityKey = determineSeniorityKey(avg);
+  const rpg = buildRPGStats();
+  if(checkLegendaryHero(typeResult.key, seniorityKey, rpg)) return 4;
+  return TIER_RANK[seniorityKey] || 1;
+}
+
 function getJobClass(typeKey, seniorityKey){
   const tierData = JOB_CLASS_TIERS[typeKey] && JOB_CLASS_TIERS[typeKey][seniorityKey];
   const fallback = JOB_CLASS_TIERS[typeKey] ? JOB_CLASS_TIERS[typeKey].junior : JOB_CLASS_TIERS.general.junior;
@@ -1291,24 +1371,33 @@ const LEGENDARY_HERO_DATA = {
 };
 const LEGENDARY_AI_THRESHOLD = 4;      // 5段階中4以上（AIで設定）
 const LEGENDARY_EXP_THRESHOLD = 150000; // けいけんちの水準（AIで設定）
+function legendaryConditionFlags(){
+  const toeicOk = state.profile.toeic != null && state.profile.toeic >= 900;
+  const vitals = computeVitalsScores(state.vitalsAnswers || {});
+  const aiOk = vitals.ai != null && vitals.ai >= LEGENDARY_AI_THRESHOLD;
+  return { toeicOk, aiOk };
+}
 function checkLegendaryHero(typeResultKey, seniorityKey, rpg){
   const isHeroBase = typeResultKey === "general" && seniorityKey === "senior";
   if(!isHeroBase) return false;
-  const toeicOk = state.profile.toeic != null && state.profile.toeic >= 900;
   const expYearsOk = state.profile.experienceYears != null && state.profile.experienceYears >= 7;
-  const vitals = computeVitalsScores(state.vitalsAnswers || {});
-  const aiOk = vitals.ai != null && vitals.ai >= LEGENDARY_AI_THRESHOLD;
   const expPointsOk = rpg.exp >= LEGENDARY_EXP_THRESHOLD;
-  return toeicOk && expYearsOk && aiOk && expPointsOk;
+  const { toeicOk, aiOk } = legendaryConditionFlags();
+  return expYearsOk && expPointsOk && (toeicOk || aiOk);
 }
-/* でんせつのゆうしゃ専用の固有スキル（スコアに関係なく、常にこの5つを表示する） */
-const LEGENDARY_UNIQUE_SKILLS = [
-  { name:"こうどAIくどうかいはつ", kind:"こゆう", desc:"AIを駆使し、常人には見えぬ速さで開発をやりとげる" },
-  { name:"ぶいじかいふく",         kind:"こゆう", desc:"どん底の状況すら、するどく反転させ立て直す" },
-  { name:"プロダクトそしきこうちく", kind:"こゆう", desc:"つよい組織を築き、なかまの力を最大限に引き出す" },
-  { name:"ワールドワイド・コミュニケーション", kind:"こゆう", desc:"言葉の壁を越え、世界じゅうのなかまと心を通わせる" },
-  { name:"ピーエムエフのはどう",   kind:"こゆう", desc:"市場の求める形を見抜き、一撃で顧客の心をつかむ" },
-];
+/* でんせつのゆうしゃ専用の固有スキル。基本4つ＋条件を満たした方（TOEIC／AI活用力）に応じて追加される */
+function buildLegendarySkills(){
+  const { toeicOk, aiOk } = legendaryConditionFlags();
+  const skills = [
+    { name:"ぶいじかいふく",         kind:"こゆう", desc:"どん底の状況すら、するどく反転させ立て直す" },
+    { name:"プロダクトそしきこうちく", kind:"こゆう", desc:"つよい組織を築き、なかまの力を最大限に引き出す" },
+    { name:"ピーエムエフのはどう",   kind:"こゆう", desc:"市場の求める形を見抜き、一撃で顧客の心をつかむ" },
+    { name:"じょうじょうせいこう",   kind:"こゆう", desc:"事業を大きく育て上げ、株式市場という大舞台に立たせる" },
+  ];
+  if(toeicOk) skills.push({ name:"ワールドワイド・コミュニケーション", kind:"こゆう", desc:"言葉の壁を越え、世界じゅうのなかまと心を通わせる" });
+  if(aiOk) skills.push({ name:"こうどAIくどうかいはつ", kind:"こゆう", desc:"AIを駆使し、常人には見えぬ速さで開発をやりとげる" });
+  return skills;
+}
 
 /* カテゴリ→ドラクエ風ステータス名（元のカテゴリ名も併記して表示する） */
 const STAT_FLAVOR = {
@@ -2323,6 +2412,7 @@ let state = {
   vitalsAnswers: {},       // 体力・AI設問の回答（"vitals:idx" -> 1..5）。HP/MP算出専用
   vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
   rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
+  selectedMonster: null,   // モンスターとたたかう機能で選択中のモンスターkey
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -2461,6 +2551,8 @@ function render(){
   else if(state.screen==="orgAssess") renderOrgAssess();
   else if(state.screen==="orgResults") renderOrgResults();
   else if(state.screen==="battleDefeat") renderBattleDefeat();
+  else if(state.screen==="monsterSelect") renderMonsterSelect();
+  else if(state.screen==="monsterBattle") renderMonsterBattle();
   else renderResults();
 }
 
@@ -2717,6 +2809,187 @@ async function submitApplication(fields){
    全49問で同じ選択肢だけが選ばれた（まじめに回答していない可能性が高い）場合に表示する、
    ドラクエ風バトルUIの演出。特定タイトルのキャラクターを再現したものではなく、
    「まおう」という一般的なファンタジーの記号を、オリジナルのドット絵で表現したもの。 */
+/* ---------------- モンスターせんたく画面 ---------------- */
+function renderMonsterSelect(){
+  const myTier = getCurrentTierRank();
+  app.innerHTML = `
+    <div class="eyebrow">モンスターと　たたかう</div>
+    <h1 class="hero-title" style="font-size:28px;">いどむ　あいてを　えらんでほしい</h1>
+    <p class="hero-lead">きみの　しんだんけっかにより、たたかいの　ゆくえは　すでに　きまっている。じぶんの　ランクを　ためしてみよう。</p>
+
+    <div class="monster-select-grid">
+      ${MONSTERS.map(m=>{
+        const willWin = myTier >= m.requiredTier;
+        return `
+        <div class="monster-select-card" data-key="${m.key}">
+          <div class="monster-select-icon">
+            ${m.key==="demonking"
+              ? `<img src="./assets/battle/demon_king.png" alt="${m.name}">`
+              : `<svg viewBox="0 0 100 100">${MONSTER_ICON_SVG[m.icon]}</svg>`}
+          </div>
+          <div class="monster-select-name">${m.name}</div>
+          <div class="monster-select-theme">${m.theme}</div>
+          <div class="monster-select-req">かちめ：${TIER_RANK_LABEL[m.requiredTier]}</div>
+          <div class="monster-select-outcome ${willWin ? 'win' : 'lose'}">${willWin ? "◆ かてる　はず" : "◆ まだ　てにあまる"}</div>
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="start-row" style="margin-top:24px;">
+      <button class="ghost" id="monsterBackBtn">もどる</button>
+    </div>
+  `;
+
+  document.getElementById("monsterBackBtn").onclick = ()=>{ state.screen="results"; render(); window.scrollTo(0,0); };
+  app.querySelectorAll(".monster-select-card").forEach(card=>{
+    card.onclick = ()=>{
+      state.selectedMonster = card.getAttribute("data-key");
+      state.screen = "monsterBattle";
+      render(); window.scrollTo(0,0);
+    };
+  });
+}
+
+/* ---------------- モンスターバトル（自動ターン制） ---------------- */
+function renderMonsterBattle(){
+  const monster = MONSTERS.find(m=>m.key===state.selectedMonster) || MONSTERS[0];
+  const heroName = state.profile.nickname && state.profile.nickname.trim() ? state.profile.nickname.trim() : "ぼうけんしゃ";
+  const myTier = getCurrentTierRank();
+  const willWin = myTier >= monster.requiredTier;
+  const maxHp = 200;
+
+  app.innerHTML = `
+    <div class="battle-scene">
+      <div class="battle-status-box">
+        <div class="status-row status-header">
+          <span>なまえ</span><span>LV</span><span>HP</span><span>MP</span>
+        </div>
+        <div class="status-row">
+          <span>${heroName}</span><span>12</span><span id="battleHpNum">${maxHp}</span><span>8</span>
+        </div>
+      </div>
+
+      <div class="monster-hp-box">
+        <div class="monster-hp-name">${monster.name}</div>
+        <div class="monster-hp-num">HP <span id="monsterHpNum">${maxHp}</span></div>
+      </div>
+
+      <div class="battle-center">
+        <div class="battle-enemy-area">
+          <div class="battle-effect-layer" id="battleEffectLayer"></div>
+          ${monster.key==="demonking"
+            ? `<img src="./assets/battle/demon_king.png" alt="${monster.name}" class="battle-enemy-img" id="battleEnemyImg">`
+            : `<svg viewBox="0 0 100 100" class="battle-enemy-img monster-svg-icon" id="battleEnemyImg">${MONSTER_ICON_SVG[monster.icon]}</svg>`}
+        </div>
+        <div class="battle-log" id="battleLog">${monster.name}が　あらわれた！</div>
+      </div>
+    </div>
+
+    <div class="battle-death-overlay" id="battleDeathOverlay" style="display:none;">
+      <div class="dq-window battle-death-window">
+        <p id="battleDeathText1"></p>
+        <p id="battleDeathText2" style="margin-top:14px;"></p>
+        <div class="battle-death-choice" id="battleDeathChoice" style="display:none;">
+          <button class="primary" id="battleYesBtn">はい</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const hpNum = document.getElementById("battleHpNum");
+  const monsterHpNum = document.getElementById("monsterHpNum");
+  const battleLog = document.getElementById("battleLog");
+  const enemyImg = document.getElementById("battleEnemyImg");
+  const effectLayer = document.getElementById("battleEffectLayer");
+
+  function updateHpColor(el, hp){
+    el.classList.remove("hp-yellow","hp-red");
+    if(hp === 0){ el.classList.add("hp-red"); }
+    else if(hp <= maxHp/2){ el.classList.add("hp-yellow"); }
+  }
+
+  function spawnHitSpark(x, y){
+    const el = document.createElement("div");
+    el.className = "battle-float-icon hit-spark";
+    el.style.left = x + "%"; el.style.top = y + "%";
+    el.textContent = "★";
+    effectLayer.appendChild(el);
+    setTimeout(()=>el.remove(), 500);
+  }
+
+  function typeMessage(el, text, onDone){
+    el.textContent = "";
+    let i = 0;
+    const timer = setInterval(()=>{
+      el.textContent += text[i];
+      i++;
+      if(i>=text.length){ clearInterval(timer); if(onDone) onDone(); }
+    }, 45);
+  }
+
+  // 3〜5ターンで決着：プレイヤーのこうげき/じゅもん/とくぎ と、モンスターのこうげきを交互に実施する
+  const playerActionNames = ["こうげき","じゅもん","とくぎ","こうげき"];
+  const playerDmg = willWin ? [50,50,50,50] : [12,12,12,12];
+  const monsterDmg = willWin ? [15,15,15,0] : [45,45,45,65];
+
+  const sequence = [];
+  let pHp = maxHp, mHp = maxHp;
+  for(let i=0;i<4;i++){
+    mHp = Math.max(0, mHp - playerDmg[i]);
+    sequence.push({ actor:"player", label:playerActionNames[i], pHp, mHp });
+    if(mHp<=0) break;
+    pHp = Math.max(0, pHp - monsterDmg[i]);
+    sequence.push({ actor:"monster", pHp, mHp });
+    if(pHp<=0) break;
+  }
+
+  sequence.forEach((step, idx)=>{
+    setTimeout(()=>{
+      if(step.actor === "player"){
+        battleLog.textContent = `${heroName}の　${step.label}！`;
+        enemyImg.classList.add("battle-shake");
+        setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
+        spawnHitSpark(45+Math.random()*10, 35+Math.random()*10);
+      }else{
+        battleLog.textContent = `${monster.name}の　こうげき！`;
+      }
+      hpNum.textContent = step.pHp;
+      monsterHpNum.textContent = step.mHp;
+      updateHpColor(hpNum, step.pHp);
+      updateHpColor(monsterHpNum, step.mHp);
+      document.querySelector(".battle-scene").classList.add("battle-flash");
+      setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
+
+      const isLast = idx === sequence.length-1;
+      if(isLast){
+        setTimeout(()=>{
+          const overlay = document.getElementById("battleDeathOverlay");
+          overlay.style.display = "flex";
+          if(willWin){
+            typeMessage(document.getElementById("battleDeathText1"), `${monster.name}を　たおした！`, ()=>{
+              typeMessage(document.getElementById("battleDeathText2"), `${heroName}は　レベルアップした！`, ()=>{
+                document.getElementById("battleDeathChoice").style.display = "block";
+              });
+            });
+          }else{
+            typeMessage(document.getElementById("battleDeathText1"), `${heroName}は　しんでしまった。`, ()=>{
+              typeMessage(document.getElementById("battleDeathText2"), "しんでしまうとは　なさけない。しゅぎょうして、また　ちょうせんするのじゃ。", ()=>{
+                document.getElementById("battleDeathChoice").style.display = "block";
+              });
+            });
+          }
+        }, 1200);
+      }
+    }, (idx+1) * 1400);
+  });
+
+  document.getElementById("battleYesBtn").onclick = ()=>{
+    state.selectedMonster = null;
+    state.screen = "intro";
+    render(); window.scrollTo(0,0);
+  };
+}
+
 function renderBattleDefeat(){
   const maxHp = 200;
   const heroName = state.profile.nickname && state.profile.nickname.trim() ? state.profile.nickname.trim() : "ぼうけんしゃ";
@@ -3743,7 +4016,7 @@ function renderResults(){
   const jobClass = isLegendaryHero ? LEGENDARY_HERO_DATA : getJobClass(typeResult.key, seniorityKey);
   const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
   const techniques = isLegendaryHero
-    ? LEGENDARY_UNIQUE_SKILLS.map(s=>({ name:s.name, kind:s.kind, cost:0, v:5, catName:"でんせつ", desc:s.desc }))
+    ? buildLegendarySkills().map(s=>({ name:s.name, kind:s.kind, cost:0, v:5, catName:"でんせつ", desc:s.desc }))
     : buildSkillTechniques();
   const equipment = buildEquipment(state.mbti);
   const orgType = determineOrgType(state.orgScores);
@@ -3809,7 +4082,8 @@ function renderResults(){
     ${isLegendaryHero ? `
     <div class="insight fusion" style="margin-top:28px; text-align:center;">
       <h4 style="justify-content:center;">✨ でんせつのゆうしゃが　かいほうされた ✨</h4>
-      <p>ゆうしゃの条件・TOEIC900点以上・PdM経験7年以上・高いAI活用力・十分なけいけんちを　すべて　みたした証。</p>
+      <p>ゆうしゃの条件・PdM経験7年以上・十分なけいけんちに加え、TOEIC900点以上　または　高いAI活用力の　いずれかを　みたした証。</p>
+      ${(() => { const f = legendaryConditionFlags(); return `<p style="margin-top:6px; font-size:11.5px; color:#B8BEFF;">みたした条件：${[f.toeicOk?"TOEIC900点以上":null, f.aiOk?"高いAI活用力":null].filter(Boolean).join("・")}</p>`; })()}
     </div>` : ""}
 
     <div class="section-label" style="margin-top:28px;">${isLegendaryHero ? "でんせつのゆうしゃの　こゆうスキル" : "おぼえている とくぎ・じゅもん"}</div>
@@ -4162,6 +4436,12 @@ function renderResults(){
     </div>
     `}
 
+    <div class="section-label" style="margin-top:44px;">モンスターと　たたかう</div>
+    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">きみの　しんだんけっかを　たずさえて、5しゅるいの　モンスターに　いどんでみよう。</p>
+    <div class="start-row" style="margin-top:14px;">
+      <button class="primary" id="monsterFightBtn">モンスターと　たたかう</button>
+    </div>
+
     <footer class="note">
       本診断はセルフチェック用の簡易ツールです。半年に一度など定期的に見直すことで、成長やスキルの重心の変化を確認しやすくなります。
       MBTIとの掛け合わせも、公開されている性格類型論の一般的傾向を業務文脈に翻訳した簡易的な分析であり、断定的な適性診断ではありません。
@@ -4234,6 +4514,13 @@ function renderResults(){
     state.screen="intro";
     render(); window.scrollTo(0,0);
   };
+  const monsterFightBtn = document.getElementById("monsterFightBtn");
+  if(monsterFightBtn){
+    monsterFightBtn.onclick = ()=>{
+      state.screen = "monsterSelect";
+      render(); window.scrollTo(0,0);
+    };
+  }
 }
 
 (async function boot(){
