@@ -468,6 +468,16 @@
     .job-showcase-grid{grid-template-columns:repeat(2,1fr);}
     .job-showcase-cell img{width:52px; height:52px;}
   }
+
+  .battle-preview-shots{display:flex; gap:16px; margin-top:18px; flex-wrap:wrap;}
+  .battle-preview-shot{flex:1; min-width:260px;}
+  .battle-preview-shot img{
+    width:100%; display:block; border:3px solid #fff; box-shadow:0 0 0 3px #000, 4px 4px 0 rgba(0,0,0,.4);
+    image-rendering:auto;
+  }
+  .battle-preview-caption{
+    font-family:var(--pixel-font); font-size:11px; color:#B8BEFF; text-align:center; margin-top:10px; line-height:1.5;
+  }
   .start-row{
     margin-top:40px;
     display:flex;
@@ -3769,7 +3779,7 @@ async function renderIntro(){
 
   app.innerHTML = `
     <div class="eyebrow">PdMクエスト（PdM診断）</div>
-    <h1 class="hero-title">きみの　PdMとしての　ちからを、<br>しょくぎょう・のうりょく値で　あきらかにする。</h1>
+    <h1 class="hero-title">きみの　PdMとしての　ちからで、<br>モンスターと　たたかおう！</h1>
     <p class="hero-lead">
       じぎょうせんりゃくから　こうしょうじゅつまで、プロダクトマネージャーに　もとめられる　ちからを　10のぞくせい・49のとくぎに　ぶんかい。
       かくとくぎを　5だんかいで　じこひょうかすると、つよみと　のびしろが　のうりょくレーダーに　うかびあがる。
@@ -3814,6 +3824,22 @@ async function renderIntro(){
             </div>`;
           }).join("")}
         </div>`).join("")}
+    </div>
+
+    <div class="section-label" style="margin-top:44px;">しんだんの　ちからで　モンスターと　たたかおう</div>
+    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">
+      しんだんで　あきらかになった　PdMとしての　ちから（じつりょく・とくぎ・じゅもん）を　そのまま　もちいて、モンスターバトルに　いどめる。
+      じぶんの　ランクに　あわせて、スライムから　ラスボスまで　えらべる。かちめは　しんだんけっかしだい――さあ、じぶんの　ちからを　ためしてみよう。
+    </p>
+    <div class="battle-preview-shots">
+      <div class="battle-preview-shot">
+        <img src="./assets/screenshots/monster_select_preview.png" alt="モンスターせんたく がめん">
+        <div class="battle-preview-caption">じぶんの　ランクに　あわせて、いどむ　モンスターを　えらべる</div>
+      </div>
+      <div class="battle-preview-shot">
+        <img src="./assets/screenshots/battle_preview.png" alt="バトル がめん">
+        <div class="battle-preview-caption">おぼえた　とくぎ・じゅもんで　こうげき。かいしんの　いちげきも　でる</div>
+      </div>
     </div>
 
     ${supabaseClient ? `
