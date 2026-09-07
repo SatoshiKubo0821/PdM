@@ -3118,17 +3118,26 @@ function renderBattleDefeat(){
     }, 45);
   }
 
+  let prevHp = maxHp;
   ATTACKS.forEach((atk, idx)=>{
     setTimeout(()=>{
       battleLog.textContent = `まおうの　${atk.name}！`;
       enemyImg.classList.add("battle-shake");
       setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
       playAttackEffect(atk.effect);
-      const hp = Math.round(maxHp * atk.ratio);
-      hpNum.textContent = hp;
-      updateHpColor(hp);
       document.querySelector(".battle-scene").classList.add("battle-flash");
       setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
+
+      const hp = Math.round(maxHp * atk.ratio);
+      const dmg = prevHp - hp;
+      prevHp = hp;
+
+      // ワンテンポおいて「〇〇は〇〇のダメージをうけた」を表示し、HPを反映する
+      setTimeout(()=>{
+        battleLog.textContent = `${heroName}は　${dmg}の　ダメージを　うけた！`;
+        hpNum.textContent = hp;
+        updateHpColor(hp);
+      }, 700);
 
       if(atk.effect === "exodus"){
         setTimeout(()=>{
