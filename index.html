@@ -1398,7 +1398,7 @@ const MONSTER_STATS = {
   dragon:    { hp:155, atk:33, def:15 },
   orochi:    { hp:200, atk:46, def:21 },
   demonking: { hp:250, atk:58, def:26 },
-  psycho:    { hp:1110, atk:90, def:10 }, // でんせつのゆうしゃの最大ステータスでも、勝率はおよそ0.05%程度のほぼ不可能なラスボス（シミュレーションで校正済み）
+  psycho:    { hp:9999, atk:90, def:10 }, // ターン制限なし・HP9999での勝率はシミュレーションで別途計測
 };
 /* モンスターごとの攻撃こうげき名のプール（確率で抽選する）。各わざには威力倍率がある。
    しめつのいちげきのみ instantKill:true とし、命中すれば必ずHPをゼロにする。
@@ -3198,7 +3198,6 @@ function renderMonsterBattle(){
   const TURN_DELAY = 1500, REVEAL_DELAY = 700, REACTION_DELAY = 1700;
   let turnCount = 0;
   const SAFETY_MAX_TURNS = 500; // ここまでは基本的に到達しない、無限ループ防止のための安全装置
-  const PSYCHO_TURN_WINDOW = 6; // サイコパスけいえいしゃは、この手数以内に決着をつけられなければ敗北とする（絶望的な強さを表現するため）
 
   function endBattle(win){
     setTimeout(()=>{
@@ -3409,10 +3408,6 @@ function renderMonsterBattle(){
     turnCount++;
     if(mHp<=0){ endBattle(true); return; }
     if(pHp<=0){ endBattle(false); return; }
-    if(monster.key === "psycho" && turnCount > PSYCHO_TURN_WINDOW){
-      endBattle(false);
-      return;
-    }
     if(turnCount > SAFETY_MAX_TURNS){
       // 通常はここまで届かない安全装置。万一の無限ループ防止のみが目的で、たたかいは基本的にHPが尽きるまで続く。
       endBattle((pHp/maxHp) >= (mHp/mStats.hp));
