@@ -3124,8 +3124,11 @@ function renderMonsterBattle(){
     }, 45);
   }
 
-  // プレイヤーのこうげきは、分析画面で「おぼえているとくぎ・じゅもん」に表示された実際のスキルからランダムに選ぶ
-  const myTechniques = buildSkillTechniques();
+  // プレイヤーのこうげきは、分析画面で「おぼえているとくぎ・じゅもん」に表示された実際のスキルからランダムに選ぶ。
+  // でんせつのゆうしゃの場合は、こゆうスキルを使う。
+  const myTechniques = isLegendary
+    ? buildLegendarySkills().map(s=>({ name:s.name, kind:s.kind, v:5, desc:s.desc }))
+    : buildSkillTechniques();
 
   let pHp = maxHp, mHp = mStats.hp;
   let legendaryRevived = false, graceRevived = false;
