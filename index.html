@@ -1779,7 +1779,27 @@ function computeVitalsScores(vitalsAnswers){
   };
 }
 
+/* rpg_stats列を追加する前に保存された履歴記録用：記録IDから決定的（＝毎回おなじ値）にHP/MP/Lv/EXPを算出するフォールバック。
+   本来の値は復元できないが、少なくとも「見るたびに変わる」問題は解消できる。 */
+function seededRpgStatsFromRow(row){
+  const seedBase = String(row.id || row.created_at || "0");
+  const seed = Array.from(seedBase).reduce((a,c)=>a + c.charCodeAt(0), 1);
+  const pseudo = (n) => ((seed * 9301 + 49297 + n*233) % 233280) / 233280;
+  const lv = row.experience_years != null
+    ? Math.max(1, Math.min(99, Math.round(row.experience_years * 3 + 20)))
+    : Math.max(1, Math.min(99, Math.round(10 + pseudo(1) * 60)));
+  const hp = Math.max(10, Math.round(60 + pseudo(2) * 140));
+  const mp = Math.max(5, Math.round(5 + pseudo(3) * 145));
+  const exp = Math.round(lv * 1000);
+  return { lv, hp, mp, maxMp:150, exp };
+}
+
 function buildRPGStats(){
+  // 履歴閲覧中は、保存時点のステータスをそのまま使う（毎回再計算すると、HPやMPが変わってしまうため）
+  if(state.viewingHistory && state.viewingHistoryRpgStats){
+    return state.viewingHistoryRpgStats;
+  }
+
   const vitals = computeVitalsScores(state.vitalsAnswers || {});
   const staminaAvg = vitals.stamina != null ? vitals.stamina : 3;
   const expAvg = vitals.experience; // 1〜5、未回答ならnull
@@ -2515,6 +2535,7 @@ let state = {
   displayOrder: {},       // 全設問のランダム化した表示順（キャッシュ）
   viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
   viewingHistoryIsLegendary: null, // 履歴閲覧中、その記録がでんせつのゆうしゃだったかどうか（trueで確定表示）
+  viewingHistoryRpgStats: null,    // 履歴閲覧中、その記録の保存時点のRPGステータス（HP/MP等が毎回変わらないよう固定する）
   applyContext: null,     // 応募フォームに渡す診断結果の参考情報（任意）
   orgAnswers: {},         // 組織タイプ診断の回答（"org:idx" -> 1..5）
   orgScores: null,        // 診断済みの場合、4軸の平均スコアが入る
@@ -2707,32 +2728,40 @@ async function saveDiagnosisToCloud(payload){
     seniority: payload.seniorityKey,
     hensachi: payload.hensachi,
   };
+  // HP/MP/Lv/EXPは、あとで履歴から呼び出した際に毎回変わってしまわないよう、保存時点の値をそのまま記録する
+  const rpgStats = payload.rpgStats ? { lv: payload.rpgStats.lv, hp: payload.rpgStats.hp, mp: payload.rpgStats.mp, maxMp: payload.rpgStats.maxMp, exp: payload.rpgStats.exp } : null;
+
+  // 新しい列（is_legendary・rpg_stats）がまだ存在しない環境でも壊れないよう、段階的にフォールバックする
+  const attempts = [
+    { ...baseRow, is_legendary: !!payload.isLegendaryHero, rpg_stats: rpgStats },
+    { ...baseRow, is_legendary: !!payload.isLegendaryHero },
+    baseRow,
+  ];
   try{
-    // is_legendary列がある前提でまず保存を試みる（でんせつのゆうしゃ判定を、あとで履歴から呼び出した際も再現できるようにする）
-    const { error } = await supabaseClient.from("diagnoses").insert({ ...baseRow, is_legendary: !!payload.isLegendaryHero });
-    if(!error){ state.savedThisResult = true; return; }
-    // is_legendary列がまだ存在しない場合（マイグレーション未実施）は、その列なしで再保存する
-    const retry = await supabaseClient.from("diagnoses").insert(baseRow);
-    if(!retry.error) state.savedThisResult = true;
+    for(const row of attempts){
+      const { error } = await supabaseClient.from("diagnoses").insert(row);
+      if(!error){ state.savedThisResult = true; return; }
+    }
   }catch(e){ /* オフライン等の場合は次回の保存タイミングで再試行される */ }
 }
 
 async function fetchHistory(){
   if(!supabaseClient || !state.userId) return [];
+  const selects = [
+    "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary, rpg_stats",
+    "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary",
+    "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications",
+  ];
   try{
-    const { data, error } = await supabaseClient
-      .from("diagnoses")
-      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary")
-      .order("created_at", { ascending:false })
-      .limit(20);
-    if(!error) return data || [];
-    // is_legendary列がまだ存在しない場合（マイグレーション未実施）は、その列なしで再取得する
-    const retry = await supabaseClient
-      .from("diagnoses")
-      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications")
-      .order("created_at", { ascending:false })
-      .limit(20);
-    return retry.data || [];
+    for(const cols of selects){
+      const { data, error } = await supabaseClient
+        .from("diagnoses")
+        .select(cols)
+        .order("created_at", { ascending:false })
+        .limit(20);
+      if(!error) return data || [];
+    }
+    return [];
   }catch(e){ return []; }
 }
 
@@ -2880,6 +2909,9 @@ async function renderHistory(){
       const expYearsOk = row.experience_years != null && row.experience_years >= 7;
       const toeicOk = row.toeic != null && row.toeic >= 900;
       state.viewingHistoryIsLegendary = row.is_legendary === true || (heroBaseOk && expYearsOk && toeicOk);
+      // HP/MP/Lv/EXPも、保存時点のステータスをそのまま再現する（毎回変わってしまわないように）。
+      // rpg_stats列を追加する前に保存された記録には無いため、記録IDから決定的に算出した値で固定する。
+      state.viewingHistoryRpgStats = row.rpg_stats || seededRpgStatsFromRow(row);
       state.screen = "results";
       render(); window.scrollTo(0,0);
     };
@@ -4369,7 +4401,7 @@ function renderResults(){
   const equipment = buildEquipment(state.mbti);
   const orgType = determineOrgType(state.orgScores);
 
-  saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi, isLegendaryHero });
+  saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi, isLegendaryHero, rpgStats: rpg });
 
   app.innerHTML = `
     <div class="eyebrow">診断結果</div>
@@ -4804,7 +4836,7 @@ function renderResults(){
 
   const backToHistoryLink = document.getElementById("backToHistoryLink");
   if(backToHistoryLink){
-    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.viewingHistoryIsLegendary=null; state.screen="history"; render(); window.scrollTo(0,0); };
+    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.viewingHistoryIsLegendary=null; state.viewingHistoryRpgStats=null; state.screen="history"; render(); window.scrollTo(0,0); };
   }
   const orgDiagLink = document.getElementById("orgDiagLink");
   if(orgDiagLink) orgDiagLink.onclick = ()=>{ state.screen="orgIntro"; render(); window.scrollTo(0,0); };
@@ -4833,12 +4865,14 @@ function renderResults(){
     document.getElementById("toHistoryBtn").onclick = ()=>{
       state.viewingHistory=null;
       state.viewingHistoryIsLegendary=null;
+      state.viewingHistoryRpgStats=null;
       state.screen="history";
       render(); window.scrollTo(0,0);
     };
     document.getElementById("toIntroBtn").onclick = ()=>{
       state.viewingHistory=null;
       state.viewingHistoryIsLegendary=null;
+      state.viewingHistoryRpgStats=null;
       state.answers = {};
       state.mbti = null;
       state.displayOrder = {};
