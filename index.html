@@ -1398,7 +1398,7 @@ const MONSTER_STATS = {
   dragon:    { hp:155, atk:33, def:15 },
   orochi:    { hp:200, atk:46, def:21 },
   demonking: { hp:250, atk:58, def:26 },
-  psycho:    { hp:99999, atk:90, def:10 }, // でんせつのゆうしゃでも絶対に勝てない、実質無敵のラスボス
+  psycho:    { hp:1110, atk:90, def:10 }, // でんせつのゆうしゃの最大ステータスでも、勝率はおよそ0.05%程度のほぼ不可能なラスボス（シミュレーションで校正済み）
 };
 /* モンスターごとの攻撃こうげき名のプール（確率で抽選する）。各わざには威力倍率がある。
    しめつのいちげきのみ instantKill:true とし、命中すれば必ずHPをゼロにする。
@@ -2578,6 +2578,38 @@ async function saveProgress(){
   }catch(e){ /* storage unavailable, continue silently */ }
 }
 
+/* シュタインズ・ゲートの真エンディング：ユーザーのすべてのデータ（クラウドの診断履歴＋ローカルの保存内容）を消去し、まっさらな状態でトップへ戻す */
+async function deleteAllUserData(){
+  // クラウド側の診断履歴をすべて削除
+  if(supabaseClient && state.userId){
+    try{ await supabaseClient.from("diagnoses").delete().eq("user_id", state.userId); }catch(e){ /* 失敗しても続行 */ }
+  }
+  // ローカル保存の診断データを削除
+  try{
+    if(window.storage && typeof window.storage.delete === "function"){
+      await window.storage.delete(STORAGE_KEY, false);
+    }else{
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }catch(e){ /* 失敗しても続行 */ }
+  // メモリ上のstateを初期状態に戻す
+  state.answers = {};
+  state.mbti = null;
+  state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
+  state.orgAnswers = {};
+  state.orgScores = null;
+  state.vitalsAnswers = {};
+  state.rpgMp = null;
+  state.defeatedMonsters = {};
+  state.selectedMonster = null;
+  state.savedThisResult = false;
+  state.viewingHistory = null;
+  state.viewingHistoryIsLegendary = null;
+  state.viewingHistoryRpgStats = null;
+  state.displayOrder = {};
+  state.pageIndex = 0;
+}
+
 /* ---------------- Helpers ---------------- */
 function answeredCount(){
   return Object.keys(state.answers).length;
@@ -3072,6 +3104,9 @@ function renderMonsterBattle(){
           <button class="primary" id="battleAgainBtn">モンスターと　たたかう</button>
           <button class="ghost" id="battleTopBtn" style="margin-top:10px;">トップに　もどる</button>
         </div>
+        <div class="battle-death-choice" id="battleTrueEndChoice" style="display:none;">
+          <button class="primary" id="battleTrueEndBtn">はい</button>
+        </div>
       </div>
     </div>
   `;
@@ -3135,11 +3170,21 @@ function renderMonsterBattle(){
   const TURN_DELAY = 1500, REVEAL_DELAY = 700, REACTION_DELAY = 1700;
   let turnCount = 0;
   const SAFETY_MAX_TURNS = 500; // ここまでは基本的に到達しない、無限ループ防止のための安全装置
+  const PSYCHO_TURN_WINDOW = 6; // サイコパスけいえいしゃは、この手数以内に決着をつけられなければ敗北とする（絶望的な強さを表現するため）
 
   function endBattle(win){
     setTimeout(()=>{
       const overlay = document.getElementById("battleDeathOverlay");
       overlay.style.display = "flex";
+      if(win && monster.key === "psycho"){
+        // 0.05%の奇跡：サイコパスけいえいしゃを撃破した唯一の結末
+        typeMessage(document.getElementById("battleDeathText1"), "おめでとうございます。", ()=>{
+          typeMessage(document.getElementById("battleDeathText2"), "シュタインズ・ゲートが　ひらかれました。", ()=>{
+            document.getElementById("battleTrueEndChoice").style.display = "block";
+          });
+        });
+        return;
+      }
       if(win){
         state.defeatedMonsters = state.defeatedMonsters || {};
         state.defeatedMonsters[monster.key] = true;
@@ -3333,12 +3378,15 @@ function renderMonsterBattle(){
 
   function nextTurn(){
     turnCount++;
-    if(monster.key === "psycho" && pHp<=0){ endBattle(false); return; } // ぜったいに かてない ラスボス
     if(mHp<=0){ endBattle(true); return; }
     if(pHp<=0){ endBattle(false); return; }
+    if(monster.key === "psycho" && turnCount > PSYCHO_TURN_WINDOW){
+      endBattle(false);
+      return;
+    }
     if(turnCount > SAFETY_MAX_TURNS){
       // 通常はここまで届かない安全装置。万一の無限ループ防止のみが目的で、たたかいは基本的にHPが尽きるまで続く。
-      endBattle(monster.key === "psycho" ? false : (pHp/maxHp) >= (mHp/mStats.hp));
+      endBattle((pHp/maxHp) >= (mHp/mStats.hp));
       return;
     }
     playerTurn(()=>{
@@ -3359,6 +3407,14 @@ function renderMonsterBattle(){
     state.screen = "intro";
     render(); window.scrollTo(0,0);
   };
+  const battleTrueEndBtn = document.getElementById("battleTrueEndBtn");
+  if(battleTrueEndBtn){
+    battleTrueEndBtn.onclick = async ()=>{
+      await deleteAllUserData();
+      state.screen = "intro";
+      render(); window.scrollTo(0,0);
+    };
+  }
 }
 
 function renderBattleDefeat(){
