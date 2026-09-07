@@ -1714,7 +1714,8 @@ function buildRPGStats(){
     : Math.round(lv * 1000);
 
   const hp = Math.max(10, Math.round(staminaAvg * 40));
-  const maxHp = 200;
+  // さいだいHPも、Lvに応じて変動させる（これまでのように固定200に戻らないようにする）
+  const maxHp = Math.max(hp, Math.round(60 + lv * 1.6));
   const maxMp = 150;
   // MPはランダムに決定する。診断のたびに毎回変わらないよう、一度決めたらstateにキャッシュする
   if(state.rpgMp == null){
