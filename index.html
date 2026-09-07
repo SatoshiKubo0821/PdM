@@ -255,9 +255,6 @@
   .monster-select-name{font-family:var(--pixel-font); font-size:14px; color:#fff; margin-top:8px; font-weight:700;}
   .monster-select-theme{font-family:var(--pixel-font); font-size:10.5px; color:#B8BEFF; margin-top:4px;}
   .monster-select-req{font-family:var(--pixel-font); font-size:10px; color:#8A8EC4; margin-top:8px;}
-  .monster-select-outcome{font-family:var(--pixel-font); font-size:11px; margin-top:6px; font-weight:700;}
-  .monster-select-outcome.win{color:var(--good);}
-  .monster-select-outcome.lose{color:var(--bad);}
   @media (max-width:560px){
     .monster-select-grid{grid-template-columns:repeat(2,1fr);}
   }
@@ -2812,16 +2809,13 @@ async function submitApplication(fields){
    「まおう」という一般的なファンタジーの記号を、オリジナルのドット絵で表現したもの。 */
 /* ---------------- モンスターせんたく画面 ---------------- */
 function renderMonsterSelect(){
-  const myTier = getCurrentTierRank();
   app.innerHTML = `
     <div class="eyebrow">モンスターと　たたかう</div>
     <h1 class="hero-title" style="font-size:28px;">いどむ　あいてを　えらんでほしい</h1>
     <p class="hero-lead">きみの　しんだんけっかにより、たたかいの　ゆくえは　すでに　きまっている。じぶんの　ランクを　ためしてみよう。</p>
 
     <div class="monster-select-grid">
-      ${MONSTERS.map(m=>{
-        const willWin = myTier >= m.requiredTier;
-        return `
+      ${MONSTERS.map(m=>`
         <div class="monster-select-card" data-key="${m.key}">
           <div class="monster-select-icon">
             ${m.key==="demonking"
@@ -2831,9 +2825,7 @@ function renderMonsterSelect(){
           <div class="monster-select-name">${m.name}</div>
           <div class="monster-select-theme">${m.theme}</div>
           <div class="monster-select-req">かちめ：${TIER_RANK_LABEL[m.requiredTier]}</div>
-          <div class="monster-select-outcome ${willWin ? 'win' : 'lose'}">${willWin ? "◆ かてる　はず" : "◆ まだ　てにあまる"}</div>
-        </div>`;
-      }).join("")}
+        </div>`).join("")}
     </div>
 
     <div class="start-row" style="margin-top:24px;">
@@ -2928,38 +2920,70 @@ function renderMonsterBattle(){
     }, 45);
   }
 
-  // 3〜5ターンで決着：プレイヤーのこうげき/じゅもん/とくぎ と、モンスターのこうげきを交互に実施する
-  const playerActionNames = ["こうげき","じゅもん","とくぎ","こうげき"];
-  const playerDmg = willWin ? [50,50,50,50] : [12,12,12,12];
-  const monsterDmg = willWin ? [15,15,15,0] : [45,45,45,65];
+  // プレイヤーのこうげきは、分析画面で「おぼえているとくぎ・じゅもん」に表示された実際のスキルを使う
+  const myTechniques = buildSkillTechniques();
+  const playerActions = [0,1,2,3].map(i=>myTechniques[i % myTechniques.length]);
+
+  // ダメージはスキルスコアに応じて重み付けしつつ、若干の乱数で毎回変化させる。
+  // 勝つ場合はプレイヤーの合計ダメージがちょうどモンスターの最大HPに達するよう最終手で調整する。
+  function buildDamageSet(total, weights, forceExactTotal){
+    const weightSum = weights.reduce((a,b)=>a+b,0) || 1;
+    const dmgs = weights.map(w=>{
+      const base = total * (w / weightSum);
+      const jitter = 0.82 + Math.random()*0.36; // ±18%程度のばらつき
+      return Math.max(4, Math.round(base * jitter));
+    });
+    if(forceExactTotal){
+      const sumExceptLast = dmgs.slice(0,-1).reduce((a,b)=>a+b,0);
+      dmgs[dmgs.length-1] = Math.max(8, total - sumExceptLast);
+    }
+    return dmgs;
+  }
+
+  const playerWeights = playerActions.map(a=>a.v);
+  const playerDmg = willWin
+    ? buildDamageSet(maxHp, playerWeights, true)          // 勝つ場合：合計でちょうどモンスターを倒しきる
+    : buildDamageSet(Math.round(maxHp*0.24), playerWeights, false); // 負ける場合：かすり傷程度
+  const monsterDmg = willWin
+    ? buildDamageSet(Math.round(maxHp*0.23), [1,1,1,1], false)      // 勝つ場合：プレイヤーは軽傷で済む
+    : buildDamageSet(maxHp, [1,1,1,1], true);                        // 負ける場合：合計でちょうどプレイヤーを倒しきる
 
   const sequence = [];
   let pHp = maxHp, mHp = maxHp;
   for(let i=0;i<4;i++){
-    mHp = Math.max(0, mHp - playerDmg[i]);
-    sequence.push({ actor:"player", label:playerActionNames[i], pHp, mHp });
+    const dmg = Math.min(mHp, playerDmg[i]);
+    mHp = Math.max(0, mHp - dmg);
+    sequence.push({ actor:"player", action:playerActions[i], dmg, pHp, mHp });
     if(mHp<=0) break;
-    pHp = Math.max(0, pHp - monsterDmg[i]);
-    sequence.push({ actor:"monster", pHp, mHp });
+    const mdmg = Math.min(pHp, monsterDmg[i]);
+    pHp = Math.max(0, pHp - mdmg);
+    sequence.push({ actor:"monster", dmg:mdmg, pHp, mHp });
     if(pHp<=0) break;
   }
 
   sequence.forEach((step, idx)=>{
+    const baseDelay = (idx+1) * 1600;
     setTimeout(()=>{
       if(step.actor === "player"){
-        battleLog.textContent = `${heroName}の　${step.label}！`;
+        battleLog.textContent = `${heroName}の　${step.action.name}！`;
         enemyImg.classList.add("battle-shake");
         setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
         spawnHitSpark(45+Math.random()*10, 35+Math.random()*10);
       }else{
         battleLog.textContent = `${monster.name}の　こうげき！`;
       }
-      hpNum.textContent = step.pHp;
-      monsterHpNum.textContent = step.mHp;
-      updateHpColor(hpNum, step.pHp);
-      updateHpColor(monsterHpNum, step.mHp);
       document.querySelector(".battle-scene").classList.add("battle-flash");
       setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
+
+      // ワンテンポおいて「〇〇は〇〇のダメージをうけた」を表示し、HPを反映する
+      setTimeout(()=>{
+        const targetName = step.actor === "player" ? monster.name : heroName;
+        battleLog.textContent = `${targetName}は　${step.dmg}の　ダメージを　うけた！`;
+        hpNum.textContent = step.pHp;
+        monsterHpNum.textContent = step.mHp;
+        updateHpColor(hpNum, step.pHp);
+        updateHpColor(monsterHpNum, step.mHp);
+      }, 700);
 
       const isLast = idx === sequence.length-1;
       if(isLast){
@@ -2979,9 +3003,9 @@ function renderMonsterBattle(){
               });
             });
           }
-        }, 1200);
+        }, 1900);
       }
-    }, (idx+1) * 1400);
+    }, baseDelay);
   });
 
   document.getElementById("battleYesBtn").onclick = ()=>{
