@@ -584,32 +584,30 @@
     gap:20px;
     margin-top:20px;
     padding:20px 24px;
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:8px;
+    background:#000;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000, 6px 6px 0 rgba(0,0,0,.5);
   }
   .mbti-emblem{
     position:relative;
     width:104px; height:104px;
-    border-radius:50%;
     flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
     color:#fff;
-    box-shadow:0 12px 26px -10px rgba(16,28,54,.35);
+    border:2px solid #fff;
   }
   .mbti-emblem::before{
     content:"";
     position:absolute;
     inset:-4px;
-    border-radius:50%;
-    border:2px solid currentColor;
+    border:1px dashed currentColor;
     opacity:.55;
   }
   .mbti-emblem svg{width:60px; height:60px; position:relative; z-index:1;}
   .mbti-emblem-text{}
-  .mbti-emblem-text .code{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:900; font-size:20px; color:var(--navy-900);}
-  .mbti-emblem-text .nick{font-size:13px; color:var(--ink-soft); margin-top:2px;}
-  .mbti-emblem-text .grp{display:inline-block; margin-top:6px; font-size:11px; padding:2px 10px; border-radius:10px; background:var(--bg); color:var(--ink-soft);}
+  .mbti-emblem-text .code{font-family:var(--pixel-font); font-weight:700; font-size:20px; color:#fff;}
+  .mbti-emblem-text .nick{font-size:13px; color:#C9CDF5; margin-top:2px; font-family:var(--pixel-font);}
+  .mbti-emblem-text .grp{display:inline-block; margin-top:6px; font-size:11px; padding:2px 10px; background:rgba(255,255,255,.12); color:#fff; font-family:var(--pixel-font);}
 
   /* 偏差値・年収などの指標タイル */
   .metric-grid{
@@ -619,79 +617,76 @@
     margin-top:16px;
   }
   .metric-tile{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:8px;
+    background:#000;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000, 4px 4px 0 rgba(0,0,0,.5);
     padding:18px 20px;
   }
-  .metric-label{font-size:12px; color:var(--ink-soft); font-weight:600;}
+  .metric-label{font-size:12px; color:var(--gold); font-weight:600; font-family:var(--pixel-font);}
   .hensachi-bell-wrap{margin-top:12px;}
   .hensachi-bell-svg{width:100%; height:auto; display:block;}
   .metric-value{
-    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-family:var(--pixel-font);
     font-size:32px;
-    font-weight:900;
+    font-weight:700;
     margin-top:4px;
-    background:var(--grad-main);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
+    color:#fff;
   }
   .metric-value.salary{font-size:22px;}
-  .metric-note{font-size:12px; color:var(--ink-soft); margin-top:6px; line-height:1.6;}
+  .metric-note{font-size:12px; color:#C9CDF5; margin-top:6px; line-height:1.6; font-family:var(--pixel-font);}
 
   /* 求人カード */
   .job-card{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:8px;
+    background:#000;
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px #000;
     padding:16px 18px;
     margin-top:10px;
     display:block;
     text-decoration:none;
     color:inherit;
-    transition:border-color .12s ease, transform .12s ease;
+    transition:transform .12s ease;
   }
-  .job-card:hover{border-color:var(--blue-300); transform:translateY(-1px);}
-  .job-company{font-size:12.5px; color:var(--ink-soft);}
-  .job-title{font-family:"Zen Kaku Gothic New",sans-serif; font-weight:700; font-size:14.5px; margin-top:2px;}
+  .job-card:hover{transform:translate(2px,2px); box-shadow:0 0 0 2px #000;}
+  .job-company{font-size:12.5px; color:#B8BEFF; font-family:var(--pixel-font);}
+  .job-title{font-family:var(--pixel-font); font-weight:700; font-size:14.5px; margin-top:2px; color:#fff;}
   .job-meta{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; align-items:center;}
-  .job-salary{font-size:13px; color:var(--navy-900); font-weight:700;}
-  .job-source{font-size:11px; color:var(--ink-soft); background:var(--bg); padding:2px 9px; border-radius:10px;}
+  .job-salary{font-size:13px; color:var(--gold); font-weight:700; font-family:var(--pixel-font);}
+  .job-source{font-size:11px; color:#fff; background:rgba(255,255,255,.12); padding:2px 9px; font-family:var(--pixel-font);}
 
   /* SWOT 四象限 */
   .swot-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:2px;
-    background:var(--line);
-    border:1px solid var(--line);
-    border-radius:8px;
+    background:#fff;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000;
     overflow:hidden;
     margin-top:16px;
   }
-  .swot-quad{background:var(--paper); padding:18px 20px;}
+  .swot-quad{background:#000; padding:18px 20px;}
   .swot-quad.s{border-top:3px solid var(--good);}
   .swot-quad.w{border-top:3px solid var(--bad);}
-  .swot-quad.o{border-top:3px solid var(--blue-500);}
+  .swot-quad.o{border-top:3px solid #4696F0;}
   .swot-quad.t{border-top:3px solid var(--gold);}
   .swot-head{
-    font-family:"Zen Kaku Gothic New",sans-serif;
-    font-weight:900;
+    font-family:var(--pixel-font);
+    font-weight:700;
     font-size:12.5px;
     margin-bottom:12px;
     display:flex;
     align-items:center;
     gap:8px;
-    color:var(--ink-soft);
+    color:#fff;
   }
   .swot-head .letter{
     width:22px; height:22px;
-    border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     color:#fff;
     font-size:12px;
     flex-shrink:0;
+    border:1px solid #fff;
   }
   .swot-quad.s .letter{background:var(--good);}
   .swot-quad.w .letter{background:var(--bad);}
@@ -699,8 +694,8 @@
   .swot-quad.t .letter{background:var(--gold);}
   .swot-item{margin-bottom:12px;}
   .swot-item:last-child{margin-bottom:0;}
-  .swot-item b{font-size:13px; display:block; font-family:"Zen Kaku Gothic New",sans-serif;}
-  .swot-item span{font-size:12px; color:var(--ink-soft); line-height:1.6;}
+  .swot-item b{font-size:13px; display:block; font-family:var(--pixel-font); color:#fff;}
+  .swot-item span{font-size:12px; color:#C9CDF5; line-height:1.6;}
 
   @media (max-width:600px){
     .swot-grid{grid-template-columns:1fr;}
@@ -783,29 +778,29 @@
     gap:12px;
   }
   .career-branch{
-    background:var(--paper);
-    border:1px solid var(--line);
+    background:#000;
+    border:2px solid #fff;
     border-top:3px solid var(--gold);
-    border-radius:8px;
+    box-shadow:0 0 0 2px #000;
     padding:16px 18px;
   }
-  .career-branch h5{margin:0 0 4px; font-family:"Zen Kaku Gothic New",sans-serif; font-size:14px;}
-  .career-branch .salary{font-size:13px; color:var(--navy-900); font-weight:700; margin-bottom:6px; display:block;}
-  .career-branch p{margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.6;}
+  .career-branch h5{margin:0 0 4px; font-family:var(--pixel-font); font-size:14px; color:#fff;}
+  .career-branch .salary{font-size:13px; color:var(--gold); font-weight:700; margin-bottom:6px; display:block; font-family:var(--pixel-font);}
+  .career-branch p{margin:0; font-size:12.5px; color:#C9CDF5; line-height:1.6;}
 
   /* 語学力・資格カード */
   .lang-card{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:8px;
+    background:#000;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000, 4px 4px 0 rgba(0,0,0,.5);
     padding:16px 18px;
     margin-top:14px;
     display:flex;
     gap:24px;
     flex-wrap:wrap;
   }
-  .lang-item b{display:block; font-size:12px; color:var(--ink-soft); font-weight:600;}
-  .lang-item span{font-size:14px; color:var(--ink);}
+  .lang-item b{display:block; font-size:12px; color:var(--gold); font-weight:600; font-family:var(--pixel-font);}
+  .lang-item span{font-size:14px; color:#fff; font-family:var(--pixel-font);}
 
   @media (max-width:600px){
     .career-branches{grid-template-columns:1fr;}
@@ -827,26 +822,25 @@
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:2px;
-    background:var(--line);
-    border:1px solid var(--line);
+    background:#fff;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000;
     margin-top:8px;
-    border-radius:var(--radius);
     overflow:hidden;
   }
   .result-grid > div{
-    background:var(--paper);
+    background:#000;
     padding:14px 16px;
   }
-  .result-row-name{font-size:13.5px; display:flex; justify-content:space-between;}
-  .result-row-name b{font-variant-numeric:tabular-nums; color:var(--navy-900);}
+  .result-row-name{font-size:13.5px; display:flex; justify-content:space-between; color:#fff; font-family:var(--pixel-font);}
+  .result-row-name b{font-variant-numeric:tabular-nums; color:var(--gold);}
   .bar-track{
     margin-top:8px;
     height:7px;
-    background:var(--bg);
-    border-radius:4px;
+    background:#333;
     overflow:hidden;
   }
-  .bar-fill{height:100%; background:var(--grad-main); border-radius:4px;}
+  .bar-fill{height:100%; background:linear-gradient(90deg,#4696F0,#F8C630);}
 
   .section-label{
     margin-top:52px;
@@ -866,42 +860,42 @@
     background:var(--line);
   }
   .insight{
-    background:var(--paper);
-    border:2px solid var(--navy-950);
-    border-left:6px solid var(--blue-500);
-    box-shadow:3px 3px 0 rgba(0,0,0,.15);
+    background:#000;
+    border:2px solid #fff;
+    border-left:6px solid #4696F0;
+    box-shadow:0 0 0 2px #000, 3px 3px 0 rgba(0,0,0,.4);
     padding:16px 18px;
     margin-top:14px;
   }
   .insight.weak{border-left-color:var(--bad);}
   .insight.strong{border-left-color:var(--good);}
-  .insight.fusion{border-left-color:var(--gold); background:var(--gold-soft);}
-  .insight.neutral{border-left-color:var(--line);}
+  .insight.fusion{border-left-color:var(--gold); background:#1a1400;}
+  .insight.neutral{border-left-color:#666;}
   .history-row{transition:border-color .12s ease, transform .12s ease;}
-  .history-row:hover{border-color:var(--blue-300); transform:translateX(2px);}
+  .history-row:hover{border-color:var(--gold); transform:translateX(2px);}
   .insight h4{
     margin:0 0 6px;
     font-size:15px;
     font-family:var(--pixel-font);
-    color:var(--ink);
+    color:#fff;
     display:flex;
     justify-content:space-between;
     gap:10px;
   }
-  .insight h4 b{color:var(--navy-900); font-variant-numeric:tabular-nums;}
-  .insight p{margin:0; font-size:13.5px; color:var(--ink-soft);}
+  .insight h4 b{color:var(--gold); font-variant-numeric:tabular-nums;}
+  .insight p{margin:0; font-size:13.5px; color:#C9CDF5;}
   .insight p + p{margin-top:8px;}
 
   .pill-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
   .pill{
     font-size:12.5px;
     padding:6px 12px;
-    border-radius:20px;
-    background:var(--bg);
-    border:1px solid var(--line);
-    color:var(--ink-soft);
+    background:#000;
+    border:1px solid #fff;
+    color:#fff;
+    font-family:var(--pixel-font);
   }
-  .pill b{color:var(--navy-900);}
+  .pill b{color:var(--gold);}
   .pill.strong{border-color:var(--good); color:var(--good);}
   .pill.weak{border-color:var(--bad); color:var(--bad);}
 
@@ -912,25 +906,26 @@
     margin-top:14px;
   }
   .task-list{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
+    background:#000;
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px #000;
     padding:16px 18px;
   }
-  .task-list.good{border-left:3px solid var(--good);}
-  .task-list.bad{border-left:3px solid var(--bad);}
+  .task-list.good{border-left:4px solid var(--good);}
+  .task-list.bad{border-left:4px solid var(--bad);}
   .task-list h4{
     margin:0 0 10px;
     font-size:14px;
-    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-family:var(--pixel-font);
+    color:#fff;
   }
   .task-list ul{margin:0; padding-left:18px;}
-  .task-list li{font-size:13px; color:var(--ink-soft); margin-bottom:6px;}
+  .task-list li{font-size:13px; color:#C9CDF5; margin-bottom:6px;}
 
   .matrix-row{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
+    background:#000;
+    border:2px solid #fff;
+    box-shadow:0 0 0 2px #000;
     padding:14px 16px;
     margin-top:10px;
     display:flex;
@@ -939,23 +934,37 @@
     gap:14px;
     flex-wrap:wrap;
   }
-  .matrix-row.strong{border-left:3px solid var(--good);}
-  .matrix-row.weak{border-left:3px solid var(--bad);}
-  .matrix-row.fusion{border-left:3px solid var(--gold);}
-  .matrix-row.neutral{border-left:3px solid var(--line);}
+  .matrix-row.strong{border-left:4px solid var(--good);}
+  .matrix-row.weak{border-left:4px solid var(--bad);}
+  .matrix-row.fusion{border-left:4px solid var(--gold);}
+  .matrix-row.neutral{border-left:4px solid #666;}
   .matrix-left{flex:1; min-width:180px;}
-  .matrix-cat{font-size:14px; font-weight:700; font-family:"Zen Kaku Gothic New",sans-serif;}
+  .matrix-cat{font-size:14px; font-weight:700; font-family:var(--pixel-font); color:#fff;}
   .matrix-tag{
     display:inline-block;
     margin-top:4px;
     font-size:11.5px;
     padding:3px 9px;
-    border-radius:12px;
-    background:var(--bg);
-    color:var(--ink-soft);
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-family:var(--pixel-font);
   }
-  .matrix-score{font-size:20px; font-weight:900; color:var(--navy-900); font-variant-numeric:tabular-nums;}
-  .matrix-note{flex:2; min-width:220px; font-size:12.5px; color:var(--ink-soft);}
+  .matrix-score{font-size:20px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; font-family:var(--pixel-font);}
+  .matrix-note{flex:2; min-width:220px; font-size:12.5px; color:#C9CDF5;}
+
+  /* なかまカード（相性の良いメンバー） */
+  .teammate-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  .teammate-card{
+    background:#000; border:2px solid #fff; box-shadow:0 0 0 2px #000;
+    padding:14px 10px; text-align:center;
+  }
+  .teammate-job{font-family:var(--pixel-font); font-size:10.5px; color:var(--gold); margin-bottom:6px;}
+  .teammate-mbti{font-family:var(--pixel-font); font-size:18px; font-weight:700; color:#fff;}
+  .teammate-nick{font-family:var(--pixel-font); font-size:11px; color:#C9CDF5; margin-top:4px;}
+  .teammate-diff{font-family:var(--pixel-font); font-size:9.5px; color:#8A8EC4; margin-top:8px; padding-top:6px; border-top:1px dashed rgba(255,255,255,.25);}
+  @media (max-width:560px){
+    .teammate-grid{grid-template-columns:1fr;}
+  }
 
   footer.note{
     margin-top:56px;
@@ -1354,7 +1363,7 @@ function hensachiComment(h){
   return "これから力をつけていくフェーズ。基礎固めが最優先です。";
 }
 
-/* 偏差値の位置を正規分布の釣鐘曲線上にプロットするSVGを生成する（白背景の指標タイル内に表示） */
+/* 偏差値の位置を正規分布の釣鐘曲線上にプロットするSVGを生成する（黒背景のステータスウィンドウ内に表示） */
 function hensachiBellCurveSVG(h){
   const w = 320, ht = 140, padX = 20, padY = 16;
   const mean = 50, sd = 10;
@@ -1375,18 +1384,18 @@ function hensachiBellCurveSVG(h){
 
   const ticks = [30,40,50,60,70].map(t=>{
     const x = xScale(t);
-    return `<line x1="${x}" y1="${ht-padY}" x2="${x}" y2="${ht-padY+4}" stroke="#16171A" stroke-width="1" opacity="0.4"/>
-      <text x="${x}" y="${ht-2}" font-size="9" fill="#5B5D66" text-anchor="middle" font-family="DotGothic16">${t}</text>`;
+    return `<line x1="${x}" y1="${ht-padY}" x2="${x}" y2="${ht-padY+4}" stroke="#fff" stroke-width="1" opacity="0.5"/>
+      <text x="${x}" y="${ht-2}" font-size="9" fill="#fff" opacity="0.7" text-anchor="middle" font-family="DotGothic16">${t}</text>`;
   }).join("");
 
   return `<svg viewBox="0 0 ${w} ${ht}" class="hensachi-bell-svg">
-    <line x1="${padX}" y1="${ht-padY}" x2="${w-padX}" y2="${ht-padY}" stroke="#16171A" stroke-width="1" opacity="0.3"/>
-    <path d="${pathD}" fill="none" stroke="#1C1D21" stroke-width="2"/>
-    <path d="${pathD} L${w-padX},${ht-padY} L${padX},${ht-padY} Z" fill="#1C1D21" opacity="0.08"/>
+    <line x1="${padX}" y1="${ht-padY}" x2="${w-padX}" y2="${ht-padY}" stroke="#fff" stroke-width="1" opacity="0.4"/>
+    <path d="${pathD}" fill="none" stroke="#4696F0" stroke-width="2"/>
+    <path d="${pathD} L${w-padX},${ht-padY} L${padX},${ht-padY} Z" fill="#4696F0" opacity="0.15"/>
     ${ticks}
-    <line x1="${markerX}" y1="${ht-padY}" x2="${markerX}" y2="${markerY}" stroke="#E8792A" stroke-width="2" stroke-dasharray="3,2"/>
-    <circle cx="${markerX}" cy="${markerY}" r="5" fill="#E8792A" stroke="#fff" stroke-width="1.5"/>
-    <text x="${markerX}" y="${markerY-10}" font-size="12" fill="#E8792A" text-anchor="middle" font-weight="bold" font-family="DotGothic16">${h}</text>
+    <line x1="${markerX}" y1="${ht-padY}" x2="${markerX}" y2="${markerY}" stroke="#F8C630" stroke-width="2" stroke-dasharray="3,2"/>
+    <circle cx="${markerX}" cy="${markerY}" r="5" fill="#F8C630" stroke="#000" stroke-width="1.5"/>
+    <text x="${markerX}" y="${markerY-10}" font-size="12" fill="#F8C630" text-anchor="middle" font-weight="bold" font-family="DotGothic16">${h}</text>
   </svg>`;
 }
 
@@ -1703,6 +1712,53 @@ function mbtiTeamFit(mbti){
     return `${AXIS_NAME[l]}型のあなたは、${AXIS_NAME[opp[i]]}型（${l}に対して${opp[i]}）のメンバーと組むと、ものの見方の違いが補い合いになりやすい軸です。`;
   });
   return lines;
+}
+
+/* ---------------- 相性の良いなかま（MBTI × ジョブ）----------------
+   4つのジョブ（事業開発／エンジニア／デザイナー／カスタマーサクセス）ごとに、
+   相性の良いMBTIタイプのプールを定義。ユーザー自身のタイプと最も対照的な
+   （文字の違いが多い）タイプを各ジョブから1名選び、3名を提案する。 */
+const TEAMMATE_JOB_LABEL = { bizdev:"事業開発", engineer:"エンジニア", designer:"デザイナー", success:"カスタマーサクセス" };
+const TEAMMATE_JOB_POOL = {
+  bizdev:   ["ENTJ","ESTJ","ENTP","ESTP"],
+  engineer: ["INTJ","ISTP","INTP","ISTJ"],
+  designer: ["INFP","ISFP","ENFP","INFJ"],
+  success:  ["ESFJ","ENFJ","ISFJ","ESFP"],
+};
+function mbtiDiffCount(a, b){
+  let c = 0;
+  for(let i=0;i<4;i++){ if(a[i]!==b[i]) c++; }
+  return c;
+}
+function buildCompatibleTeammates(userMbti){
+  if(!userMbti || userMbti==="unknown") return null;
+  const jobs = Object.keys(TEAMMATE_JOB_POOL);
+
+  // ユーザー自身のタイプに最も近い（文字の違いが少ない）ジョブは、多様性を出すため候補から外す
+  let closestJob = jobs[0], closestDiff = 99;
+  jobs.forEach(j=>{
+    const minDiff = Math.min(...TEAMMATE_JOB_POOL[j].map(t=>mbtiDiffCount(userMbti,t)));
+    if(minDiff < closestDiff){ closestDiff = minDiff; closestJob = j; }
+  });
+  const chosenJobs = jobs.filter(j=>j!==closestJob).slice(0,3);
+
+  return chosenJobs.map(job=>{
+    const pool = TEAMMATE_JOB_POOL[job];
+    // 各ジョブのプールの中で、ユーザーと最も対照的な（違いが多い）タイプを選ぶ
+    let best = pool[0], bestDiff = -1;
+    pool.forEach(t=>{
+      const d = mbtiDiffCount(userMbti, t);
+      if(d > bestDiff){ bestDiff = d; best = t; }
+    });
+    const meta = MBTI_META[best];
+    const diffLetters = [];
+    for(let i=0;i<4;i++){ if(userMbti[i]!==best[i]) diffLetters.push(`${userMbti[i]}↔${best[i]}`); }
+    return {
+      job, jobLabel: TEAMMATE_JOB_LABEL[job],
+      mbti: best, nickname: meta ? meta.nickname : "",
+      diffCount: bestDiff, diffLetters: diffLetters.join("・"),
+    };
+  });
 }
 
 /* ---------------- MBTI属性プロファイル（深掘り分析の素材） ----------------
@@ -2353,7 +2409,7 @@ async function renderHistory(){
       <h4>ログインして、履歴をどの端末でも見られるように</h4>
       <p style="margin-bottom:12px;">Googleアカウントでログインすると、今の匿名データがそのまま引き継がれます。</p>
       <button class="google-btn" id="mypageGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>Googleでログイン</button>
-      <span style="margin:0 8px; color:var(--ink-soft); font-size:12px;">または</span>
+      <span style="margin:0 8px; color:#C9CDF5; font-size:12px;">または</span>
       <button class="ghost" id="toAccountBtn" style="font-size:12.5px; padding:8px 16px;">メールアドレスで同期</button>
     </div>
     ` : ""}
@@ -2424,7 +2480,7 @@ function renderAccount(){
       <label class="profile-label" for="emailInput">メールアドレス</label>
       <input type="email" id="emailInput" class="profile-input" placeholder="you@example.com">
       <button class="primary" id="linkEmailBtn" style="margin-top:14px; width:fit-content;">確認メールを送る</button>
-      <div id="linkMsg" style="font-size:13px; color:var(--ink-soft); margin-top:12px;"></div>
+      <div id="linkMsg" style="font-size:13px; color:#C9CDF5; margin-top:12px;"></div>
     </div>` : ""}
 
     <div class="start-row" style="margin-top:32px;">
@@ -2662,13 +2718,13 @@ async function renderIntro(){
         <p style="margin-bottom:14px;">ぼうけんのしょを　つくっておくと、しんだんの　きろくを　どの　たんまつからでも　みられるようになる。つくらずに　すすむことも　できる。</p>
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
           <button class="google-btn" id="introGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>Googleで　ぼうけんのしょを　つくる</button>
-          <span style="color:var(--ink-soft); font-size:12px;">または</span>
+          <span style="color:#C9CDF5; font-size:12px;">または</span>
         </div>
         <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
           <input type="email" id="introEmailInput" class="profile-input" placeholder="メールアドレス" style="flex:1; min-width:200px;">
           <button class="ghost" id="introEmailBtn" style="white-space:nowrap;">メールで　とうろく</button>
         </div>
-        <div id="introAccountMsg" style="font-size:12.5px; color:var(--ink-soft); margin-top:8px;"></div>
+        <div id="introAccountMsg" style="font-size:12.5px; color:#C9CDF5; margin-top:8px;"></div>
       `}
     </div>` : ""}
 
@@ -2988,7 +3044,7 @@ function renderOrgResults(){
       <div class="insight" style="margin-top:14px;">
         <h4>${cat.name}${userScore!=null ? ` <b>${userScore.toFixed(1)}</b>` : ""}</h4>
         <p>${f.reasons[0]}</p>
-        ${userScore!=null ? `<p style="margin-top:6px;">${userScore>=3.5 ? "あなたはすでにこの領域が強みです。この組織で特に活躍しやすいポイントと言えます。" : "あなたのこの領域のスコアはまだ発展途上です。この組織で重視される力なので、優先して伸ばすと良さそうです。"}</p>` : `<p style="margin-top:6px; color:var(--ink-soft);">PdMスキル診断も受けると、あなた自身のこの領域のスコアと突き合わせて分析できます。</p>`}
+        ${userScore!=null ? `<p style="margin-top:6px;">${userScore>=3.5 ? "あなたはすでにこの領域が強みです。この組織で特に活躍しやすいポイントと言えます。" : "あなたのこの領域のスコアはまだ発展途上です。この組織で重視される力なので、優先して伸ばすと良さそうです。"}</p>` : `<p style="margin-top:6px; color:#C9CDF5;">PdMスキル診断も受けると、あなた自身のこの領域のスコアと突き合わせて分析できます。</p>`}
       </div>`;
     }).join("")}
 
@@ -3274,16 +3330,26 @@ const ADVICE = {
    カテゴリごとに「研修・学習」「実務経験」「具体的タスク」の3方向で、
    弱みを補うための現実的なアクションをまとめたもの。 */
 const GROWTH_REMEDY = {
-  strategy:      { training:"グロービス経営大学院のプロダクトマネジメント講座や『INSPIRED』などの書籍で学ぶ", experience:"事業計画のレビュー会議に同席し、意思決定プロセスを観察する", task:"次期ロードマップのドラフト作成を、上長のレビュー付きで担当してみる" },
-  research:      { training:"ユーザーインタビュー・定量分析の入門講座（Udemy等）を受講する", experience:"リサーチャーやデータアナリストのインタビュー同席・分析レビューに参加する", task:"小規模な機能改善で、仮説検証のミニプロジェクトを一件回してみる" },
-  direction:     { training:"アジャイル／スクラムの認定研修（CSPO等）を受講する", experience:"開発チームのスプリントプランニング・振り返りに継続的に参加する", task:"小規模施策のスケジュール見積もりとリソース配分を任せてもらう" },
-  requirement:   { training:"要求定義・要件定義の書籍やテンプレートを使って自己学習する", experience:"エンジニア・デザイナーとの要件レビュー会に同席し、フィードバックをもらう", task:"1つの機能の要件定義書を自分で書き、レビューを受けてみる" },
-  design:        { training:"Figma等のプロトタイピングツールやUXライティングの講座を受講する", experience:"デザイナーのプロトタイプレビューやユーザビリティテストに同席する", task:"小さな画面のプロトタイプを自分で作成し、チームに共有してみる" },
-  release:       { training:"QA・テスト設計の基礎講座（JSTQB等）で体系的に学ぶ", experience:"QAチームのテスト計画レビューやリリース判定会議に同席する", task:"次回リリースのテスト観点洗い出しを担当してみる" },
-  communication: { training:"プレゼンテーションやファシリテーションの社外セミナーに参加する", experience:"社内勉強会や1on1でのフィードバックのやり取りを積極的に行う", task:"次の定例会議のファシリテーションを担当してみる" },
-  consulting:    { training:"交渉術やコンサルティングスキルに関する書籍・研修を受講する", experience:"クライアントや他部署との折衝の場に同席し、進め方を観察する", task:"小規模な期待値調整や交渉を任せてもらう" },
-  success:       { training:"カスタマーサクセスの基礎講座や実務コミュニティの勉強会に参加する", experience:"CSチームのオンボーディング・チャーン分析ミーティングに同席する", task:"1顧客分のオンボーディング改善案を企画してみる" },
-  global:        { training:"ビジネス英語・TOEIC対策講座やオンライン英会話を継続する", experience:"海外拠点とのミーティングやグローバルGTM会議に同席する", task:"英語でのドキュメント作成や簡単なプレゼンを担当してみる" },
+  strategy:      { training:"グロービス経営大学院のプロダクトマネジメント講座や『INSPIRED』などの書籍で学ぶ", experience:"事業計画のレビュー会議に同席し、意思決定プロセスを観察する", task:"次期ロードマップのドラフト作成を、上長のレビュー付きで担当してみる",
+    links:[{label:"Udemyでプロダクト戦略の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E6%88%A6%E7%95%A5"},{label:"グロービス学び放題（サービス概要）",url:"https://hodai.globis.co.jp/"}] },
+  research:      { training:"ユーザーインタビュー・定量分析の入門講座（Udemy等）を受講する", experience:"リサーチャーやデータアナリストのインタビュー同席・分析レビューに参加する", task:"小規模な機能改善で、仮説検証のミニプロジェクトを一件回してみる",
+    links:[{label:"Udemyでユーザーリサーチの講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%83%AA%E3%82%B5%E3%83%BC%E3%83%81"}] },
+  direction:     { training:"アジャイル／スクラムの認定研修（CSPO等）を受講する", experience:"開発チームのスプリントプランニング・振り返りに継続的に参加する", task:"小規模施策のスケジュール見積もりとリソース配分を任せてもらう",
+    links:[{label:"Certified Scrum Product Owner（公式情報）",url:"https://www.scrumalliance.org/get-certified/product-owner-track/certified-scrum-product-owner"}] },
+  requirement:   { training:"要求定義・要件定義の書籍やテンプレートを使って自己学習する", experience:"エンジニア・デザイナーとの要件レビュー会に同席し、フィードバックをもらう", task:"1つの機能の要件定義書を自分で書き、レビューを受けてみる",
+    links:[{label:"Udemyで要件定義の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9"}] },
+  design:        { training:"Figma等のプロトタイピングツールやUXライティングの講座を受講する", experience:"デザイナーのプロトタイプレビューやユーザビリティテストに同席する", task:"小さな画面のプロトタイプを自分で作成し、チームに共有してみる",
+    links:[{label:"Figma公式のチュートリアル",url:"https://www.figma.com/resources/learn-design/"},{label:"UdemyでUXライティングの講座を探す",url:"https://www.udemy.com/courses/search/?q=UX%E3%83%A9%E3%82%A4%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0"}] },
+  release:       { training:"QA・テスト設計の基礎講座（JSTQB等）で体系的に学ぶ", experience:"QAチームのテスト計画レビューやリリース判定会議に同席する", task:"次回リリースのテスト観点洗い出しを担当してみる",
+    links:[{label:"JSTQB（公式サイト）",url:"https://jstqb.jp/"}] },
+  communication: { training:"プレゼンテーションやファシリテーションの社外セミナーに参加する", experience:"社内勉強会や1on1でのフィードバックのやり取りを積極的に行う", task:"次の定例会議のファシリテーションを担当してみる",
+    links:[{label:"Udemyでファシリテーションの講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%95%E3%82%A1%E3%82%B7%E3%83%AA%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3"}] },
+  consulting:    { training:"交渉術やコンサルティングスキルに関する書籍・研修を受講する", experience:"クライアントや他部署との折衝の場に同席し、進め方を観察する", task:"小規模な期待値調整や交渉を任せてもらう",
+    links:[{label:"Udemyで交渉術の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E4%BA%A4%E6%B8%89%E8%A1%93"}] },
+  success:       { training:"カスタマーサクセスの基礎講座や実務コミュニティの勉強会に参加する", experience:"CSチームのオンボーディング・チャーン分析ミーティングに同席する", task:"1顧客分のオンボーディング改善案を企画してみる",
+    links:[{label:"Udemyでカスタマーサクセスの講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%9E%E3%83%BC%E3%82%B5%E3%82%AF%E3%82%BB%E3%82%B9"}] },
+  global:        { training:"ビジネス英語・TOEIC対策講座やオンライン英会話を継続する", experience:"海外拠点とのミーティングやグローバルGTM会議に同席する", task:"英語でのドキュメント作成や簡単なプレゼンを担当してみる",
+    links:[{label:"TOEIC公式サイト",url:"https://www.iibc-global.org/toeic.html"},{label:"Udemyでビジネス英語の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%93%E3%82%B8%E3%83%8D%E3%82%B9%E8%8B%B1%E8%AA%9E"}] },
 };
 
 function renderResults(){
@@ -3309,6 +3375,7 @@ function renderResults(){
   const matrix = hasMbti ? buildCategoryMatrix(state.mbti) : null;
   const entrustRec = hasMbti ? buildEntrustRecommendation(state.mbti, pdmType, topCatForEntrust.name) : null;
   const teamFitMbti = hasMbti ? mbtiTeamFit(state.mbti) : null;
+  const compatibleTeammates = hasMbti ? buildCompatibleTeammates(state.mbti) : null;
 
   const seniorityKey = determineSeniorityKey(avg);
   const hensachi = calcHensachi(avg);
@@ -3460,7 +3527,7 @@ function renderResults(){
     <div class="insight fusion">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
         <div class="mbti-icon" style="background:var(--bg); width:48px; height:48px; border:2px solid ${mbtiMeta.color};"><span style="color:#fff; display:flex;">${mbtiIconSvg(mbtiMeta,30)}</span></div>
-        <div style="font-family:'Zen Kaku Gothic New',sans-serif; font-weight:700; font-size:15px;">${state.mbti}｜${mbtiMeta.nickname}<span style="display:block; font-size:11.5px; color:var(--ink-soft); font-weight:500; font-family:'Noto Sans JP',sans-serif;">${mbtiMeta.groupName}</span></div>
+        <div style="font-family:var(--pixel-font); font-weight:700; font-size:15px; color:#fff;">${state.mbti}｜${mbtiMeta.nickname}<span style="display:block; font-size:11.5px; color:#C9CDF5; font-weight:500; font-family:var(--pixel-font);">${mbtiMeta.groupName}</span></div>
       </div>
       <p>${MBTI_BLURB[state.mbti]}</p>
       <div class="pill-row">
@@ -3496,7 +3563,7 @@ function renderResults(){
     </div>
 
     <div class="section-label">属性タグ × スキルスコアの掛け合わせ分析</div>
-    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+    <p style="font-size:13px; color:#C9CDF5; margin-top:8px;">
       MBTIの一般的な傾向（性格的な資質）と、実際の49項目診断のスコア（実務経験）を10カテゴリごとに重ね合わせています。
       両方が高ければ「鉄板の強み」、資質はあるのにスコアが伴っていなければ「伸びしろ大」、資質的には苦手なのにスコアが高ければ「努力で築いた強み」、
       両方低ければ「要フォロー」として最優先の育成ポイントになります。
@@ -3519,7 +3586,7 @@ function renderResults(){
       </div>
     </div>` : `
     <div class="section-label">属性タグ × スキル分析</div>
-    <div class="insight" style="border-left-color:var(--ink-soft);">
+    <div class="insight" style="border-left-color:#666;">
       <p>MBTIを選択すると、性格タイプの属性タグと49項目のスコアを掛け合わせた詳細分析（得意・不得意な日常業務、意思決定スタイル、任せると強い仕事など）が表示されます。結果画面下部の「MBTIを選び直す」からいつでも追加できます。</p>
     </div>`}
 
@@ -3547,7 +3614,7 @@ function renderResults(){
     </div>
 
     <div class="section-label">強み・弱みのSWOT分析</div>
-    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+    <p style="font-size:13px; color:#C9CDF5; margin-top:8px;">
       S・Wはスキル診断のスコアから、O・TはMBTIとの掛け合わせ分析（属性タグ×スキルスコア）から構成しています。
     </p>
     <div class="swot-grid">
@@ -3578,16 +3645,20 @@ function renderResults(){
     <div class="section-label">次に身につけると良いスキル</div>
     <div class="insight fusion" style="margin-top:10px;">
       <h4>${nextSkill.skill.name} <b>${nextSkill.skill.v}</b></h4>
-      <p style="font-size:12px; color:var(--ink-soft); margin-bottom:8px;">「${nextSkill.catName}」領域の中で、現時点で最もスコアが低い項目です。ここを伸ばすと、全体のバランスが底上げされやすくなります。</p>
+      <p style="font-size:12px; color:#C9CDF5; margin-bottom:8px;">「${nextSkill.catName}」領域の中で、現時点で最もスコアが低い項目です。ここを伸ばすと、全体のバランスが底上げされやすくなります。</p>
       ${nextSkill.remedy ? `
-      <p><b style="color:var(--ink);">リスキリングのアイデア：</b>${nextSkill.remedy.training}</p>
-      <p style="margin-top:4px;"><b style="color:var(--ink);">実践のヒント：</b>${nextSkill.remedy.task}</p>
+      <p><b style="color:var(--gold);">リスキリングのアイデア：</b>${nextSkill.remedy.training}</p>
+      <p style="margin-top:4px;"><b style="color:var(--gold);">実践のヒント：</b>${nextSkill.remedy.task}</p>
+      ${nextSkill.remedy.links && nextSkill.remedy.links.length ? `
+      <div class="pill-row" style="margin-top:10px;">
+        ${nextSkill.remedy.links.map(l=>`<a class="pill" href="${l.url}" target="_blank" rel="noopener" style="text-decoration:none;">${l.label} ↗</a>`).join("")}
+      </div>` : ""}
       ` : ""}
     </div>
     ` : ""}
 
     <div class="section-label">弱みを補うアクション</div>
-    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+    <p style="font-size:13px; color:#C9CDF5; margin-top:8px;">
       平均3.5未満のカテゴリごとに、研修・実務経験・具体的タスクの3方向で近道になりそうなアクションをまとめました。
     </p>
     ${growthCats.length ? growthCats.map(c=>{
@@ -3595,9 +3666,13 @@ function renderResults(){
       return `
       <div class="insight weak">
         <h4>${c.name} <b>${categoryAverage(c).toFixed(1)}</b></h4>
-        <p><b style="color:var(--ink);">研修・学習：</b>${remedy.training}</p>
-        <p><b style="color:var(--ink);">実務経験：</b>${remedy.experience}</p>
-        <p><b style="color:var(--ink);">具体的タスク：</b>${remedy.task}</p>
+        <p><b style="color:var(--gold);">研修・学習：</b>${remedy.training}</p>
+        <p><b style="color:var(--gold);">実務経験：</b>${remedy.experience}</p>
+        <p><b style="color:var(--gold);">具体的タスク：</b>${remedy.task}</p>
+        ${remedy.links && remedy.links.length ? `
+        <div class="pill-row" style="margin-top:10px;">
+          ${remedy.links.map(l=>`<a class="pill" href="${l.url}" target="_blank" rel="noopener" style="text-decoration:none;">${l.label} ↗</a>`).join("")}
+        </div>` : ""}
       </div>`;
     }).join("") : `
     <div class="insight strong">
@@ -3605,7 +3680,7 @@ function renderResults(){
     </div>`}
 
     <div class="section-label">将来のキャリアパス</div>
-    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+    <p style="font-size:13px; color:#C9CDF5; margin-top:8px;">
       ジュニア→ミドル→シニアPdMとステップアップした先には、いくつかの分岐があります。金額は各種転職メディアの公開データをもとにした目安です。
     </p>
     <div class="career-main">
@@ -3672,8 +3747,21 @@ function renderResults(){
       ${teamFitMbti.map(line=>`<p>${line}</p>`).join("")}
     </div>` : ""}
 
+    ${compatibleTeammates ? `
+    <div class="section-label" style="margin-top:28px;">パーティーに　くわえたい　なかま　3にん</div>
+    <p style="font-size:12px; color:#B8BEFF; margin-top:8px;">きみの　せいかく（${state.mbti}）と　もっとも　ちがう　タイプを、しょくむべつに　えらんだ。せいかくの　ちがいが　おおきいほど、たがいの　にがてを　おぎないやすい。</p>
+    <div class="teammate-grid">
+      ${compatibleTeammates.map(tm=>`
+        <div class="teammate-card">
+          <div class="teammate-job">${tm.jobLabel}</div>
+          <div class="teammate-mbti">${tm.mbti}</div>
+          <div class="teammate-nick">${tm.nickname}</div>
+          <div class="teammate-diff">ちがい：${tm.diffLetters}</div>
+        </div>`).join("")}
+    </div>` : ""}
+
     <div class="section-label">あなたに近い公開求人</div>
-    <p style="font-size:13px; color:var(--ink-soft); margin-top:8px;">
+    <p style="font-size:13px; color:#C9CDF5; margin-top:8px;">
       診断タイプ（${pdmType.label}）とレベル（${seniority.label}）に近い、実在の公開求人情報から抜粋しています。
       掲載企業・給与・募集状況は変動するため、応募の際は必ず出典元ページで最新情報をご確認ください。
     </p>
