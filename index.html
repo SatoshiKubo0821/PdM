@@ -267,7 +267,6 @@
   .monster-hp-num{font-family:var(--pixel-font); color:#fff; font-size:13px; margin-top:2px;}
   #monsterHpNum.hp-yellow{color:#F8C630;}
   #monsterHpNum.hp-red{color:#E6432E;}
-  .monster-svg-icon{width:220px; height:220px;}
   .battle-float-icon.hit-spark{color:#F8C630; font-size:28px; animation:coinFall 0.5s ease-out forwards;}
   @media (max-width:480px){
     .dq-stat-name{width:110px; font-size:11px;}
@@ -1355,36 +1354,6 @@ function rollDamage(attackerPower, moveMult, defenderDef){
   const jitter = 0.85 + Math.random()*0.3;
   return { dmg: Math.round(base*jitter), missed:false };
 }
-const MONSTER_ICON_SVG = {
-  slime: `<ellipse cx="50" cy="62" rx="36" ry="26" fill="#4696F0"/>
-    <path d="M16 62 Q22 84 36 68 Q44 90 50 70 Q56 90 64 68 Q78 84 84 62" fill="#4696F0"/>
-    <ellipse cx="38" cy="56" rx="6" ry="8" fill="#fff"/><ellipse cx="62" cy="56" rx="6" ry="8" fill="#fff"/>
-    <circle cx="38" cy="59" r="3" fill="#0a1f3d"/><circle cx="62" cy="59" r="3" fill="#0a1f3d"/>
-    <path d="M40 70 Q50 77 60 70" stroke="#1a3a6b" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
-  chimera: `<ellipse cx="52" cy="70" rx="32" ry="18" fill="#B8860B"/>
-    <circle cx="34" cy="42" r="17" fill="#D2A441"/>
-    <path d="M20 30 L14 12 L29 24 Z" fill="#D2A441"/><path d="M48 30 L54 12 L40 24 Z" fill="#D2A441"/>
-    <circle cx="29" cy="40" r="2.5" fill="#1a0f00"/><circle cx="39" cy="40" r="2.5" fill="#1a0f00"/>
-    <path d="M28 48 Q34 52 40 48" stroke="#5a3a00" stroke-width="2" fill="none"/>
-    <circle cx="72" cy="46" r="11" fill="#8B4513"/><path d="M65 38 L60 26 L72 34 Z" fill="#8B4513"/>
-    <circle cx="68" cy="44" r="1.8" fill="#000"/><circle cx="76" cy="44" r="1.8" fill="#000"/>
-    <path d="M84 62 Q98 55 92 42" stroke="#B22222" stroke-width="4.5" fill="none" stroke-linecap="round"/>`,
-  dragon: `<ellipse cx="50" cy="62" rx="27" ry="23" fill="#C0392B"/>
-    <path d="M50 28 L38 8 L56 18 Z" fill="#C0392B"/>
-    <path d="M14 46 Q-2 28 10 10 Q22 32 32 40 Z" fill="#922B21"/>
-    <path d="M86 46 Q102 28 90 10 Q78 32 68 40 Z" fill="#922B21"/>
-    <circle cx="41" cy="54" r="3.5" fill="#FFEB3B"/><circle cx="59" cy="54" r="3.5" fill="#FFEB3B"/>
-    <path d="M36 70Q50 78 64 70" stroke="#5c1a12" stroke-width="2.5" fill="none"/>
-    <path d="M68 78 Q90 88 96 104" stroke="#922B21" stroke-width="7" fill="none" stroke-linecap="round"/>`,
-  orochi: `<path d="M30 78 Q18 46 34 22" stroke="#4B0082" stroke-width="11" fill="none" stroke-linecap="round"/>
-    <path d="M50 82 Q50 46 50 14" stroke="#5A0FA0" stroke-width="11" fill="none" stroke-linecap="round"/>
-    <path d="M70 78 Q82 46 66 22" stroke="#4B0082" stroke-width="11" fill="none" stroke-linecap="round"/>
-    <circle cx="34" cy="19" r="9" fill="#6A0DAD"/><circle cx="50" cy="11" r="9" fill="#7A1DC0"/><circle cx="66" cy="19" r="9" fill="#6A0DAD"/>
-    <circle cx="31" cy="17" r="1.6" fill="#FF3030"/><circle cx="37" cy="17" r="1.6" fill="#FF3030"/>
-    <circle cx="47" cy="9" r="1.6" fill="#FF3030"/><circle cx="53" cy="9" r="1.6" fill="#FF3030"/>
-    <circle cx="63" cy="17" r="1.6" fill="#FF3030"/><circle cx="69" cy="17" r="1.6" fill="#FF3030"/>
-    <ellipse cx="50" cy="90" rx="26" ry="14" fill="#4B0082"/>`,
-};
 function getCurrentTierRank(){
   const avg = overallAverage();
   const typeResult = determinePdmType();
@@ -2862,9 +2831,7 @@ function renderMonsterSelect(){
       ${MONSTERS.map(m=>`
         <div class="monster-select-card" data-key="${m.key}">
           <div class="monster-select-icon">
-            ${m.key==="demonking"
-              ? `<img src="./assets/battle/demon_king.png" alt="${m.name}">`
-              : `<svg viewBox="0 0 100 100">${MONSTER_ICON_SVG[m.icon]}</svg>`}
+            <img src="./assets/monsters/${m.icon}.png" alt="${m.name}">
           </div>
           <div class="monster-select-name">${m.name}</div>
           <div class="monster-select-theme">${m.theme}</div>
@@ -2917,9 +2884,7 @@ function renderMonsterBattle(){
       <div class="battle-center">
         <div class="battle-enemy-area">
           <div class="battle-effect-layer" id="battleEffectLayer"></div>
-          ${monster.key==="demonking"
-            ? `<img src="./assets/battle/demon_king.png" alt="${monster.name}" class="battle-enemy-img" id="battleEnemyImg">`
-            : `<svg viewBox="0 0 100 100" class="battle-enemy-img monster-svg-icon" id="battleEnemyImg">${MONSTER_ICON_SVG[monster.icon]}</svg>`}
+          <img src="./assets/monsters/${monster.icon}.png" alt="${monster.name}" class="battle-enemy-img" id="battleEnemyImg">
         </div>
         <div class="battle-log" id="battleLog">${monster.name}が　あらわれた！</div>
       </div>
