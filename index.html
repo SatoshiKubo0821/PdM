@@ -986,6 +986,23 @@
   .insight.fusion{border-left-color:var(--gold); background:#1a1400;}
   .insight.neutral{border-left-color:#666;}
   .history-row{transition:border-color .12s ease, transform .12s ease;}
+  .history-row-card{
+    display:flex; gap:14px; align-items:flex-start;
+    background:#000; border:2px solid #fff; box-shadow:0 0 0 2px #000;
+    padding:14px 16px; margin-top:12px; cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .history-row-card:hover{transform:translate(2px,2px);}
+  .history-row-icon{
+    width:56px; height:56px; flex-shrink:0; border:2px solid #fff; overflow:hidden;
+  }
+  .history-row-icon img{width:100%; height:100%; object-fit:cover; image-rendering:pixelated;}
+  .history-row-body{flex:1; min-width:0;}
+  .history-row-top{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .history-row-date{font-family:var(--pixel-font); font-size:12px; color:#B8BEFF;}
+  .history-row-nick{font-family:var(--pixel-font); font-size:13px; color:#fff; font-weight:700;}
+  .history-row-job{font-family:var(--pixel-font); font-size:13px; color:var(--gold); margin-top:4px;}
+  .history-row-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
   .history-row:hover{border-color:var(--gold); transform:translateX(2px);}
   .insight h4{
     margin:0 0 6px;
@@ -1714,8 +1731,6 @@ function buildRPGStats(){
     : Math.round(lv * 1000);
 
   const hp = Math.max(10, Math.round(staminaAvg * 40));
-  // さいだいHPも、Lvに応じて変動させる（これまでのように固定200に戻らないようにする）
-  const maxHp = Math.max(hp, Math.round(60 + lv * 1.6));
   const maxMp = 150;
   // MPはランダムに決定する。診断のたびに毎回変わらないよう、一度決めたらstateにキャッシュする
   if(state.rpgMp == null){
@@ -1723,7 +1738,7 @@ function buildRPGStats(){
   }
   const mp = state.rpgMp;
 
-  return { lv, hp, maxHp, mp, maxMp, exp };
+  return { lv, hp, mp, maxMp, exp };
 }
 
 /* カテゴリスコア(1〜5)を、ドラクエ3風の能力値スケール(1〜255)に変換する */
@@ -2605,7 +2620,12 @@ async function ensureSession(){
 }
 
 async function saveDiagnosisToCloud(payload){
-  if(!supabaseClient || !state.userId || state.savedThisResult) return;
+  if(!supabaseClient || state.savedThisResult) return;
+  if(!state.userId){
+    // セッションがまだ確立していない場合、あきらめる前にもう一度だけ試みる
+    await ensureSession();
+    if(!state.userId) return;
+  }
   try{
     const { error } = await supabaseClient.from("diagnoses").insert({
       user_id: state.userId,
@@ -2714,18 +2734,33 @@ async function renderHistory(){
     </div>
     ` : ""}
 
-    <div class="section-label" style="margin-top:32px;">診断履歴</div>
+    <div class="section-label" style="margin-top:32px;">ぼうけんの書</div>
     ${rows.length===0 ? `
     <div class="insight" style="margin-top:14px;"><p>まだ保存された診断履歴がありません。診断を完了すると、ここに記録されていきます。</p></div>
     ` : rows.map(r=>{
       const date = new Date(r.created_at).toLocaleDateString("ja-JP", {year:"numeric", month:"short", day:"numeric"});
       const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
       const seniorityLabel = SENIORITY[r.seniority] ? SENIORITY[r.seniority].label : r.seniority;
+      const jobClass = getJobClass(r.pdm_type, r.seniority);
       return `
-      <div class="insight history-row" data-id="${r.id}" style="cursor:pointer;">
-        <h4>${date}${r.nickname ? `｜${r.nickname}さん` : ""} <b>${Number(r.overall_avg).toFixed(1)}</b></h4>
-        <p>${typeLabel}／${seniorityLabel}／偏差値${r.hensachi}${r.mbti ? "／"+r.mbti : ""}${r.experience_years!=null ? `／経験${r.experience_years}年` : ""}</p>
-        <p style="margin-top:6px; font-size:12px; color:var(--gold);">タップして当時の詳細結果を見る →</p>
+      <div class="history-row-card" data-id="${r.id}">
+        <div class="history-row-icon"><img src="./assets/jobs/${jobClass.icon}.png" alt="${jobClass.name}"></div>
+        <div class="history-row-body">
+          <div class="history-row-top">
+            <span class="history-row-date">${date}</span>
+            ${r.nickname ? `<span class="history-row-nick">${r.nickname}さん</span>` : ""}
+          </div>
+          <div class="history-row-job">${jobClass.name}（${jobClass.tierLabel}）</div>
+          <div class="history-row-tags">
+            <span class="pill">${typeLabel}</span>
+            <span class="pill">${seniorityLabel}</span>
+            <span class="pill">偏差値<b>${r.hensachi}</b></span>
+            <span class="pill">平均<b>${Number(r.overall_avg).toFixed(1)}</b></span>
+            ${r.mbti ? `<span class="pill">${r.mbti}</span>` : ""}
+            ${r.experience_years!=null ? `<span class="pill">経験${r.experience_years}年</span>` : ""}
+          </div>
+          <p style="margin-top:8px; font-size:12px; color:var(--gold);">タップして当時の詳細結果を見る →</p>
+        </div>
       </div>`;
     }).join("")}
 
@@ -2742,7 +2777,7 @@ async function renderHistory(){
   if(logoutBtnPage) logoutBtnPage.onclick = signOutUser;
   document.getElementById("backHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
 
-  app.querySelectorAll(".history-row").forEach(el=>{
+  app.querySelectorAll(".history-row-card").forEach(el=>{
     el.onclick = ()=>{
       const id = el.getAttribute("data-id");
       const row = rows.find(r=>String(r.id)===String(id));
@@ -2882,7 +2917,7 @@ function renderMonsterBattle(){
   const myTier = getCurrentTierRank();
   const isLegendary = myTier >= 4;
   const rpg = buildRPGStats();
-  const maxHp = rpg.maxHp, maxMp = rpg.maxMp;
+  const maxHp = rpg.hp, maxMp = rpg.maxMp;
   const mStats = MONSTER_STATS[monster.key] || MONSTER_STATS.slime;
   const { atk: playerAtk, def: playerDef } = computePlayerBattleStats();
 
@@ -2916,7 +2951,8 @@ function renderMonsterBattle(){
         <p id="battleDeathText1"></p>
         <p id="battleDeathText2" style="margin-top:14px;"></p>
         <div class="battle-death-choice" id="battleDeathChoice" style="display:none;">
-          <button class="primary" id="battleYesBtn">はい</button>
+          <button class="primary" id="battleAgainBtn">モンスターと　たたかう</button>
+          <button class="ghost" id="battleTopBtn" style="margin-top:10px;">トップに　もどる</button>
         </div>
       </div>
     </div>
@@ -3108,7 +3144,12 @@ function renderMonsterBattle(){
 
   setTimeout(nextTurn, TURN_DELAY);
 
-  document.getElementById("battleYesBtn").onclick = ()=>{
+  document.getElementById("battleAgainBtn").onclick = ()=>{
+    state.selectedMonster = null;
+    state.screen = "monsterSelect";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("battleTopBtn").onclick = ()=>{
     state.selectedMonster = null;
     state.screen = "intro";
     render(); window.scrollTo(0,0);
@@ -4191,8 +4232,8 @@ function renderResults(){
         <div class="dq-status-col">
           <div class="dq-bar-row">
             <span class="dq-bar-label">HP</span>
-            <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:${Math.min(100, rpg.hp/rpg.maxHp*100)}%;"></div></div>
-            <span class="dq-bar-num">${rpg.hp}/${rpg.maxHp}</span>
+            <div class="pixel-bar-track" style="flex:1;"><div class="pixel-bar-fill" style="width:100%;"></div></div>
+            <span class="dq-bar-num">${rpg.hp}</span>
           </div>
           <div class="dq-bar-row">
             <span class="dq-bar-label">MP</span>
