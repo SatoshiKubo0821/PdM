@@ -2725,6 +2725,7 @@ async function renderHistory(){
         certifications: row.certifications || "",
         nickname: row.nickname || "",
         experienceYears: row.experience_years ?? null,
+        age: row.age ?? null,
       };
       state.savedThisResult = true; // 過去の結果を開いただけなので、新規保存はしない
       state.viewingHistory = row.created_at;
@@ -4462,6 +4463,14 @@ function renderResults(){
     state.screen="orgAssess"; render(); window.scrollTo(0,0);
   };
 
+  const monsterFightBtn = document.getElementById("monsterFightBtn");
+  if(monsterFightBtn){
+    monsterFightBtn.onclick = ()=>{
+      state.screen = "monsterSelect";
+      render(); window.scrollTo(0,0);
+    };
+  }
+
   if(state.viewingHistory){
     document.getElementById("toHistoryBtn").onclick = ()=>{
       state.viewingHistory=null;
@@ -4514,13 +4523,6 @@ function renderResults(){
     state.screen="intro";
     render(); window.scrollTo(0,0);
   };
-  const monsterFightBtn = document.getElementById("monsterFightBtn");
-  if(monsterFightBtn){
-    monsterFightBtn.onclick = ()=>{
-      state.screen = "monsterSelect";
-      render(); window.scrollTo(0,0);
-    };
-  }
 }
 
 (async function boot(){
