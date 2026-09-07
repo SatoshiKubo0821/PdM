@@ -1311,23 +1311,49 @@ const MONSTERS = [
   { key:"orochi",     name:"ピーエムエフおろち", theme:"プロダクトマーケットフィット実現", requiredTier:3, icon:"orochi" },
   { key:"demonking",  name:"アイピーまおう",     theme:"IPO実現",                        requiredTier:4, icon:"demonking" },
 ];
-/* モンスターごとの攻撃こうげき名のプール（確率で抽選する）。スライムは通常こうげきのみ。 */
-const MONSTER_ATTACK_POOL = {
-  slime:     [ { name:"こうげき", weight:1 } ],
-  chimera:   [ { name:"えんじょう", weight:0.5 }, { name:"こうげき", weight:0.5 } ],
-  dragon:    [ { name:"だいえんじょう", weight:0.5 }, { name:"とうそつりょくていか", weight:0.25 }, { name:"さらなるおいうち", weight:0.25 } ],
-  orochi:    [ { name:"しきんショート", weight:0.25 }, { name:"たいりょうたいしょく", weight:0.25 }, { name:"えむえーゆーが　のびない", weight:0.25 }, { name:"とどめの　いちげき", weight:0.25 } ],
-  demonking: [ { name:"とうしかの　いかり", weight:0.25 }, { name:"かんさの　れんごく", weight:0.25 }, { name:"ならない　かね", weight:0.25 }, { name:"しめつの　いちげき", weight:0.25 } ],
+/* モンスターごとの基礎ステータス（HP・こうげきりょく・ぼうぎょりょく） */
+const MONSTER_STATS = {
+  slime:     { hp:80,  atk:16, def:5 },
+  chimera:   { hp:140, atk:30, def:13 },
+  dragon:    { hp:155, atk:33, def:15 },
+  orochi:    { hp:200, atk:46, def:21 },
+  demonking: { hp:250, atk:58, def:26 },
 };
-function pickMonsterAttackName(monsterKey){
+/* モンスターごとの攻撃こうげき名のプール（確率で抽選する）。各わざには威力倍率がある。
+   しめつのいちげきのみ instantKill:true とし、命中すれば必ずHPをゼロにする。 */
+const MONSTER_ATTACK_POOL = {
+  slime:     [ { name:"こうげき", weight:1, mult:1.0 } ],
+  chimera:   [ { name:"えんじょう", weight:0.5, mult:1.35 }, { name:"こうげき", weight:0.5, mult:0.9 } ],
+  dragon:    [ { name:"だいえんじょう", weight:0.5, mult:1.5 }, { name:"とうそつりょくていか", weight:0.25, mult:0.85 }, { name:"さらなるおいうち", weight:0.25, mult:1.15 } ],
+  orochi:    [ { name:"しきんショート", weight:0.25, mult:1.1 }, { name:"たいりょうたいしょく", weight:0.25, mult:1.2 }, { name:"えむえーゆーが　のびない", weight:0.25, mult:1.0 }, { name:"とどめの　いちげき", weight:0.25, mult:1.6 } ],
+  demonking: [ { name:"とうしかの　いかり", weight:0.25, mult:1.2 }, { name:"かんさの　れんごく", weight:0.25, mult:1.35 }, { name:"ならない　かね", weight:0.25, mult:1.1 }, { name:"しめつの　いちげき", weight:0.25, mult:null, instantKill:true } ],
+};
+function pickMonsterMove(monsterKey){
   const pool = MONSTER_ATTACK_POOL[monsterKey] || MONSTER_ATTACK_POOL.slime;
   const r = Math.random();
   let acc = 0;
   for(const item of pool){
     acc += item.weight;
-    if(r <= acc) return item.name;
+    if(r <= acc) return item;
   }
-  return pool[pool.length-1].name;
+  return pool[pool.length-1];
+}
+/* プレイヤーのこうげきりょく・ぼうぎょりょくを、診断ステータス（Lv相当のランク・スキル平均）から算出する */
+function computePlayerBattleStats(){
+  const tierRank = getCurrentTierRank();
+  const avg = overallAverage();
+  const atk = 25 + tierRank*12 + avg*7;
+  const def = 12 + tierRank*6 + avg*3;
+  return { atk, def };
+}
+/* こうげき／じゅもん／とくぎの命中判定つきダメージ計算。30%でミスし、ダメージ0になる。 */
+const BATTLE_MISS_RATE = 0.30;
+function rollDamage(attackerPower, moveMult, defenderDef){
+  if(Math.random() < BATTLE_MISS_RATE) return { dmg:0, missed:true };
+  const raw = attackerPower * moveMult - defenderDef * 0.5;
+  const base = Math.max(6, raw);
+  const jitter = 0.85 + Math.random()*0.3;
+  return { dmg: Math.round(base*jitter), missed:false };
 }
 const MONSTER_ICON_SVG = {
   slime: `<ellipse cx="50" cy="62" rx="36" ry="26" fill="#4696F0"/>
@@ -2866,8 +2892,11 @@ function renderMonsterBattle(){
   const monster = MONSTERS.find(m=>m.key===state.selectedMonster) || MONSTERS[0];
   const heroName = state.profile.nickname && state.profile.nickname.trim() ? state.profile.nickname.trim() : "ぼうけんしゃ";
   const myTier = getCurrentTierRank();
-  const willWin = myTier >= monster.requiredTier;
-  const maxHp = 200;
+  const isLegendary = myTier >= 4;
+  const rpg = buildRPGStats();
+  const maxHp = rpg.maxHp, maxMp = rpg.maxMp;
+  const mStats = MONSTER_STATS[monster.key] || MONSTER_STATS.slime;
+  const { atk: playerAtk, def: playerDef } = computePlayerBattleStats();
 
   app.innerHTML = `
     <div class="battle-scene">
@@ -2876,13 +2905,13 @@ function renderMonsterBattle(){
           <span>なまえ</span><span>LV</span><span>HP</span><span>MP</span>
         </div>
         <div class="status-row">
-          <span>${heroName}</span><span>12</span><span id="battleHpNum">${maxHp}</span><span>8</span>
+          <span>${heroName}</span><span>${rpg.lv}</span><span id="battleHpNum">${rpg.hp}</span><span id="battleMpNum">${rpg.mp}</span>
         </div>
       </div>
 
       <div class="monster-hp-box">
         <div class="monster-hp-name">${monster.name}</div>
-        <div class="monster-hp-num">HP <span id="monsterHpNum">${maxHp}</span></div>
+        <div class="monster-hp-num">HP <span id="monsterHpNum">${mStats.hp}</span></div>
       </div>
 
       <div class="battle-center">
@@ -2913,10 +2942,10 @@ function renderMonsterBattle(){
   const enemyImg = document.getElementById("battleEnemyImg");
   const effectLayer = document.getElementById("battleEffectLayer");
 
-  function updateHpColor(el, hp){
+  function updateHpColor(el, hp, hpMax){
     el.classList.remove("hp-yellow","hp-red");
     if(hp === 0){ el.classList.add("hp-red"); }
-    else if(hp <= maxHp/2){ el.classList.add("hp-yellow"); }
+    else if(hp <= hpMax/2){ el.classList.add("hp-yellow"); }
   }
 
   function spawnHitSpark(x, y){
@@ -2926,6 +2955,13 @@ function renderMonsterBattle(){
     el.textContent = "★";
     effectLayer.appendChild(el);
     setTimeout(()=>el.remove(), 500);
+  }
+
+  function shakeAndFlash(){
+    enemyImg.classList.add("battle-shake");
+    setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
+    document.querySelector(".battle-scene").classList.add("battle-flash");
+    setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
   }
 
   function typeMessage(el, text, onDone){
@@ -2938,93 +2974,132 @@ function renderMonsterBattle(){
     }, 45);
   }
 
-  // プレイヤーのこうげきは、分析画面で「おぼえているとくぎ・じゅもん」に表示された実際のスキルを使う
+  // プレイヤーのこうげきは、分析画面で「おぼえているとくぎ・じゅもん」に表示された実際のスキルからランダムに選ぶ
   const myTechniques = buildSkillTechniques();
-  const playerActions = [0,1,2,3].map(i=>myTechniques[i % myTechniques.length]);
 
-  // ダメージはスキルスコアに応じて重み付けしつつ、若干の乱数で毎回変化させる。
-  // 勝つ場合はプレイヤーの合計ダメージがちょうどモンスターの最大HPに達するよう最終手で調整する。
-  function buildDamageSet(total, weights, forceExactTotal){
-    const weightSum = weights.reduce((a,b)=>a+b,0) || 1;
-    const dmgs = weights.map(w=>{
-      const base = total * (w / weightSum);
-      const jitter = 0.82 + Math.random()*0.36; // ±18%程度のばらつき
-      return Math.max(4, Math.round(base * jitter));
-    });
-    if(forceExactTotal){
-      const sumExceptLast = dmgs.slice(0,-1).reduce((a,b)=>a+b,0);
-      dmgs[dmgs.length-1] = Math.max(8, total - sumExceptLast);
-    }
-    return dmgs;
-  }
+  let pHp = maxHp, mHp = mStats.hp;
+  let legendaryRevived = false, graceRevived = false;
+  const TURN_DELAY = 1500, REVEAL_DELAY = 700, REACTION_DELAY = 1700;
+  let turnCount = 0;
+  const MAX_TURNS = 8; // 安全装置：長引きすぎた場合は残りHP割合の高い方を勝者とする
 
-  const playerWeights = playerActions.map(a=>a.v);
-  const playerDmg = willWin
-    ? buildDamageSet(maxHp, playerWeights, true)          // 勝つ場合：合計でちょうどモンスターを倒しきる
-    : buildDamageSet(Math.round(maxHp*0.24), playerWeights, false); // 負ける場合：かすり傷程度
-  const monsterDmg = willWin
-    ? buildDamageSet(Math.round(maxHp*0.23), [1,1,1,1], false)      // 勝つ場合：プレイヤーは軽傷で済む
-    : buildDamageSet(maxHp, [1,1,1,1], true);                        // 負ける場合：合計でちょうどプレイヤーを倒しきる
-
-  const sequence = [];
-  let pHp = maxHp, mHp = maxHp;
-  for(let i=0;i<4;i++){
-    const dmg = Math.min(mHp, playerDmg[i]);
-    mHp = Math.max(0, mHp - dmg);
-    sequence.push({ actor:"player", action:playerActions[i], dmg, pHp, mHp });
-    if(mHp<=0) break;
-    const mdmg = Math.min(pHp, monsterDmg[i]);
-    pHp = Math.max(0, pHp - mdmg);
-    sequence.push({ actor:"monster", dmg:mdmg, pHp, mHp, attackName:pickMonsterAttackName(monster.key) });
-    if(pHp<=0) break;
-  }
-
-  sequence.forEach((step, idx)=>{
-    const baseDelay = (idx+1) * 1600;
+  function endBattle(win){
     setTimeout(()=>{
-      if(step.actor === "player"){
-        battleLog.textContent = `${heroName}の　${step.action.name}！`;
-        enemyImg.classList.add("battle-shake");
-        setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
-        spawnHitSpark(45+Math.random()*10, 35+Math.random()*10);
+      const overlay = document.getElementById("battleDeathOverlay");
+      overlay.style.display = "flex";
+      if(win){
+        typeMessage(document.getElementById("battleDeathText1"), `${monster.name}を　たおした！`, ()=>{
+          typeMessage(document.getElementById("battleDeathText2"), `${heroName}は　レベルアップした！`, ()=>{
+            document.getElementById("battleDeathChoice").style.display = "block";
+          });
+        });
       }else{
-        battleLog.textContent = `${monster.name}の　${step.attackName}！`;
+        typeMessage(document.getElementById("battleDeathText1"), `${heroName}は　しんでしまった。`, ()=>{
+          typeMessage(document.getElementById("battleDeathText2"), "しんでしまうとは　なさけない。しゅぎょうして、また　ちょうせんするのじゃ。", ()=>{
+            document.getElementById("battleDeathChoice").style.display = "block";
+          });
+        });
       }
-      document.querySelector(".battle-scene").classList.add("battle-flash");
-      setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
+    }, 300);
+  }
 
-      // ワンテンポおいて「〇〇は〇〇のダメージをうけた」を表示し、HPを反映する
+  function playerTurn(next){
+    const action = myTechniques[Math.floor(Math.random()*myTechniques.length)];
+    battleLog.textContent = `${heroName}の　${action.name}！`;
+    shakeAndFlash();
+    spawnHitSpark(45+Math.random()*10, 35+Math.random()*10);
+
+    setTimeout(()=>{
+      const moveMult = 0.7 + (action.v/5)*0.6;
+      const { dmg, missed } = rollDamage(playerAtk, moveMult, mStats.def);
+      if(!missed){ mHp = Math.max(0, mHp - Math.min(mHp, dmg)); }
+      battleLog.textContent = missed ? "しかし　こうげきは　はずれた！" : `${monster.name}は　${dmg}の　ダメージを　うけた！`;
+      monsterHpNum.textContent = mHp;
+      updateHpColor(monsterHpNum, mHp, mStats.hp);
+
+      if(mHp<=0){ setTimeout(()=>endBattle(true), REACTION_DELAY); return; }
+      setTimeout(next, REACTION_DELAY);
+    }, REVEAL_DELAY);
+  }
+
+  function tryRevive(afterRevive){
+    // でんせつのゆうしゃ：ぎゃっきょうのちからで、あらゆる致命傷から一度だけHP半分でふっかつ
+    if(isLegendary && !legendaryRevived){
+      legendaryRevived = true;
+      pHp = Math.max(1, Math.round(maxHp/2));
       setTimeout(()=>{
-        const targetName = step.actor === "player" ? monster.name : heroName;
-        battleLog.textContent = `${targetName}は　${step.dmg}の　ダメージを　うけた！`;
-        hpNum.textContent = step.pHp;
-        monsterHpNum.textContent = step.mHp;
-        updateHpColor(hpNum, step.pHp);
-        updateHpColor(monsterHpNum, step.mHp);
-      }, 700);
+        battleLog.textContent = "ぎゃっきょうのちからが　めざめた！はんぶんの　HPで　ふっかつした！";
+        hpNum.textContent = pHp;
+        updateHpColor(hpNum, pHp, maxHp);
+        setTimeout(afterRevive, REACTION_DELAY);
+      }, REVEAL_DELAY);
+      return true;
+    }
+    return false;
+  }
 
-      const isLast = idx === sequence.length-1;
-      if(isLast){
-        setTimeout(()=>{
-          const overlay = document.getElementById("battleDeathOverlay");
-          overlay.style.display = "flex";
-          if(willWin){
-            typeMessage(document.getElementById("battleDeathText1"), `${monster.name}を　たおした！`, ()=>{
-              typeMessage(document.getElementById("battleDeathText2"), `${heroName}は　レベルアップした！`, ()=>{
-                document.getElementById("battleDeathChoice").style.display = "block";
-              });
-            });
-          }else{
-            typeMessage(document.getElementById("battleDeathText1"), `${heroName}は　しんでしまった。`, ()=>{
-              typeMessage(document.getElementById("battleDeathText2"), "しんでしまうとは　なさけない。しゅぎょうして、また　ちょうせんするのじゃ。", ()=>{
-                document.getElementById("battleDeathChoice").style.display = "block";
-              });
-            });
-          }
-        }, 1900);
+  function monsterTurn(next){
+    const move = pickMonsterMove(monster.key);
+    battleLog.textContent = `${monster.name}の　${move.name}！`;
+    shakeAndFlash();
+
+    setTimeout(()=>{
+      if(move.instantKill){
+        // しめつのいちげき：命中すれば問答無用でHPがゼロになる
+        pHp = 0;
+        battleLog.textContent = `${heroName}は　ぜんしんに　うけられぬ　いちげきを　うけた！`;
+        hpNum.textContent = pHp;
+        updateHpColor(hpNum, pHp, maxHp);
+
+        // ふっかつ判定：でんせつのゆうしゃ＞つうじょうのゆうしゃ（かみのごかご）の順
+        if(isLegendary && !legendaryRevived){
+          if(tryRevive(next)) return;
+        }
+        if(!graceRevived){
+          graceRevived = true;
+          pHp = 1;
+          setTimeout(()=>{
+            battleLog.textContent = "かみの　ごかごが　くだり、HP1で　いきかえった！";
+            hpNum.textContent = pHp;
+            updateHpColor(hpNum, pHp, maxHp);
+            setTimeout(next, REACTION_DELAY);
+          }, REVEAL_DELAY);
+          return;
+        }
+        setTimeout(()=>endBattle(false), REACTION_DELAY);
+        return;
       }
-    }, baseDelay);
-  });
+
+      const { dmg, missed } = rollDamage(mStats.atk, move.mult, playerDef);
+      if(!missed){ pHp = Math.max(0, pHp - Math.min(pHp, dmg)); }
+      battleLog.textContent = missed ? "しかし　こうげきは　はずれた！" : `${heroName}は　${dmg}の　ダメージを　うけた！`;
+      hpNum.textContent = pHp;
+      updateHpColor(hpNum, pHp, maxHp);
+
+      if(pHp<=0){
+        if(tryRevive(next)) return;
+        setTimeout(()=>endBattle(false), REACTION_DELAY);
+        return;
+      }
+      setTimeout(next, REACTION_DELAY);
+    }, REVEAL_DELAY);
+  }
+
+  function nextTurn(){
+    turnCount++;
+    if(mHp<=0){ endBattle(true); return; }
+    if(pHp<=0){ endBattle(false); return; }
+    if(turnCount > MAX_TURNS){
+      endBattle((pHp/maxHp) >= (mHp/mStats.hp));
+      return;
+    }
+    playerTurn(()=>{
+      if(mHp<=0) return; // すでにendBattle(true)へ進行済み
+      monsterTurn(nextTurn);
+    });
+  }
+
+  setTimeout(nextTurn, TURN_DELAY);
 
   document.getElementById("battleYesBtn").onclick = ()=>{
     state.selectedMonster = null;
