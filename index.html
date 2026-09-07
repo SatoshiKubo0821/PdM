@@ -2584,6 +2584,7 @@ let state = {
 };
 
 const STORAGE_KEY = "pdm35:latest";
+const PENDING_PROFILE_ENTRY_KEY = "pdm35:pendingProfileEntry"; // Googleログイン→なまえ入力への復帰フラグ
 
 /* claude.aiのアーティファクト内ではwindow.storageを使い、
    一般公開したWebページではブラウザのlocalStorageに自動フォールバックする。 */
@@ -2880,7 +2881,18 @@ async function linkEmail(email){
    すでに永久アカウントの場合は signInWithOAuth() で通常ログイン。 */
 async function signInWithGoogle(returnHash){
   if(!supabaseClient) return false;
-  const redirectTo = window.location.origin + window.location.pathname + (returnHash || "#mypage");
+  let redirectTo = window.location.origin + window.location.pathname + (returnHash || "#mypage");
+  // profileEntryへの復帰だけは、OAuthコールバックのURL操作と干渉しないようハッシュではなくフラグで管理する
+  if(returnHash === "#profileEntry"){
+    try{
+      if(window.storage && typeof window.storage.set === "function"){
+        await window.storage.set(PENDING_PROFILE_ENTRY_KEY, "1", false);
+      }else{
+        localStorage.setItem(PENDING_PROFILE_ENTRY_KEY, "1");
+      }
+    }catch(e){ /* 保存できなくても続行する */ }
+    redirectTo = window.location.origin + window.location.pathname;
+  }
   try{
     const { error } = await supabaseClient.auth.signInWithOAuth({ provider:"google", options:{ redirectTo } });
     if(error) return false;
@@ -5096,20 +5108,36 @@ function renderResults(){
     state.screen = "mypage";
   }else if(window.location.hash === "#orgculture"){
     state.screen = "orgIntro";
-  }else if(window.location.hash === "#profileEntry"){
-    // Googleログインからのリダイレクト直後：保存しておいた回答内容を復元してから、なまえ・けいけん入力へ
-    const saved = await loadSaved();
-    if(saved){
-      state.answers = saved.answers || {};
-      state.mbti = saved.mbti || null;
-      state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
-      state.orgAnswers = saved.orgAnswers || {};
-      state.orgScores = saved.orgScores || null;
-      state.vitalsAnswers = saved.vitalsAnswers || {};
-      state.rpgMp = saved.rpgMp ?? null;
-      state.defeatedMonsters = saved.defeatedMonsters || {};
+  }else{
+    // Googleログインからの復帰フラグをチェック（OAuthコールバックのURL書き換えに影響されないよう、ハッシュではなくストレージのフラグで判定する）
+    let pendingProfileEntry = false;
+    try{
+      if(window.storage && typeof window.storage.get === "function"){
+        const r = await window.storage.get(PENDING_PROFILE_ENTRY_KEY, false);
+        if(r && r.value === "1"){
+          pendingProfileEntry = true;
+          await window.storage.delete(PENDING_PROFILE_ENTRY_KEY, false);
+        }
+      }else if(localStorage.getItem(PENDING_PROFILE_ENTRY_KEY) === "1"){
+        pendingProfileEntry = true;
+        localStorage.removeItem(PENDING_PROFILE_ENTRY_KEY);
+      }
+    }catch(e){ /* フラグが読めなくても通常のトップ画面へ進むだけなので無視する */ }
+
+    if(pendingProfileEntry){
+      const saved = await loadSaved();
+      if(saved){
+        state.answers = saved.answers || {};
+        state.mbti = saved.mbti || null;
+        state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
+        state.orgAnswers = saved.orgAnswers || {};
+        state.orgScores = saved.orgScores || null;
+        state.vitalsAnswers = saved.vitalsAnswers || {};
+        state.rpgMp = saved.rpgMp ?? null;
+        state.defeatedMonsters = saved.defeatedMonsters || {};
+      }
+      state.screen = "profileEntry";
     }
-    state.screen = "profileEntry";
   }
   const navMypageLink = document.getElementById("navMypageLink");
   if(navMypageLink){
