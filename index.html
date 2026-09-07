@@ -3352,7 +3352,7 @@ function renderMonsterBattle(){
         battleLog.textContent = move.customMsg ? move.customMsg.replace("{hero}", heroName) : `${monster.name}の　こうげき！`;
         chargeCount++;
         setTimeout(()=>{
-          battleLog.textContent = `${monster.name}は　ちからを　ためている……（×${chargeCount}）`;
+          battleLog.textContent = `${monster.name}は　ちからを　ためている……`;
           setTimeout(next, REACTION_DELAY);
         }, REVEAL_DELAY);
         return;
@@ -3367,6 +3367,7 @@ function renderMonsterBattle(){
           return;
         }
         const dmg = baseDmg * Math.max(1, chargeCount);
+        chargeCount = 1; // 発動後は、ためていたちからをリセットしX1から数え直す
         pHp = Math.max(0, pHp - Math.min(pHp, dmg));
         battleLog.textContent = move.customMsg ? move.customMsg.replace("{hero}", heroName) : `${heroName}は　${dmg}の　ダメージを　うけた！`;
         hpNum.textContent = pHp;
