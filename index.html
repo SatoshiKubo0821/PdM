@@ -150,14 +150,52 @@
   .dq-stat-name small{font-size:9px; color:rgba(255,255,255,.6); display:block; margin-top:2px;}
   .dq-stat-num{font-family:var(--pixel-font); font-size:13px; width:32px; text-align:right; flex-shrink:0; color:var(--gold);}
 
-  .dq-tech-row{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px dashed rgba(255,255,255,.2);}
+  .dq-tech-row{display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px dashed rgba(255,255,255,.2);}
   .dq-tech-row:last-child{border-bottom:none;}
   .dq-tech-kind{
     font-family:var(--pixel-font); font-size:10px; background:var(--gold); color:#000; padding:2px 8px; flex-shrink:0; min-width:52px; text-align:center;
   }
   .dq-tech-kind.spell{background:#4696F0; color:#fff;}
-  .dq-tech-name{font-family:var(--pixel-font); font-size:12.5px; flex:1;}
+  .dq-tech-body{flex:1; min-width:0;}
+  .dq-tech-name-row{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  .dq-tech-name{font-family:var(--pixel-font); font-size:12.5px;}
   .dq-tech-cost{font-family:var(--pixel-font); font-size:11px; color:var(--gold-soft); flex-shrink:0;}
+  .dq-tech-desc{font-family:var(--pixel-font); font-size:10.5px; color:#B8BEFF; margin-top:3px; line-height:1.5;}
+
+  /* ---------- とくべつイベント：まおうにやぶれるシーン ---------- */
+  .battle-scene{
+    background:#000; min-height:70vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:32px; padding:32px 16px;
+  }
+  .battle-enemy-area{display:flex; justify-content:center;}
+  .battle-enemy-svg{width:160px; height:160px;}
+  .battle-shake{animation:battleShake 0.3s ease;}
+  @keyframes battleShake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-6px);}
+    80%{transform:translateX(6px);}
+  }
+  .battle-flash{background:#3a0000 !important;}
+  .battle-log{
+    font-family:var(--pixel-font); color:#fff; font-size:15px; text-align:center; min-height:24px;
+  }
+  .battle-player-panel{
+    width:100%; max-width:360px; border:3px solid #fff; box-shadow:0 0 0 3px #000;
+    padding:16px 20px; background:#000;
+  }
+  .battle-player-name{font-family:var(--pixel-font); color:#fff; font-size:13px; margin-bottom:8px;}
+  .battle-hp-fill{background:repeating-linear-gradient(90deg, #E6432E 0, #E6432E 3px, #B02F1E 3px, #B02F1E 6px); transition:width 1s ease;}
+  .battle-hp-text{font-family:var(--pixel-font); color:#fff; font-size:12px; margin-top:8px; text-align:right;}
+
+  .battle-death-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.85);
+    align-items:center; justify-content:center; z-index:100; padding:24px;
+  }
+  .battle-death-window{max-width:480px; width:100%;}
+  .battle-death-window p{font-family:var(--pixel-font); font-size:14px; color:#fff; line-height:1.9; min-height:1.9em;}
+  .battle-death-choice{margin-top:20px; text-align:center;}
   @media (max-width:480px){
     .dq-stat-name{width:110px; font-size:11px;}
   }
@@ -1521,6 +1559,59 @@ function buildEquipment(mbtiCode){
 }
 
 /* 得意スキル上位5件を、とくぎ・じゅもんとして表示するためのリストを作る */
+/* 全49スキルの、とくぎ・じゅもん説明文（50文字以内のフレーバーテキスト） */
+const SKILL_FLAVOR_DESC = {
+  "プロダクトビジョン策定":"みらいの すがたを えがき、なかまを みちびく",
+  "短期ロードマップ作成":"ちかい みちすじを しめし、すすむべき みちを てらす",
+  "中長期ロードマップ作成":"とおい さきまで みとおし、たびの ちずを えがく",
+  "プロダクト戦略":"しょうりへの みちすじを かんがえる ちからの もと",
+  "マーケティング戦略立案":"せかいに その みりょくを つたえる じゅもん",
+  "KPI管理":"せいかを かずで はかり、ただしい みちを しめす",
+  "プライシング戦略":"ねだんに いのちを ふきこみ、かちを さだめる",
+  "パートナーシップ・アライアンス戦略":"たにんと ちからを あわせ、おおきな ちからを うむ",
+  "競合調査":"てきの ようすを みやぶり、じゃくてんを あばく",
+  "市場調査":"せかいの うごきを よみとく めがねの じゅつ",
+  "定量分析":"かずの なかに かくれた しんじつを あばきだす",
+  "ユーザーリサーチ":"ひとの こころの こえを ききだす じゅもん",
+  "ユーザー検証":"かせつを ためし、ただしさを たしかめる ぎじゅつ",
+  "TAM/SAM/SOM算出":"せかいの おおきさを かずで あらわす まほう",
+  "業界動向・トレンド分析":"じだいの ながれを よみ、さきを みとおす",
+  "施策優先度管理":"なにを さきに やるべきか、じゅんばんを さだめる",
+  "スケジュール見積もり":"たびの にっていを くみたてる ちからづよい わざ",
+  "リソース調整":"なかまの ちからを むだなく くばる とうそつじゅつ",
+  "開発ディレクション":"つくり手たちを みちびき、かたちに する ちから",
+  "UIデザインのディレクション":"みための うつくしさを みちびく びじゅつの わざ",
+  "ユーザー価値定義":"だれを しあわせに するかを ことばに する",
+  "要求への落とし込み":"ねがいを かたちある ちからに かえる じゅつ",
+  "プロダクト要件定義の作成":"つくるべき ものを はっきりと しめす しょもん",
+  "フィジビリティ確認":"じつげん できるかを みきわめる ちからの め",
+  "仕様詳細のドキュメント化":"こまかい とりきめを ふでに のこす わざ",
+  "プロトタイプ作成":"かりの すがたを つくりだす こうぼうの じゅつ",
+  "ユーザー体験設計":"つかう ひとの こころに よろこびを きざむ",
+  "影響範囲の確認":"なみが どこまで およぶかを みさだめる め",
+  "技術アーキテクチャの理解":"つくりの しくみを みぬく けんじゃの ちしき",
+  "リリース戦略設計":"せかいに おくりだす ときを みさだめる じゅつ",
+  "ABテスト":"ふたつの みちを くらべ、ただしい ほうを えらぶ",
+  "QA対応":"きずを みつけ、なおす まもりの じゅもん",
+  "リリースタスクマネジメント":"おくりだしの したくを ぬかりなく ととのえる",
+  "テスト計画・品質基準の設計":"まもるべき きじゅんを さだめる たてのじゅつ",
+  "フィードバックの受け取りと提供":"ことばの やりとりで たがいを みがきあう",
+  "プレゼンテーション":"おもいを ひとまえで かたる ゆうきの じゅつ",
+  "チーム内コミュニケーション":"なかまの きずなを つよめる わじゅつ",
+  "ドキュメンテーション":"しるしを のこし、のちの たみを たすける",
+  "ネゴシエーション":"たがいの のぞみを すりあわせる わじゅつ",
+  "ファシリテーション":"ばを ととのえ、みなの ちからを ひきだす",
+  "プロジェクトの要件設計、管理":"たびの けいかくを たて、みちびく とうそつじゅつ",
+  "販売チャネル戦略":"しなものを とどける みちを ひらく じゅつ",
+  "コンテンツ・ブランディング戦略":"なも しれた そんざいに する ひかりの じゅつ",
+  "オンボーディング設計":"はじめの いっぽを やさしく みちびく じゅつ",
+  "チャーン分析・防止":"はなれゆく ものを ひきとめる いんろくの じゅつ",
+  "アップセル・クロスセル戦略":"きずなを ふかめ、さらなる ちからを うる",
+  "英語での開発チーム牽引":"ことばの かべを こえ、なかまを みちびく",
+  "英語でのグローバルGTM展開":"せかいじゅうに ちからを とどける こうげきじゅつ",
+  "各国に応じたGTM戦略の実行":"くにぐにの ならわしに あわせ、みちを ひらく",
+};
+
 function buildSkillTechniques(){
   const flat = allSkillsFlat().sort((a,b)=>b.v-a.v).slice(0,5);
   return flat.map(s=>{
@@ -1528,7 +1619,8 @@ function buildSkillTechniques(){
     const kind = cat ? SKILL_KIND_BY_CATEGORY[cat.key] : "とくぎ";
     const cost = Math.max(1, 6 - s.v); // スコアが高いほど「MP消費が少ない=使い慣れている」という表現
     const displayName = SKILL_NAME_HIRAGANA[s.name] || s.name;
-    return { name:displayName, kind, cost, v:s.v, catName:s.catName };
+    const flavorDesc = SKILL_FLAVOR_DESC[s.name] || "";
+    return { name:displayName, kind, cost, v:s.v, catName:s.catName, desc:flavorDesc };
   });
 }
 
@@ -2268,6 +2360,14 @@ function allSkillsFlat(){
   return flat;
 }
 
+/* 全49問すべてで同じ選択肢（生の回答）が選ばれていないかを判定する。
+   まじめに回答していない可能性が高いケースを検出し、特殊な「まおうにやぶれる」画面に誘導するために使う。 */
+function isAllSameRawAnswer(){
+  const rawValues = ALL_SKILLS_FLAT_META.map(item => state.answers[item.catKey+":"+item.name]);
+  if(rawValues.some(v => v==null)) return false; // 未回答が残っている場合は対象外
+  return rawValues.every(v => v === rawValues[0]);
+}
+
 /* ---------------- Rendering ---------------- */
 const app = document.getElementById("app");
 
@@ -2284,6 +2384,7 @@ function render(){
   else if(state.screen==="orgIntro") renderOrgIntro();
   else if(state.screen==="orgAssess") renderOrgAssess();
   else if(state.screen==="orgResults") renderOrgResults();
+  else if(state.screen==="battleDefeat") renderBattleDefeat();
   else renderResults();
 }
 
@@ -2534,6 +2635,100 @@ async function submitApplication(fields){
   }catch(e){
     return { ok:false, message:"通信エラーが発生しました。時間をおいて再度お試しください。" };
   }
+}
+
+/* ---------------- とくべつイベント：まおうにやぶれるシーン ----------------
+   全49問で同じ選択肢だけが選ばれた（まじめに回答していない可能性が高い）場合に表示する、
+   ドラクエ風バトルUIの演出。特定タイトルのキャラクターを再現したものではなく、
+   「まおう」という一般的なファンタジーの記号を、オリジナルのドット絵で表現したもの。 */
+function renderBattleDefeat(){
+  app.innerHTML = `
+    <div class="battle-scene">
+      <div class="battle-enemy-area">
+        <svg viewBox="0 0 120 120" class="battle-enemy-svg" id="battleEnemySvg">
+          <ellipse cx="60" cy="108" rx="38" ry="8" fill="#000" opacity="0.5"/>
+          <path d="M60 10 L50 28 L38 18 L42 34 L26 30 L34 44 L60 40 L86 44 L94 30 L78 34 L82 18 L70 28 Z" fill="#2B0A4A"/>
+          <ellipse cx="60" cy="58" rx="30" ry="34" fill="#3D1A6B"/>
+          <ellipse cx="60" cy="60" rx="26" ry="30" fill="#5B2E9E"/>
+          <circle cx="48" cy="52" r="5" fill="#FF2A2A"/>
+          <circle cx="72" cy="52" r="5" fill="#FF2A2A"/>
+          <path d="M40 44Q48 38 56 44" stroke="#1A0838" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M64 44Q72 38 80 44" stroke="#1A0838" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M42 76Q60 92 78 76" stroke="#1A0838" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M30 62Q10 70 14 92" stroke="#3D1A6B" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M90 62Q110 70 106 92" stroke="#3D1A6B" stroke-width="10" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="battle-log" id="battleLog">まおうが　あらわれた！</div>
+      <div class="battle-player-panel">
+        <div class="battle-player-name">ぼうけんしゃ</div>
+        <div class="pixel-bar-track" style="height:20px;"><div class="pixel-bar-fill battle-hp-fill" id="battleHpBar" style="width:100%;"></div></div>
+        <div class="battle-hp-text" id="battleHpText">HP 200/200</div>
+      </div>
+    </div>
+
+    <div class="battle-death-overlay" id="battleDeathOverlay" style="display:none;">
+      <div class="dq-window battle-death-window">
+        <p id="battleDeathText1"></p>
+        <p id="battleDeathText2" style="margin-top:14px;"></p>
+        <div class="battle-death-choice" id="battleDeathChoice" style="display:none;">
+          <button class="primary" id="battleYesBtn">はい</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const hpBar = document.getElementById("battleHpBar");
+  const hpText = document.getElementById("battleHpText");
+  const battleLog = document.getElementById("battleLog");
+  const enemySvg = document.getElementById("battleEnemySvg");
+  const maxHp = 200;
+  const steps = [0.7, 0.4, 0.15, 0];
+
+  function typeMessage(el, text, onDone){
+    el.textContent = "";
+    let i = 0;
+    const timer = setInterval(()=>{
+      el.textContent += text[i];
+      i++;
+      if(i>=text.length){ clearInterval(timer); if(onDone) onDone(); }
+    }, 45);
+  }
+
+  steps.forEach((ratio, idx)=>{
+    setTimeout(()=>{
+      battleLog.textContent = "まおうの　こうげき！";
+      enemySvg.classList.add("battle-shake");
+      setTimeout(()=>enemySvg.classList.remove("battle-shake"), 300);
+      const hp = Math.round(maxHp * ratio);
+      hpBar.style.width = (ratio*100) + "%";
+      hpText.textContent = `HP ${hp}/${maxHp}`;
+      document.querySelector(".battle-scene").classList.add("battle-flash");
+      setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
+
+      if(ratio === 0){
+        setTimeout(()=>{
+          const overlay = document.getElementById("battleDeathOverlay");
+          overlay.style.display = "flex";
+          typeMessage(document.getElementById("battleDeathText1"), "ぼうけんしゃは　しんでしまった。", ()=>{
+            typeMessage(document.getElementById("battleDeathText2"), "しんでしまうとは　なさけない。まじめに　せんたくしを　えらぶのじゃ。", ()=>{
+              document.getElementById("battleDeathChoice").style.display = "block";
+            });
+          });
+        }, 900);
+      }
+    }, (idx+1) * 1400);
+  });
+
+  document.getElementById("battleYesBtn").onclick = ()=>{
+    state.answers = {};
+    state.mbti = null;
+    state.displayOrder = {};
+    state.pageIndex = 0;
+    state.screen = "intro";
+    saveProgress();
+    render(); window.scrollTo(0,0);
+  };
 }
 
 function renderApply(){
@@ -2903,7 +3098,9 @@ function renderAssess(){
   const nextBtn = document.getElementById("qNextBtn");
   if(nextBtn && pageDone){
     nextBtn.onclick = ()=>{
-      if(isLast){ state.screen="mbti"; }
+      if(isLast){
+        state.screen = isAllSameRawAnswer() ? "battleDefeat" : "mbti";
+      }
       else { state.pageIndex++; }
       render(); window.scrollTo(0,0);
     };
@@ -3457,8 +3654,10 @@ function renderResults(){
       ${techniques.map(t=>`
         <div class="dq-tech-row">
           <span class="dq-tech-kind ${t.kind==='じゅもん'?'spell':''}">${t.kind}</span>
-          <span class="dq-tech-name">${t.name}</span>
-          <span class="dq-tech-cost">MP${t.cost}</span>
+          <div class="dq-tech-body">
+            <div class="dq-tech-name-row"><span class="dq-tech-name">${t.name}</span><span class="dq-tech-cost">MP${t.cost}</span></div>
+            ${t.desc ? `<div class="dq-tech-desc">${t.desc}</div>` : ""}
+          </div>
         </div>`).join("")}
     </div>
 
