@@ -312,6 +312,24 @@
   .check-icon{color:var(--orange); font-weight:900; flex-shrink:0;}
   .compare-arrow-mobile{display:none; text-align:center; font-size:22px; color:var(--blue); font-weight:900;}
 
+  /* PdMクエスト紹介セクション */
+  .pdm-quest-card{
+    background:linear-gradient(135deg, #08090B 0%, #1C1D21 55%, #45474E 100%);
+    border-radius:20px; padding:40px; display:flex; align-items:center; gap:40px; margin-top:8px;
+  }
+  .pdm-quest-text{flex:1.3; min-width:280px;}
+  .pdm-quest-list{list-style:none; padding:0; margin:18px 0 0; display:flex; flex-direction:column; gap:10px;}
+  .pdm-quest-list li{
+    font-size:13px; color:rgba(255,255,255,.85); padding-left:20px; position:relative;
+  }
+  .pdm-quest-list li::before{content:"◆"; position:absolute; left:0; color:var(--orange); font-size:11px;}
+  .pdm-quest-visual{flex:1; display:flex; justify-content:center; min-width:180px;}
+  .pdm-quest-hero-img{width:220px; height:auto; image-rendering:pixelated; filter:drop-shadow(0 12px 24px rgba(0,0,0,.4));}
+  @media (max-width:720px){
+    .pdm-quest-card{flex-direction:column; padding:28px 22px;}
+    .pdm-quest-visual{order:-1;}
+  }
+
   /* ---------- Market value chart / job examples ---------- */
   .value-chart-card{
     background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:32px;
@@ -507,7 +525,7 @@
     <nav>
       <a href="#curriculum">カリキュラム</a>
       <a href="#features">特徴</a>
-      <a href="./index.html">PdMスキル診断</a>
+      <a href="./index.html">PdMクエスト（PdM診断）</a>
       <a href="./events.html">イベントカレンダー</a>
       <a href="./index.html#orgculture">組織タイプ診断</a>
       <a href="https://discord.gg/YOUR-INVITE-CODE" target="_blank" rel="noopener" title="コミュニティDiscordにJOIN" style="color:rgba(255,255,255,.9); display:inline-flex; align-items:center; gap:5px;"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M20.3 4.4A19.8 19.8 0 0015.6 3l-.3.5a13.9 13.9 0 016.1 3.1 18.5 18.5 0 00-15.9 0 13.9 13.9 0 016.1-3.1L11.3 3a19.8 19.8 0 00-4.7 1.4C3.6 8 2.8 11.5 3.1 15c1.6 1.2 3.2 1.9 4.7 2.4l.7-1.2c-.8-.3-1.6-.7-2.3-1.2l.4-.3c3.3 1.5 6.9 1.5 10.2 0l.4.3c-.7.5-1.5.9-2.3 1.2l.7 1.2c1.5-.5 3.1-1.2 4.7-2.4.4-4-.7-7.4-3.1-10.6zM9.7 13.4c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7zm5 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7z"/></svg>Discord</a>
@@ -620,6 +638,29 @@
           <li><span class="check-icon">✓</span>実際のプロダクト課題に取り組む実践中心設計</li>
           <li><span class="check-icon">✓</span>現役PdM講師陣にいつでも相談できる</li>
         </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pdm-quest-intro">
+  <div class="wrap">
+    <div class="pdm-quest-card">
+      <div class="pdm-quest-text">
+        <span class="eyebrow-pill" style="background:rgba(255,255,255,.15); color:#fff;">FREE・約5分</span>
+        <h2 class="section-title" style="font-size:26px; color:#fff; margin-top:14px;">まずは無料の「PdMクエスト（PdM診断）」で、自分の実力を確かめよう</h2>
+        <p class="section-lead" style="color:rgba(255,255,255,.85); margin-top:14px;">
+          事業戦略からグローバル展開まで、PdMに求められる10領域49項目をドット絵RPG風に診断。回答すると「まほうつかい」「せんし」「そうりょ」「ゆうしゃ」など職業タイプ・レベル・じゅもん/とくぎが明らかになり、モンスターとのバトルにも挑戦できます。
+        </p>
+        <ul class="pdm-quest-list">
+          <li>10領域49項目を5段階で自己評価、強み・伸びしろがレーダーチャートで見える化</li>
+          <li>MBTI・経験年数と掛け合わせた職業タイプ・キャリアパス分析</li>
+          <li>モンスターバトルなど、ゲーム感覚で結果を楽しめるしかけ</li>
+        </ul>
+        <a class="btn primary" href="./index.html" target="_blank" rel="noopener" style="margin-top:20px; display:inline-flex;">PdMクエスト（PdM診断）をはじめる →</a>
+      </div>
+      <div class="pdm-quest-visual">
+        <img src="./assets/jobs/general_senior.png" alt="ゆうしゃ" class="pdm-quest-hero-img">
       </div>
     </div>
   </div>
@@ -945,7 +986,7 @@
     <div class="section-head">
       <span class="eyebrow-pill">CURRICULUM</span>
       <h2 class="section-title">学べる10のスキルセット</h2>
-      <p class="section-lead">PdMスキル診断でも使われている、事業戦略からグローバル展開まで10のカテゴリ・49項目を土台にカリキュラムを構成。自分の診断結果と照らし合わせながら、弱点を優先的に強化できます。</p>
+      <p class="section-lead">PdMクエスト（PdM診断）でも使われている、事業戦略からグローバル展開まで10のカテゴリ・49項目を土台にカリキュラムを構成。自分の診断結果と照らし合わせながら、弱点を優先的に強化できます。</p>
     </div>
     <div class="module-grid">
       <a class="module-card" href="./module.html?m=strategy" style="--accent:#16294C;"><div class="module-badge" style="background:#16294C;"><svg viewBox="0 0 24 24" fill="#fff"><path d="M6 3v18H4V3h2zm1 1h11l-2.5 3.5L18 11H7V4z"/></svg></div><div><h3>事業戦略 <span class="module-num">01</span></h3><p>プロダクトの向かう先と向かい方を定義し、チームを前進させる力を養います。</p><span class="module-link">詳しく見る →</span></div></a>
@@ -1280,7 +1321,7 @@
 
 <footer>
   <div class="wrap">
-    <a href="./index.html">PdMスキル診断はこちら</a> ／
+    <a href="./index.html">PdMクエスト（PdM診断）はこちら</a> ／
     <a href="./index.html#orgculture">組織タイプ診断</a> ／
     <a href="./privacy.html">プライバシーポリシー</a>
   </div>
