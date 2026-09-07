@@ -704,8 +704,9 @@
   .cta-card{
     margin-top:28px;
     padding:24px 26px;
-    border-radius:8px;
-    background:var(--grad-main);
+    background:#000;
+    border:3px solid #fff;
+    box-shadow:0 0 0 3px #000, 6px 6px 0 rgba(0,0,0,.5);
     color:#fff;
     display:flex;
     align-items:center;
@@ -713,15 +714,16 @@
     gap:20px;
     flex-wrap:wrap;
   }
-  .cta-text h4{margin:0 0 4px; font-size:16px; font-family:"Zen Kaku Gothic New",sans-serif; color:#fff;}
-  .cta-text p{margin:0; font-size:13px; opacity:.85;}
-  .cta-btn{
-    background:#fff;
-    color:var(--navy-900) !important;
+  .cta-text h4{margin:0 0 4px; font-size:16px; font-family:var(--pixel-font); color:#fff;}
+  .cta-text p{margin:0; font-size:13px; color:#C9CDF5;}
+  .cta-btn.cta-btn{
+    background:#fff !important;
+    color:#000 !important;
+    border-color:#000 !important;
+    box-shadow:0 0 0 3px var(--navy-950) !important;
     white-space:nowrap;
-    box-shadow:none;
   }
-  .cta-btn:hover{background:#EFF2F1; filter:none;}
+  .cta-btn.cta-btn:hover{background:var(--gold-soft) !important;}
   @media (max-width:600px){
     .cta-card{flex-direction:column; align-items:flex-start;}
   }
