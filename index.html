@@ -1305,12 +1305,30 @@ const JOB_CLASS_TIERS = {
 const TIER_RANK = { junior:1, middle:2, senior:3, legendary:4 };
 const TIER_RANK_LABEL = { 1:"ジュニア以上", 2:"ミドル以上", 3:"シニア以上", 4:"でんせつのゆうしゃ以上" };
 const MONSTERS = [
-  { key:"slime",      name:"スライム",         theme:"通常開発",                       requiredTier:1, icon:"slime" },
-  { key:"chimera",    name:"キメラ",           theme:"リード開発",                     requiredTier:2, icon:"chimera" },
-  { key:"dragon",     name:"グレートドラゴン", theme:"新規プロダクト開発",             requiredTier:2, icon:"dragon" },
-  { key:"orochi",     name:"やまたのおろち",   theme:"プロダクトマーケットフィット実現", requiredTier:3, icon:"orochi" },
-  { key:"demonking",  name:"まおう",           theme:"IPO実現",                        requiredTier:4, icon:"demonking" },
+  { key:"slime",      name:"スライムかいはつ",   theme:"通常開発",                       requiredTier:1, icon:"slime" },
+  { key:"chimera",    name:"えんじょうキメラ",   theme:"リード開発",                     requiredTier:2, icon:"chimera" },
+  { key:"dragon",     name:"ゼロイチドラゴン",   theme:"新規プロダクト開発",             requiredTier:2, icon:"dragon" },
+  { key:"orochi",     name:"ピーエムエフおろち", theme:"プロダクトマーケットフィット実現", requiredTier:3, icon:"orochi" },
+  { key:"demonking",  name:"アイピーまおう",     theme:"IPO実現",                        requiredTier:4, icon:"demonking" },
 ];
+/* モンスターごとの攻撃こうげき名のプール（確率で抽選する）。スライムは通常こうげきのみ。 */
+const MONSTER_ATTACK_POOL = {
+  slime:     [ { name:"こうげき", weight:1 } ],
+  chimera:   [ { name:"えんじょう", weight:0.5 }, { name:"こうげき", weight:0.5 } ],
+  dragon:    [ { name:"だいえんじょう", weight:0.5 }, { name:"とうそつりょくていか", weight:0.25 }, { name:"さらなるおいうち", weight:0.25 } ],
+  orochi:    [ { name:"しきんショート", weight:0.25 }, { name:"たいりょうたいしょく", weight:0.25 }, { name:"えむえーゆーが　のびない", weight:0.25 }, { name:"とどめの　いちげき", weight:0.25 } ],
+  demonking: [ { name:"とうしかの　いかり", weight:0.25 }, { name:"かんさの　れんごく", weight:0.25 }, { name:"ならない　かね", weight:0.25 }, { name:"しめつの　いちげき", weight:0.25 } ],
+};
+function pickMonsterAttackName(monsterKey){
+  const pool = MONSTER_ATTACK_POOL[monsterKey] || MONSTER_ATTACK_POOL.slime;
+  const r = Math.random();
+  let acc = 0;
+  for(const item of pool){
+    acc += item.weight;
+    if(r <= acc) return item.name;
+  }
+  return pool[pool.length-1].name;
+}
 const MONSTER_ICON_SVG = {
   slime: `<ellipse cx="50" cy="62" rx="36" ry="26" fill="#4696F0"/>
     <path d="M16 62 Q22 84 36 68 Q44 90 50 70 Q56 90 64 68 Q78 84 84 62" fill="#4696F0"/>
@@ -2957,7 +2975,7 @@ function renderMonsterBattle(){
     if(mHp<=0) break;
     const mdmg = Math.min(pHp, monsterDmg[i]);
     pHp = Math.max(0, pHp - mdmg);
-    sequence.push({ actor:"monster", dmg:mdmg, pHp, mHp });
+    sequence.push({ actor:"monster", dmg:mdmg, pHp, mHp, attackName:pickMonsterAttackName(monster.key) });
     if(pHp<=0) break;
   }
 
@@ -2970,7 +2988,7 @@ function renderMonsterBattle(){
         setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
         spawnHitSpark(45+Math.random()*10, 35+Math.random()*10);
       }else{
-        battleLog.textContent = `${monster.name}の　こうげき！`;
+        battleLog.textContent = `${monster.name}の　${step.attackName}！`;
       }
       document.querySelector(".battle-scene").classList.add("battle-flash");
       setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
