@@ -166,10 +166,38 @@
   .battle-scene{
     background:#000; min-height:70vh; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:32px; padding:32px 16px;
+    position:relative;
   }
-  .battle-enemy-area{display:flex; justify-content:center;}
-  .battle-enemy-svg{width:160px; height:160px;}
+  .battle-enemy-area{display:flex; justify-content:center; position:relative;}
+  .battle-enemy-img{width:280px; height:auto; image-rendering:pixelated; position:relative; z-index:1;}
   .battle-shake{animation:battleShake 0.3s ease;}
+  .battle-effect-layer{position:absolute; inset:0; pointer-events:none; z-index:2; overflow:hidden;}
+  .battle-float-icon{
+    position:absolute; font-family:var(--pixel-font); font-size:22px; color:#F8C630; font-weight:700;
+  }
+  .battle-float-icon.coin-fall{animation:coinFall 1.3s ease-out forwards;}
+  @keyframes coinFall{
+    0%{transform:translateY(0); opacity:1;}
+    100%{transform:translateY(60px); opacity:0;}
+  }
+  .salary-pop{display:flex; align-items:center; justify-content:center;}
+  .salary-yen{font-family:var(--pixel-font); font-size:56px; color:#fff; position:relative; animation:salaryPop 1.3s ease-out forwards;}
+  .salary-strike{position:absolute; top:50%; left:-10px; right:-10px; height:5px; background:#E6432E; transform:scaleX(0) rotate(-15deg); animation:salaryStrike 1.3s ease-out forwards;}
+  @keyframes salaryPop{
+    0%{transform:scale(0.4); opacity:0;}
+    30%{transform:scale(1.15); opacity:1;}
+    100%{transform:scale(1); opacity:0;}
+  }
+  @keyframes salaryStrike{
+    0%,25%{transform:scaleX(0) rotate(-15deg);}
+    45%{transform:scaleX(1) rotate(-15deg);}
+    100%{transform:scaleX(1) rotate(-15deg); opacity:0;}
+  }
+  .battle-runner{position:absolute; animation:runnerFlee 0.9s ease-in forwards;}
+  @keyframes runnerFlee{
+    0%{transform:translate(0,0); opacity:1;}
+    100%{transform:translate(calc(var(--dx) * 120px), calc(var(--dy) * 90px)); opacity:0;}
+  }
   @keyframes battleShake{
     0%,100%{transform:translateX(0);}
     20%{transform:translateX(-8px);}
@@ -2644,20 +2672,9 @@ async function submitApplication(fields){
 function renderBattleDefeat(){
   app.innerHTML = `
     <div class="battle-scene">
+      <div class="battle-effect-layer" id="battleEffectLayer"></div>
       <div class="battle-enemy-area">
-        <svg viewBox="0 0 120 120" class="battle-enemy-svg" id="battleEnemySvg">
-          <ellipse cx="60" cy="108" rx="38" ry="8" fill="#000" opacity="0.5"/>
-          <path d="M60 10 L50 28 L38 18 L42 34 L26 30 L34 44 L60 40 L86 44 L94 30 L78 34 L82 18 L70 28 Z" fill="#2B0A4A"/>
-          <ellipse cx="60" cy="58" rx="30" ry="34" fill="#3D1A6B"/>
-          <ellipse cx="60" cy="60" rx="26" ry="30" fill="#5B2E9E"/>
-          <circle cx="48" cy="52" r="5" fill="#FF2A2A"/>
-          <circle cx="72" cy="52" r="5" fill="#FF2A2A"/>
-          <path d="M40 44Q48 38 56 44" stroke="#1A0838" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <path d="M64 44Q72 38 80 44" stroke="#1A0838" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <path d="M42 76Q60 92 78 76" stroke="#1A0838" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <path d="M30 62Q10 70 14 92" stroke="#3D1A6B" stroke-width="10" fill="none" stroke-linecap="round"/>
-          <path d="M90 62Q110 70 106 92" stroke="#3D1A6B" stroke-width="10" fill="none" stroke-linecap="round"/>
-        </svg>
+        <img src="./assets/battle/demon_king.png" alt="まおう" class="battle-enemy-img" id="battleEnemyImg">
       </div>
       <div class="battle-log" id="battleLog">まおうが　あらわれた！</div>
       <div class="battle-player-panel">
@@ -2681,9 +2698,54 @@ function renderBattleDefeat(){
   const hpBar = document.getElementById("battleHpBar");
   const hpText = document.getElementById("battleHpText");
   const battleLog = document.getElementById("battleLog");
-  const enemySvg = document.getElementById("battleEnemySvg");
+  const enemyImg = document.getElementById("battleEnemyImg");
+  const effectLayer = document.getElementById("battleEffectLayer");
   const maxHp = 200;
-  const steps = [0.7, 0.4, 0.15, 0];
+
+  // 3回のこうげきで HP がゼロになる。それぞれ「PdMあるある」な社会的こうげきをテーマにしている。
+  const ATTACKS = [
+    { name:"しきんちょうたつしっぱい", ratio:0.66, effect:"funding" },
+    { name:"きゅうよみばらい",         ratio:0.33, effect:"salary" },
+    { name:"えんじにあのたいりょうたいしょく", ratio:0, effect:"exodus" },
+  ];
+
+  function spawnFloatIcon(html, x, y, cls){
+    const el = document.createElement("div");
+    el.className = "battle-float-icon " + cls;
+    el.style.left = x + "%";
+    el.style.top = y + "%";
+    el.innerHTML = html;
+    effectLayer.appendChild(el);
+    setTimeout(()=>{ el.remove(); }, 1300);
+  }
+
+  function playAttackEffect(type){
+    if(type === "funding"){
+      // 資金調達失敗：コインが宙に浮かんでは消えていく
+      for(let i=0;i<6;i++){
+        setTimeout(()=>spawnFloatIcon("¥", 15+i*13, 20+((i%2)*10), "coin-fall"), i*80);
+      }
+    }else if(type === "salary"){
+      // 給与未払い：大きな¥マークに取り消し線が入る
+      spawnFloatIcon('<span class="salary-yen">¥</span><span class="salary-strike"></span>', 42, 30, "salary-pop");
+    }else if(type === "exodus"){
+      // エンジニア大量退職：人型アイコンが四方八方に走り去る
+      const dirs = [[-1,-1],[1,-1],[-1,1],[1,1],[0,-1]];
+      dirs.forEach((d,i)=>{
+        setTimeout(()=>{
+          const el = document.createElement("div");
+          el.className = "battle-runner";
+          el.style.setProperty("--dx", d[0]);
+          el.style.setProperty("--dy", d[1]);
+          el.style.left = (45+i*2) + "%";
+          el.style.top = "35%";
+          el.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="6" r="4" fill="#fff"/><path d="M6 22v-6a6 6 0 0112 0v6" fill="#fff"/></svg>`;
+          effectLayer.appendChild(el);
+          setTimeout(()=>el.remove(), 900);
+        }, i*70);
+      });
+    }
+  }
 
   function typeMessage(el, text, onDone){
     el.textContent = "";
@@ -2695,18 +2757,19 @@ function renderBattleDefeat(){
     }, 45);
   }
 
-  steps.forEach((ratio, idx)=>{
+  ATTACKS.forEach((atk, idx)=>{
     setTimeout(()=>{
-      battleLog.textContent = "まおうの　こうげき！";
-      enemySvg.classList.add("battle-shake");
-      setTimeout(()=>enemySvg.classList.remove("battle-shake"), 300);
-      const hp = Math.round(maxHp * ratio);
-      hpBar.style.width = (ratio*100) + "%";
+      battleLog.textContent = `まおうの　${atk.name}！`;
+      enemyImg.classList.add("battle-shake");
+      setTimeout(()=>enemyImg.classList.remove("battle-shake"), 300);
+      playAttackEffect(atk.effect);
+      const hp = Math.round(maxHp * atk.ratio);
+      hpBar.style.width = (atk.ratio*100) + "%";
       hpText.textContent = `HP ${hp}/${maxHp}`;
       document.querySelector(".battle-scene").classList.add("battle-flash");
       setTimeout(()=>document.querySelector(".battle-scene").classList.remove("battle-flash"), 150);
 
-      if(ratio === 0){
+      if(atk.ratio === 0){
         setTimeout(()=>{
           const overlay = document.getElementById("battleDeathOverlay");
           overlay.style.display = "flex";
@@ -2717,7 +2780,7 @@ function renderBattleDefeat(){
           });
         }, 900);
       }
-    }, (idx+1) * 1400);
+    }, (idx+1) * 1500);
   });
 
   document.getElementById("battleYesBtn").onclick = ()=>{
