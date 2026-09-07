@@ -2450,6 +2450,7 @@ let state = {
   history: [],            // クラウドから取得した過去の診断履歴
   displayOrder: {},       // 全設問のランダム化した表示順（キャッシュ）
   viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
+  viewingHistoryIsLegendary: null, // 履歴閲覧中、その記録がでんせつのゆうしゃだったかどうか（trueで確定表示）
   applyContext: null,     // 応募フォームに渡す診断結果の参考情報（任意）
   orgAnswers: {},         // 組織タイプ診断の回答（"org:idx" -> 1..5）
   orgScores: null,        // 診断済みの場合、4軸の平均スコアが入る
@@ -2629,21 +2630,26 @@ async function saveDiagnosisToCloud(payload){
     await ensureSession();
     if(!state.userId) return;
   }
+  const baseRow = {
+    user_id: state.userId,
+    answers: state.answers,
+    mbti: state.mbti && state.mbti!=="unknown" ? state.mbti : null,
+    toeic: state.profile.toeic,
+    certifications: state.profile.certifications || null,
+    nickname: state.profile.nickname || null,
+    experience_years: state.profile.experienceYears,
+    overall_avg: payload.avg,
+    pdm_type: payload.pdmTypeKey,
+    seniority: payload.seniorityKey,
+    hensachi: payload.hensachi,
+  };
   try{
-    const { error } = await supabaseClient.from("diagnoses").insert({
-      user_id: state.userId,
-      answers: state.answers,
-      mbti: state.mbti && state.mbti!=="unknown" ? state.mbti : null,
-      toeic: state.profile.toeic,
-      certifications: state.profile.certifications || null,
-      nickname: state.profile.nickname || null,
-      experience_years: state.profile.experienceYears,
-      overall_avg: payload.avg,
-      pdm_type: payload.pdmTypeKey,
-      seniority: payload.seniorityKey,
-      hensachi: payload.hensachi,
-    });
-    if(!error) state.savedThisResult = true;
+    // is_legendary列がある前提でまず保存を試みる（でんせつのゆうしゃ判定を、あとで履歴から呼び出した際も再現できるようにする）
+    const { error } = await supabaseClient.from("diagnoses").insert({ ...baseRow, is_legendary: !!payload.isLegendaryHero });
+    if(!error){ state.savedThisResult = true; return; }
+    // is_legendary列がまだ存在しない場合（マイグレーション未実施）は、その列なしで再保存する
+    const retry = await supabaseClient.from("diagnoses").insert(baseRow);
+    if(!retry.error) state.savedThisResult = true;
   }catch(e){ /* オフライン等の場合は次回の保存タイミングで再試行される */ }
 }
 
@@ -2652,11 +2658,17 @@ async function fetchHistory(){
   try{
     const { data, error } = await supabaseClient
       .from("diagnoses")
+      .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary")
+      .order("created_at", { ascending:false })
+      .limit(20);
+    if(!error) return data || [];
+    // is_legendary列がまだ存在しない場合（マイグレーション未実施）は、その列なしで再取得する
+    const retry = await supabaseClient
+      .from("diagnoses")
       .select("id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications")
       .order("created_at", { ascending:false })
       .limit(20);
-    if(error) return [];
-    return data || [];
+    return retry.data || [];
   }catch(e){ return []; }
 }
 
@@ -2796,6 +2808,8 @@ async function renderHistory(){
       };
       state.savedThisResult = true; // 過去の結果を開いただけなので、新規保存はしない
       state.viewingHistory = row.created_at;
+      // でんせつのゆうしゃだった記録は、履歴から呼び出した際も必ずそのまま再現する
+      state.viewingHistoryIsLegendary = row.is_legendary === true;
       state.screen = "results";
       render(); window.scrollTo(0,0);
     };
@@ -2894,7 +2908,6 @@ function renderMonsterSelect(){
           </div>
           <div class="monster-select-name">${m.name}</div>
           <div class="monster-select-theme">${m.theme}</div>
-          <div class="monster-select-req">かちめ：${m.requiredTier>=99 ? "？？？" : TIER_RANK_LABEL[m.requiredTier]}</div>
         </div>`).join("")}
     </div>
 
@@ -4191,7 +4204,9 @@ function renderResults(){
   const careerPath = buildCareerPath(seniorityKey);
   const toeicNote = toeicComment(state.profile.toeic);
   const rpg = buildRPGStats();
-  const isLegendaryHero = checkLegendaryHero(typeResult.key, seniorityKey, rpg);
+  const isLegendaryHero = state.viewingHistory
+    ? (state.viewingHistoryIsLegendary === true)
+    : checkLegendaryHero(typeResult.key, seniorityKey, rpg);
   const jobClass = isLegendaryHero ? LEGENDARY_HERO_DATA : getJobClass(typeResult.key, seniorityKey);
   const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
   const techniques = isLegendaryHero
@@ -4200,7 +4215,7 @@ function renderResults(){
   const equipment = buildEquipment(state.mbti);
   const orgType = determineOrgType(state.orgScores);
 
-  saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi });
+  saveDiagnosisToCloud({ avg, pdmTypeKey: typeResult.key, seniorityKey, hensachi, isLegendaryHero });
 
   app.innerHTML = `
     <div class="eyebrow">診断結果</div>
@@ -4631,7 +4646,7 @@ function renderResults(){
 
   const backToHistoryLink = document.getElementById("backToHistoryLink");
   if(backToHistoryLink){
-    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.screen="history"; render(); window.scrollTo(0,0); };
+    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.viewingHistoryIsLegendary=null; state.screen="history"; render(); window.scrollTo(0,0); };
   }
   const orgDiagLink = document.getElementById("orgDiagLink");
   if(orgDiagLink) orgDiagLink.onclick = ()=>{ state.screen="orgIntro"; render(); window.scrollTo(0,0); };
@@ -4652,11 +4667,13 @@ function renderResults(){
   if(state.viewingHistory){
     document.getElementById("toHistoryBtn").onclick = ()=>{
       state.viewingHistory=null;
+      state.viewingHistoryIsLegendary=null;
       state.screen="history";
       render(); window.scrollTo(0,0);
     };
     document.getElementById("toIntroBtn").onclick = ()=>{
       state.viewingHistory=null;
+      state.viewingHistoryIsLegendary=null;
       state.answers = {};
       state.mbti = null;
       state.displayOrder = {};
