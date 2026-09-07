@@ -1415,7 +1415,7 @@ const MONSTER_ATTACK_POOL = {
     { name:"きゅうよみばらい",     weight:0.1875, kind:"charge", customMsg:"しゃいんの　きゅうよが　はらわれない！", fx:"salary" },
     { name:"ふさいぼうちょう",     weight:0.1875, kind:"charge", customMsg:"かいしゃの　しゃっきんが　ふくらんでいる！", fx:"debt" },
     { name:"こうかいしょけい",     weight:0.20,   kind:"burst",  customMsg:"{hero}は　ぜんしゃいんの　まえで　ハラスメントを　うけた！", fx:"burst" },
-    { name:"ちょうかいかいこ",     weight:0.05,   kind:"instakill", noRevival:true, customMsg:"{hero}は　かいこされてしまった。", fx:"fadeout" },
+    { name:"ちょうかいかいこ",     weight:0.05,   kind:"instakill", noRevival:true, missChance:0.5, customMsg:"{hero}は　かいこされてしまった。", fx:"fadeout" },
   ],
 };
 function pickMonsterMove(monsterKey){
@@ -3190,6 +3190,13 @@ function renderMonsterBattle(){
     setTimeout(()=>{
       // ---- ちょうかいかいこ／しめつのいちげき：問答無用の即死・ふっかつ不可のものはここで処理 ----
       if(move.instantKill || move.kind === "instakill"){
+        // missChanceが設定されているわざ（ちょうかいかいこ）のみ、ミスの可能性がある
+        if(move.missChance && Math.random() < move.missChance){
+          battleLog.textContent = "しかし　こうげきは　はずれた！";
+          setTimeout(next, REACTION_DELAY);
+          return;
+        }
+
         pHp = 0;
         battleLog.textContent = move.customMsg
           ? move.customMsg.replace("{hero}", heroName)
@@ -3237,17 +3244,20 @@ function renderMonsterBattle(){
         return;
       }
 
-      // ---- こうかいしょけい（burst）：ためたちから分だけ被ダメージが跳ね上がる ----
+      // ---- こうかいしょけい（burst）：ためたちから分だけ被ダメージが跳ね上がる。ミス時は無害でターン続行 ----
       if(move.kind === "burst"){
         const { dmg: baseDmg, missed } = rollDamage(mStats.atk, 1.2, playerDef);
-        const dmg = missed ? 0 : baseDmg * Math.max(1, chargeCount);
-        if(!missed){ pHp = Math.max(0, pHp - Math.min(pHp, dmg)); }
-        battleLog.textContent = missed
-          ? "しかし　こうげきは　はずれた！"
-          : (move.customMsg ? move.customMsg.replace("{hero}", heroName) : `${heroName}は　${dmg}の　ダメージを　うけた！`);
+        if(missed){
+          battleLog.textContent = "しかし　こうげきは　はずれた！";
+          setTimeout(next, REACTION_DELAY);
+          return;
+        }
+        const dmg = baseDmg * Math.max(1, chargeCount);
+        pHp = Math.max(0, pHp - Math.min(pHp, dmg));
+        battleLog.textContent = move.customMsg ? move.customMsg.replace("{hero}", heroName) : `${heroName}は　${dmg}の　ダメージを　うけた！`;
         hpNum.textContent = pHp;
         updateHpColor(hpNum, pHp, maxHp);
-        if(!missed) flashRedScreen(400);
+        flashRedScreen(400);
 
         if(pHp<=0){
           if(tryRevive(next)) return;
