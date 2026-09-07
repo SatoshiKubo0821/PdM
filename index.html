@@ -119,6 +119,10 @@
   .dq-job-icon img{width:100%; height:100%; object-fit:cover; image-rendering:pixelated;}
   .dq-name{font-family:var(--pixel-font); font-size:18px; font-weight:700;}
   .dq-job{font-family:var(--pixel-font); font-size:13px; margin-top:6px; color:var(--gold-soft);}
+  .dq-tier-badge{
+    display:inline-block; font-size:10px; color:#000; padding:2px 8px; margin-left:6px;
+    font-family:var(--pixel-font); border:1px solid #000; vertical-align:middle;
+  }
   .dq-lv{font-family:var(--pixel-font); font-size:16px; margin-top:6px; color:var(--gold);}
   .dq-bar-row{display:flex; align-items:center; gap:10px; margin-top:8px;}
   .dq-bar-label{font-family:var(--pixel-font); font-size:12px; width:28px; flex-shrink:0;}
@@ -1128,12 +1132,40 @@ const CLUSTER_OF = {
    特定のゲームタイトルの固有名詞・具体的な数値バランスを模したものではなく、
    ドット絵RPGで一般的に見られる「職業・ステータス・せいかく」という表現手法を
    ゼロから設計したもの。 */
-const JOB_CLASS = {
-  tech:    { name:"まほうつかい", en:"MAGE", desc:"知略と技術で局面を切り拓く、知力特化の職業。", icon:"mage" },
-  bizdev:  { name:"せんし",       en:"WARRIOR", desc:"事業という名の戦場を、力づくで前進させる職業。", icon:"warrior" },
-  pmm:     { name:"そうりょ",     en:"PRIEST", desc:"市場と顧客に寄り添い、価値を届け支える職業。", icon:"priest" },
-  general: { name:"ゆうしゃ",     en:"HERO", desc:"どんな戦場でも戦える、バランス型の主人公職。", icon:"hero" },
+/* 職業は「ジュニア＝初級職」「ミドル＝中級職」「シニア＝上級職」という、
+   ドラクエの職業ランクシステムを踏まえた3段階構成。同じ系統内で名前が進化する。
+   アイコン画像は4系統共通で使い回し、ランクバッジで段階を表現する。 */
+const JOB_ICON_BY_TYPE = { tech:"mage", bizdev:"warrior", pmm:"priest", general:"hero" };
+const JOB_TIER_LABEL = { junior:"初級職", middle:"中級職", senior:"上級職" };
+const JOB_TIER_COLOR = { junior:"#B08D57", middle:"#C7CDD6", senior:"#F8C630" };
+const JOB_CLASS_TIERS = {
+  tech: {
+    junior: { name:"まほうつかい",   en:"MAGE",         desc:"知略と技術で局面を切り拓く、知力特化の初級職。" },
+    middle: { name:"まほうせんし",   en:"MAGE WARRIOR", desc:"魔法と実行力を兼ね備え、技術課題を前線で解決する中級職。" },
+    senior: { name:"けんじゃ",       en:"SAGE",         desc:"技術と戦略を極め、組織の意思決定を導く上級職。" },
+  },
+  bizdev: {
+    junior: { name:"せんし",         en:"WARRIOR",       desc:"事業という名の戦場を、力づくで前進させる初級職。" },
+    middle: { name:"バトルマスター", en:"BATTLE MASTER", desc:"数々の事業を率い、修羅場をくぐり抜けてきた中級職。" },
+    senior: { name:"ゴッドハンド",   en:"GOD HAND",      desc:"事業を意のままに動かす、伝説級の上級職。" },
+  },
+  pmm: {
+    junior: { name:"そうりょ",           en:"PRIEST",         desc:"市場と顧客に寄り添い、価値を届け支える初級職。" },
+    middle: { name:"パラディン",         en:"PALADIN",        desc:"顧客と組織の両方を守り抜く、信頼される中級職。" },
+    senior: { name:"てんちらいめいし",   en:"CELESTIAL SAGE", desc:"市場と組織のすべてを見通す、伝説級の上級職。" },
+  },
+  general: {
+    junior: { name:"みならいゆうしゃ", en:"HERO APPRENTICE", desc:"どんな戦場でも戦える、バランス型の見習い主人公職。" },
+    middle: { name:"ゆうしゃこうほ",   en:"HERO CANDIDATE",  desc:"幅広い経験を積み、頭角を現しつつある主人公候補職。" },
+    senior: { name:"ゆうしゃ",         en:"HERO",            desc:"どんな戦場でも戦える、バランス型の主人公職。" },
+  },
 };
+function getJobClass(typeKey, seniorityKey){
+  const tierData = JOB_CLASS_TIERS[typeKey] && JOB_CLASS_TIERS[typeKey][seniorityKey];
+  const fallback = JOB_CLASS_TIERS[typeKey] ? JOB_CLASS_TIERS[typeKey].junior : JOB_CLASS_TIERS.general.junior;
+  const data = tierData || fallback;
+  return { ...data, icon: JOB_ICON_BY_TYPE[typeKey] || "hero", tier: seniorityKey, tierLabel: JOB_TIER_LABEL[seniorityKey] || JOB_TIER_LABEL.junior };
+}
 
 /* カテゴリ→ドラクエ風ステータス名（元のカテゴリ名も併記して表示する） */
 const STAT_FLAVOR = {
@@ -3251,7 +3283,7 @@ function renderResults(){
   const careerPath = buildCareerPath(seniorityKey);
   const toeicNote = toeicComment(state.profile.toeic);
   const rpg = buildRPGStats();
-  const jobClass = JOB_CLASS[typeResult.key];
+  const jobClass = getJobClass(typeResult.key, seniorityKey);
   const persona = hasMbti ? (MBTI_DQ_PERSONA[state.mbti] || MBTI_DQ_PERSONA.unknown) : MBTI_DQ_PERSONA.unknown;
   const techniques = buildSkillTechniques();
   const equipment = buildEquipment(state.mbti);
@@ -3273,7 +3305,7 @@ function renderResults(){
         <div class="dq-job-icon"><img src="./assets/jobs/${jobClass.icon}.png" alt="${jobClass.name}"></div>
         <div>
           <div class="dq-name">${state.profile.nickname || "ぼうけんしゃ"}</div>
-          <div class="dq-job">しょくぎょう：${jobClass.name}（${jobClass.en}）</div>
+          <div class="dq-job">しょくぎょう：${jobClass.name}（${jobClass.en}）<span class="dq-tier-badge" style="background:${JOB_TIER_COLOR[jobClass.tier]};">${jobClass.tierLabel}</span></div>
           <div class="dq-lv">Lv ${rpg.lv}　<span style="color:#fff; font-size:12px;">Ex: ${rpg.exp.toLocaleString()}</span></div>
         </div>
       </div>
