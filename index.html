@@ -393,10 +393,10 @@
 
   /* ---------- Intro ---------- */
 
-  /* Intro: large existing hero image beside the copy. */
+  /* Intro: large existing hero image to the left of the copy. */
   .intro-hero{
     display:grid;
-    grid-template-columns:minmax(0, 1fr) 320px;
+    grid-template-columns:320px minmax(0, 1fr);
     align-items:center;
     gap:32px;
     width:min(1120px, calc(100vw - 48px));
@@ -3804,6 +3804,9 @@ async function renderIntro(){
 
   app.innerHTML = `
     <section class="intro-hero" aria-label="PdMクエストの紹介">
+    <figure class="intro-hero-art">
+      <img src="./assets/jobs/general_senior.png" alt="剣と盾を装備した青い髪のゆうしゃ" width="320" height="340" fetchpriority="high">
+    </figure>
     <div class="intro-hero-copy">
     <div class="eyebrow">PdMクエスト（PdM診断）</div>
     <h1 class="hero-title">きみの　PdMとしての　ちからで、<br>モンスターと　たたかおう！</h1>
@@ -3819,9 +3822,6 @@ async function renderIntro(){
     </div>
 
     </div>
-    <figure class="intro-hero-art">
-      <img src="./assets/jobs/general_senior.png" alt="剣と盾を装備した青い髪のゆうしゃ" width="320" height="340" fetchpriority="high">
-    </figure>
     </section>
 
     <div class="hero-visual">${previewRadarSVG()}</div>
