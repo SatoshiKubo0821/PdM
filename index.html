@@ -279,6 +279,22 @@
   .cat-card-text{flex:1;}
   .cat-card-num{font-size:10.5px; color:var(--ink-soft); font-weight:700; display:block;}
   .cat-card-count{color:var(--ink-soft); font-variant-numeric:tabular-nums; font-size:12px; flex-shrink:0;}
+
+  /* 12職業ショーケース（イントロ画面） */
+  .job-showcase-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
+  .job-showcase-col{background:#000; border:2px solid #fff; box-shadow:0 0 0 2px #000; padding:10px 6px;}
+  .job-showcase-type{
+    font-family:var(--pixel-font); font-size:11px; color:var(--gold); text-align:center;
+    margin-bottom:8px; padding-bottom:6px; border-bottom:1px dashed rgba(255,255,255,.3);
+  }
+  .job-showcase-cell{text-align:center; padding:6px 0;}
+  .job-showcase-cell img{width:64px; height:64px; object-fit:cover; image-rendering:pixelated; border:1px solid rgba(255,255,255,.3);}
+  .job-showcase-name{font-family:var(--pixel-font); font-size:10px; color:#fff; margin-top:4px; line-height:1.3;}
+  .job-showcase-tier{font-family:var(--pixel-font); font-size:8.5px; margin-top:2px;}
+  @media (max-width:560px){
+    .job-showcase-grid{grid-template-columns:repeat(2,1fr);}
+    .job-showcase-cell img{width:52px; height:52px;}
+  }
   .start-row{
     margin-top:40px;
     display:flex;
@@ -1135,9 +1151,9 @@ const CLUSTER_OF = {
 /* 職業は「ジュニア＝初級職」「ミドル＝中級職」「シニア＝上級職」という、
    ドラクエの職業ランクシステムを踏まえた3段階構成。同じ系統内で名前が進化する。
    アイコン画像は4系統共通で使い回し、ランクバッジで段階を表現する。 */
-const JOB_ICON_BY_TYPE = { tech:"mage", bizdev:"warrior", pmm:"priest", general:"hero" };
 const JOB_TIER_LABEL = { junior:"初級職", middle:"中級職", senior:"上級職" };
 const JOB_TIER_COLOR = { junior:"#B08D57", middle:"#C7CDD6", senior:"#F8C630" };
+const PDM_TYPE_SHORT_LABEL = { tech:"テックドリブン", bizdev:"BizDev", pmm:"PMM系", general:"総合型" };
 const JOB_CLASS_TIERS = {
   tech: {
     junior: { name:"まほうつかい",   en:"MAGE",         desc:"知略と技術で局面を切り拓く、知力特化の初級職。" },
@@ -1164,7 +1180,8 @@ function getJobClass(typeKey, seniorityKey){
   const tierData = JOB_CLASS_TIERS[typeKey] && JOB_CLASS_TIERS[typeKey][seniorityKey];
   const fallback = JOB_CLASS_TIERS[typeKey] ? JOB_CLASS_TIERS[typeKey].junior : JOB_CLASS_TIERS.general.junior;
   const data = tierData || fallback;
-  return { ...data, icon: JOB_ICON_BY_TYPE[typeKey] || "hero", tier: seniorityKey, tierLabel: JOB_TIER_LABEL[seniorityKey] || JOB_TIER_LABEL.junior };
+  const iconKey = (JOB_CLASS_TIERS[typeKey] ? typeKey : "general") + "_" + seniorityKey;
+  return { ...data, icon: iconKey, tier: seniorityKey, tierLabel: JOB_TIER_LABEL[seniorityKey] || JOB_TIER_LABEL.junior };
 }
 
 /* カテゴリ→ドラクエ風ステータス名（元のカテゴリ名も併記して表示する） */
@@ -2613,6 +2630,24 @@ async function renderIntro(){
           <div class="cat-icon" style="background:${CATEGORY_COLOR[c.key]};"><svg viewBox="0 0 24 24">${CATEGORY_ICON[c.key]}</svg></div>
           <div class="cat-card-text"><span class="cat-card-num">0${i+1}</span>${c.name}</div>
           <span class="cat-card-count">${c.skills.length}項目</span>
+        </div>`).join("")}
+    </div>
+
+    <div class="section-label" style="margin-top:44px;">診断でわかる12の職業</div>
+    <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">4つのPdMタイプ × ジュニア／ミドル／シニアの3ランクで、あなたの職業が決まります。</p>
+    <div class="job-showcase-grid">
+      ${["tech","bizdev","pmm","general"].map(typeKey=>`
+        <div class="job-showcase-col">
+          <div class="job-showcase-type">${PDM_TYPE_SHORT_LABEL[typeKey]}</div>
+          ${["junior","middle","senior"].map(tierKey=>{
+            const jc = getJobClass(typeKey, tierKey);
+            return `
+            <div class="job-showcase-cell">
+              <img src="./assets/jobs/${jc.icon}.png" alt="${jc.name}">
+              <div class="job-showcase-name">${jc.name}</div>
+              <div class="job-showcase-tier" style="color:${JOB_TIER_COLOR[tierKey]};">${JOB_TIER_LABEL[tierKey]}</div>
+            </div>`;
+          }).join("")}
         </div>`).join("")}
     </div>
 
