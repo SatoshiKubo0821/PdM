@@ -148,7 +148,7 @@
     : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // 診断結果ページ・登竜門から渡された文脈（pdmType/seniority/hensachi）を読み取り、表示・送信に使う
-  const PDM_TYPE_LABELS = { tech:"テックドリブンPdM", bizdev:"BizDevPdM", pmm:"PMM系PdM", general:"総合型PdM" };
+  const PDM_TYPE_LABELS = { tech:"開発系PdM", bizdev:"BizDev系PdM", pmm:"マーケ系PdM", general:"総合型PdM" };
   const SENIORITY_LABELS = { junior:"ジュニア", middle:"ミドル", senior:"シニア〜CPO" };
 
   const params = new URLSearchParams(window.location.search);

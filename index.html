@@ -393,6 +393,31 @@
   .eyebrow b{color:var(--gold);}
 
   /* ---------- Intro ---------- */
+
+  /* Intro: large existing hero image to the left of the copy. */
+  .intro-hero{
+    display:grid;
+    grid-template-columns:320px minmax(0, 1fr);
+    align-items:center;
+    gap:32px;
+    width:min(1120px, calc(100vw - 48px));
+    position:relative;
+    left:50%;
+    transform:translateX(-50%);
+  }
+  .intro-hero-copy{min-width:0;}
+  .intro-hero-art{margin:0; width:320px;}
+  .intro-hero-art img{
+    display:block; width:100%; height:340px;
+    object-fit:cover; object-position:center;
+    image-rendering:pixelated;
+  }
+  @media(max-width:800px){
+    .intro-hero{grid-template-columns:minmax(0, 1fr); gap:24px; width:100%; left:auto; transform:none;}
+    .intro-hero-art{width:min(280px, 100%); justify-self:center;}
+    .intro-hero-art img{height:280px;}
+  }
+
   .hero-title{
     font-size:38px;
     font-weight:900;
@@ -1304,7 +1329,7 @@ const CATEGORIES = [
     ]},
 ];
 
-/* 35項目を「テックドリブン／BizDev／PMM／共通」の4系統に分類 */
+/* 35項目を「開発系PdM／BizDev／PMM／共通」の4系統に分類 */
 const CLUSTER_OF = {
   "プロダクトビジョン策定":"bizdev",
   "短期ロードマップ作成":"bizdev",
@@ -1367,7 +1392,7 @@ const CLUSTER_OF = {
    アイコン画像は4系統共通で使い回し、ランクバッジで段階を表現する。 */
 const JOB_TIER_LABEL = { junior:"初級職", middle:"中級職", senior:"上級職" };
 const JOB_TIER_COLOR = { junior:"#B08D57", middle:"#C7CDD6", senior:"#F8C630" };
-const PDM_TYPE_SHORT_LABEL = { tech:"テックドリブン", bizdev:"BizDev", pmm:"PMM系", general:"総合型" };
+const PDM_TYPE_SHORT_LABEL = { tech:"開発系PdM", bizdev:"BizDev系PdM", pmm:"マーケ系PdM", general:"総合型" };
 const JOB_CLASS_TIERS = {
   tech: {
     junior: { name:"まほうつかい",   en:"MAGE",         desc:"知略と技術で局面を切り拓く、知力特化の初級職。" },
@@ -1630,18 +1655,18 @@ const SKILL_KIND_BY_CATEGORY = {
 };
 
 const PDM_TYPES = {
-  tech:    { label:"テックドリブンPdM",  desc:"要件定義・詳細設計・リリースなど、開発チームと並走して形にする力に強みがあります。エンジニアリングへの理解を武器に、実装まで見通した意思決定ができるタイプです。" },
-  bizdev:  { label:"BizDevPdM",         desc:"事業戦略・市場調査・優先度判断など、事業成長の道筋を描く力に強みがあります。KPIや市場環境を踏まえ、プロダクトを事業として前に進めるタイプです。" },
-  pmm:     { label:"PMM系PdM",          desc:"マーケティング戦略やユーザー理解、対外的な発信力に強みがあります。市場への届け方（GTM）や顧客への価値の伝え方をリードするタイプです。" },
+  tech:    { label:"開発系PdM",  desc:"要件定義・詳細設計・リリースなど、開発チームと並走して形にする力に強みがあります。エンジニアリングへの理解を武器に、実装まで見通した意思決定ができるタイプです。" },
+  bizdev:  { label:"BizDev系PdM",         desc:"事業戦略・市場調査・優先度判断など、事業成長の道筋を描く力に強みがあります。KPIや市場環境を踏まえ、プロダクトを事業として前に進めるタイプです。" },
+  pmm:     { label:"マーケ系PdM",          desc:"マーケティング戦略やユーザー理解、対外的な発信力に強みがあります。市場への届け方（GTM）や顧客への価値の伝え方をリードするタイプです。" },
   general: { label:"総合型PdM",         desc:"特定領域に偏らず、事業・開発・マーケティングの各領域をバランスよくカバーできています。オールラウンダーとして、専門性の高いメンバーをまとめる役割にも向いています。" },
 };
 
 /* チームフィット：スキルタイプ別に補完し合える相手 */
 const TEAM_FIT_BY_TYPE = {
-  tech:   "戦略や優先順位を描く「BizDevPdM」、市場への届け方を担う「PMM系PdM」と組むと、実装力を事業成果につなげやすくなります。",
-  bizdev: "実装可否や技術的な制約を見極める「テックドリブンPdM」、市場への発信を担う「PMM系PdM」と組むと、絵に描いた餅で終わらせずに済みます。",
-  pmm:    "実現可能性を地に足つけて判断する「テックドリブンPdM」、事業指標との整合を取る「BizDevPdM」と組むと、発信力を事業成果に変換しやすくなります。",
-  general:"特定領域を極めた「テックドリブンPdM」「BizDevPdM」「PMM系PdM」のいずれとも組みやすく、専門性の異なるメンバー同士をつなぐハブとして機能しやすいタイプです。",
+  tech:   "戦略や優先順位を描く「BizDev系PdM」、市場への届け方を担う「マーケ系PdM」と組むと、実装力を事業成果につなげやすくなります。",
+  bizdev: "実装可否や技術的な制約を見極める「開発系PdM」、市場への発信を担う「マーケ系PdM」と組むと、絵に描いた餅で終わらせずに済みます。",
+  pmm:    "実現可能性を地に足つけて判断する「開発系PdM」、事業指標との整合を取る「BizDev系PdM」と組むと、発信力を事業成果に変換しやすくなります。",
+  general:"特定領域を極めた「開発系PdM」「BizDev系PdM」「マーケ系PdM」のいずれとも組みやすく、専門性の異なるメンバー同士をつなぐハブとして機能しやすいタイプです。",
 };
 
 const LEVELS = [
@@ -2711,7 +2736,12 @@ function determinePdmType(){
   const [topKey, topVal] = entries[0];
   const [, secondVal] = entries[1];
   const isBalanced = (topVal - secondVal) < 0.5;
-  return { key: isBalanced ? "general" : topKey, scores };
+  const seniorityKey = determineSeniorityKey(overallAverage());
+  const heroThreshold = { junior:3, middle:3.5, senior:4 }[seniorityKey];
+  // 10カテゴリの平均点で判定。基準ちょうどは未満に含めない。
+  const belowThresholdCount = CATEGORIES.filter(cat => categoryAverage(cat) < heroThreshold).length;
+  const canBeHero = belowThresholdCount < 2;
+  return { key: isBalanced && canBeHero ? "general" : topKey, scores };
 }
 function allSkillsFlat(){
   const flat = [];
@@ -3779,6 +3809,11 @@ async function renderIntro(){
   const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
 
   app.innerHTML = `
+    <section class="intro-hero" aria-label="PdMクエストの紹介">
+    <figure class="intro-hero-art">
+      <img src="./assets/jobs/general_senior.png" alt="剣と盾を装備した青い髪のゆうしゃ" width="320" height="340" fetchpriority="high">
+    </figure>
+    <div class="intro-hero-copy">
     <div class="eyebrow">PdMクエスト（PdM診断）</div>
     <h1 class="hero-title">きみの　PdMとしての　ちからで、<br>モンスターと　たたかおう！</h1>
     <p class="hero-lead">
@@ -3791,6 +3826,9 @@ async function renderIntro(){
       <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
       ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
     </div>
+
+    </div>
+    </section>
 
     <div class="hero-visual">${previewRadarSVG()}</div>
 
@@ -4735,7 +4773,7 @@ function renderResults(){
 
     <div class="section-label">タイプ別スコア内訳</div>
     <div class="result-grid" style="margin-top:14px;">
-      ${[["tech","テックドリブン"],["bizdev","BizDev"],["pmm","PMM"]].map(([k,label])=>{
+      ${[["tech","開発系PdM"],["bizdev","BizDev系PdM"],["pmm","マーケ系PdM"]].map(([k,label])=>{
         const v = typeResult.scores[k];
         return `<div>
           <div class="result-row-name"><span>${label}</span><b>${v.toFixed(1)}</b></div>
