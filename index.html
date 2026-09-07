@@ -3939,6 +3939,12 @@ async function renderIntro(){
       state.rpgMp = saved.rpgMp ?? null;
       state.defeatedMonsters = saved.defeatedMonsters || {};
     }
+    // Googleでまだログインしていない場合は、なまえ・けいけん入力の前にSSOをはさむ
+    if(supabaseClient && !state.userEmail){
+      await saveProgress(); // OAuthリダイレクトでページが再読み込みされる前に、いまの回答をローカルへ保存しておく
+      await signInWithGoogle("#profileEntry");
+      return;
+    }
     state.screen = "profileEntry";
     render(); window.scrollTo(0,0);
   }
@@ -5092,6 +5098,20 @@ function renderResults(){
     state.screen = "mypage";
   }else if(window.location.hash === "#orgculture"){
     state.screen = "orgIntro";
+  }else if(window.location.hash === "#profileEntry"){
+    // Googleログインからのリダイレクト直後：保存しておいた回答内容を復元してから、なまえ・けいけん入力へ
+    const saved = await loadSaved();
+    if(saved){
+      state.answers = saved.answers || {};
+      state.mbti = saved.mbti || null;
+      state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
+      state.orgAnswers = saved.orgAnswers || {};
+      state.orgScores = saved.orgScores || null;
+      state.vitalsAnswers = saved.vitalsAnswers || {};
+      state.rpgMp = saved.rpgMp ?? null;
+      state.defeatedMonsters = saved.defeatedMonsters || {};
+    }
+    state.screen = "profileEntry";
   }
   const navMypageLink = document.getElementById("navMypageLink");
   if(navMypageLink){
