@@ -1116,6 +1116,13 @@
   .history-row-nick{font-family:var(--pixel-font); font-size:13px; color:#fff; font-weight:700;}
   .history-row-job{font-family:var(--pixel-font); font-size:13px; color:var(--gold); margin-top:4px;}
   .history-row-tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .history-row-delete{
+    flex-shrink:0; align-self:flex-start;
+    font-family:var(--pixel-font); font-size:14px; font-weight:700;
+    background:#000; color:rgba(255,255,255,.5); border:2px solid rgba(255,255,255,.3);
+    width:30px; height:30px; line-height:1; cursor:pointer; padding:0;
+  }
+  .history-row-delete:hover{color:#E6432E; border-color:#E6432E;}
   .history-row:hover{border-color:var(--gold); transform:translateX(2px);}
   .insight h4{
     margin:0 0 6px;
@@ -1277,7 +1284,7 @@ const CATEGORIES = [
       ["プライシング戦略","提供価値と市場競争環境に応じた価格設計・改定ができる","私は、提供価値と競争環境に応じた価格設計・改定を行うことができる",false],
       ["パートナーシップ・アライアンス戦略","他社との提携によって事業成長を加速する戦略を描ける","他社との提携によって事業成長を加速させる戦略を描くのは得意ではない",true],
     ]},
-  { key:"research", name:"リサーチ", sub:"顧客にとっての価値と市場からの需要を見極める力",
+  { key:"insight", name:"カスタマーインサイト", sub:"顧客と市場を深く理解し、意思決定に活かす力",
     skills:[
       ["競合調査","市場の競合を把握し、差別化ポイントを見出せる","私は、市場の競合を把握し、差別化ポイントを見出すことができる",false],
       ["市場調査","内外環境を分析し、戦略の方向性に説得力を持たせられる","内外の環境を分析し、戦略の方向性に説得力を持たせることに苦手意識がある",true],
@@ -1293,7 +1300,6 @@ const CATEGORIES = [
       ["スケジュール見積もり","開発チームと連携し、無理のないスケジュールを見積もれる","私は、開発チームと連携し、無理のないスケジュールを見積もることができる",false],
       ["リソース調整","デザイナーやエンジニアの配置・稼働を最適化できる","デザイナーやエンジニアの配置・稼働を最適化するのが不得手だ",true],
       ["開発ディレクション","要件を的確に伝え、開発の進行を管理できる","私は、要件を的確に伝え、開発の進行を管理することができる",false],
-      ["UIデザインのディレクション","デザインチームに要件を伝え、進行と品質を管理できる","デザインチームに要件を伝え、進行と品質を管理する作業に自信が持てない",true],
     ]},
   { key:"requirement", name:"要件定義", sub:"何のために何をやるのか、チームと認識をそろえる力",
     skills:[
@@ -1302,11 +1308,15 @@ const CATEGORIES = [
       ["プロダクト要件定義の作成","要求を実装要件に落とし込み、エンジニア・デザイナーと合意形成できる","私は、要求を実装要件に落とし込み、エンジニア・デザイナーと合意形成することができる",false],
       ["フィジビリティ確認","関係者と連携し、施策や機能の実現可能性を見極められる","施策や機能の実現可能性を関係者と見極める作業に苦手意識がある",true],
     ]},
-  { key:"design", name:"詳細設計", sub:"施策の詳細を設計し、関係者に正しく伝える力",
+  { key:"uiux", name:"UIUXデザイン", sub:"ユーザーにとって心地よい体験を、自らの手でかたちにする力",
     skills:[
-      ["仕様詳細のドキュメント化","後から見返せる分かりやすい仕様書を作成し、認識をそろえられる","私は、後から見返せる分かりやすい仕様書を作成し、認識をそろえることができる",false],
+      ["UIデザインのディレクション","デザインチームに要件を伝え、進行と品質を管理できる","デザインチームに要件を伝え、進行と品質を管理する作業に自信が持てない",true],
       ["プロトタイプ作成","開発前にイメージを共有するプロトタイプを素早く作れる","開発前にイメージを共有するプロトタイプを素早く作るのが不得手だ",true],
       ["ユーザー体験設計","施策や機能が生む一連の体験を可視化・言語化できる","私は、施策や機能が生む一連の体験を可視化・言語化することができる",false],
+    ]},
+  { key:"design", name:"仕様設計", sub:"施策の詳細を設計し、関係者に正しく伝える力",
+    skills:[
+      ["仕様詳細のドキュメント化","後から見返せる分かりやすい仕様書を作成し、認識をそろえられる","私は、後から見返せる分かりやすい仕様書を作成し、認識をそろえることができる",false],
       ["影響範囲の確認","技術的制約や他領域への影響を踏まえ、要件を調整できる","技術的制約や他領域への影響を踏まえて要件を調整するのが難しいと感じる",true],
       ["技術アーキテクチャの理解","システム構成や技術的制約を理解し、開発チームと対等に議論できる","私は、システム構成や技術的制約を理解し、開発チームと対等に議論することができる",false],
     ]},
@@ -1323,15 +1333,6 @@ const CATEGORIES = [
       ["フィードバックの受け取りと提供","フィードバックを活かしてアウトプットを磨き、建設的に伝えられる","私は、フィードバックを活かしてアウトプットを磨き、建設的に伝えることができる",false],
       ["プレゼンテーション","提案や依頼を通じて、意思決定・合意形成を導ける","提案や依頼を通じて意思決定・合意形成を導くプレゼンに苦手意識がある",true],
       ["チーム内コミュニケーション","チームの協働を促す雰囲気や場をつくれる","私は、チームの協働を促す雰囲気や場をつくることができる",false],
-    ]},
-  { key:"consulting", name:"コンサルティング", sub:"プロダクト開発を組織に根づかせる、伴走の力",
-    skills:[
-      ["ドキュメンテーション","取り組みのプロセスを言語化し、他者が実践できる形で残せる","取り組みのプロセスを言語化し、他者が実践できる形で残すのが難しいと感じる",true],
-      ["ネゴシエーション","期待値のズレを調整し、合意形成を導ける","私は、期待値のズレを調整し、合意形成を導くことができる",false],
-      ["ファシリテーション","相手がスキルを習得するプロセスを設計し、導ける","相手がスキルを習得するプロセスを設計し、導く役割は得意ではない",true],
-      ["プロジェクトの要件設計、管理","目標と期限に向けてスケジュールとプロセスを描き、リードできる","私は、目標と期限に向けてスケジュールとプロセスを描き、リードすることができる",false],
-      ["販売チャネル戦略","直販・代理店・オンラインなど、適切な販売チャネルを設計できる","直販・代理店・オンラインなど、適切な販売チャネルを設計するのが不得手だ",true],
-      ["コンテンツ・ブランディング戦略","コンテンツマーケティングやブランディングを通じて認知・信頼を構築できる","私は、コンテンツマーケティングやブランディングを通じて認知・信頼を構築することができる",false],
     ]},
   { key:"success", name:"カスタマーサクセス", sub:"導入後の顧客に価値を実感し続けてもらう力",
     skills:[
@@ -1380,10 +1381,6 @@ const CLUSTER_OF = {
   "フィードバックの受け取りと提供":"common",
   "プレゼンテーション":"pmm",
   "チーム内コミュニケーション":"common",
-  "ドキュメンテーション":"common",
-  "ネゴシエーション":"bizdev",
-  "ファシリテーション":"pmm",
-  "プロジェクトの要件設計、管理":"bizdev",
   "英語での開発チーム牽引":"tech",
   "英語でのグローバルGTM展開":"pmm",
   "各国に応じたGTM戦略の実行":"pmm",
@@ -1393,8 +1390,6 @@ const CLUSTER_OF = {
   "業界動向・トレンド分析":"bizdev",
   "技術アーキテクチャの理解":"tech",
   "テスト計画・品質基準の設計":"tech",
-  "販売チャネル戦略":"pmm",
-  "コンテンツ・ブランディング戦略":"pmm",
   "オンボーディング設計":"pmm",
   "チャーン分析・防止":"pmm",
   "アップセル・クロスセル戦略":"bizdev",
@@ -1566,13 +1561,13 @@ function buildLegendarySkills(){
 /* カテゴリ→ドラクエ風ステータス名（元のカテゴリ名も併記して表示する） */
 const STAT_FLAVOR = {
   strategy:      "せんりゃくりょく",
-  research:      "かんさつりょく",
+  insight:       "かんさつりょく",
   direction:     "とうそつりょく",
   requirement:   "げんみつせい",
+  uiux:          "びかんりょく",
   design:        "こうちくりょく",
   release:       "じっこうりょく",
   communication: "わじゅつ",
-  consulting:    "せっとくりょく",
   success:       "きずなのちから",
   global:        "せかいりょく",
 };
@@ -1580,13 +1575,13 @@ const STAT_FLAVOR = {
 /* カテゴリごとの「そうび」（武器・防具）風フレーバー名。得意カテゴリ上位4件を装備欄に表示する */
 const CATEGORY_EQUIPMENT = {
   strategy:      { slot:"ぶき",     name:"せんりゃくのけん" },
-  research:      { slot:"ぶき",     name:"かんさつのつえ" },
+  insight:       { slot:"ぶき",     name:"かんさつのつえ" },
   direction:     { slot:"たて",     name:"とうそつのたて" },
   requirement:   { slot:"かぶと",   name:"げんみつのかぶと" },
+  uiux:          { slot:"そうしょく", name:"びかんのブラシ" },
   design:        { slot:"よろい",   name:"せっけいのよろい" },
   release:       { slot:"たて",     name:"ひんしつのたて" },
   communication: { slot:"そうしょく", name:"わじゅつのゆびわ" },
-  consulting:    { slot:"ぶき",     name:"せっとくのつえ" },
   success:       { slot:"そうしょく", name:"きずなのペンダント" },
   global:        { slot:"よろい",   name:"せかいのマント" },
 };
@@ -1652,12 +1647,6 @@ const SKILL_NAME_HIRAGANA = {
   "フィードバックの受け取りと提供":"ふぃーどばっくのうけとりとていきょう",
   "プレゼンテーション":"ぷれぜんてーしょん",
   "チーム内コミュニケーション":"ちーむないこみゅにけーしょん",
-  "ドキュメンテーション":"どきゅめんてーしょん",
-  "ネゴシエーション":"ねごしえーしょん",
-  "ファシリテーション":"ふぁしりてーしょん",
-  "プロジェクトの要件設計、管理":"ぷろじぇくとのようけんせっけいかんり",
-  "販売チャネル戦略":"はんばいちゃねるせんりゃく",
-  "コンテンツ・ブランディング戦略":"こんてんつぶらんでぃんぐせんりゃく",
   "オンボーディング設計":"おんぼーでぃんぐせっけい",
   "チャーン分析・防止":"ちゃーんぶんせきぼうし",
   "アップセル・クロスセル戦略":"あっぷせるくろすせるせんりゃく",
@@ -1667,8 +1656,8 @@ const SKILL_NAME_HIRAGANA = {
 };
 
 const SKILL_KIND_BY_CATEGORY = {
-  strategy:"じゅもん", research:"じゅもん", direction:"とくぎ", requirement:"じゅもん",
-  design:"とくぎ", release:"とくぎ", communication:"とくぎ", consulting:"じゅもん",
+  strategy:"じゅもん", insight:"じゅもん", direction:"とくぎ", requirement:"じゅもん",
+  uiux:"とくぎ", design:"とくぎ", release:"とくぎ", communication:"とくぎ",
   success:"とくぎ", global:"じゅもん",
 };
 
@@ -1945,12 +1934,6 @@ const SKILL_FLAVOR_DESC = {
   "フィードバックの受け取りと提供":"ことばの やりとりで たがいを みがきあう",
   "プレゼンテーション":"おもいを ひとまえで かたる ゆうきの じゅつ",
   "チーム内コミュニケーション":"なかまの きずなを つよめる わじゅつ",
-  "ドキュメンテーション":"しるしを のこし、のちの たみを たすける",
-  "ネゴシエーション":"たがいの のぞみを すりあわせる わじゅつ",
-  "ファシリテーション":"ばを ととのえ、みなの ちからを ひきだす",
-  "プロジェクトの要件設計、管理":"たびの けいかくを たて、みちびく とうそつじゅつ",
-  "販売チャネル戦略":"しなものを とどける みちを ひらく じゅつ",
-  "コンテンツ・ブランディング戦略":"なも しれた そんざいに する ひかりの じゅつ",
   "オンボーディング設計":"はじめの いっぽを やさしく みちびく じゅつ",
   "チャーン分析・防止":"はなれゆく ものを ひきとめる いんろくの じゅつ",
   "アップセル・クロスセル戦略":"きずなを ふかめ、さらなる ちからを うる",
@@ -2327,13 +2310,13 @@ const MBTI_PROFILE = {
    ※ 一般的な性格傾向論を業務文脈に翻訳した簡易モデルであり、断定的な適性診断ではない。 */
 const CATEGORY_AFFINITY_LETTERS = {
   strategy:      ["N","J"],
-  research:      ["N","T"],
+  insight:       ["N","T"],
   direction:     ["T","J"],
   requirement:   ["T","S"],
+  uiux:          ["S","F"],
   design:        ["S","J"],
   release:       ["J","T"],
   communication: ["E","F"],
-  consulting:    ["F","E"],
   global:        ["E","N"],
   success:       ["F","S"],
 };
@@ -2417,20 +2400,20 @@ function buildSwot(strengthCats, growthCats, matrix){
 
 /* カテゴリごとのアクセントカラー（診断画面の視認性向上のため。toryumon.htmlのモジュールカードと同じ配色） */
 const CATEGORY_COLOR = {
-  strategy:"#16294C", research:"#1F3D74", direction:"#28519C", requirement:"#3163B0",
-  design:"#3E7FC4", release:"#4FA0B8", communication:"#6C4AB6", consulting:"#2E8F6C",
+  strategy:"#16294C", insight:"#1F3D74", direction:"#28519C", requirement:"#3163B0",
+  uiux:"#9C5FC4", design:"#3E7FC4", release:"#4FA0B8", communication:"#6C4AB6",
   success:"#3E9B7C", global:"#FF8A3D",
 };
 /* カテゴリごとのアイコン（toryumon.htmlのモジュールカードと共通のオリジナル図形） */
 const CATEGORY_ICON = {
   strategy: '<path d="M6 3v18H4V3h2zm1 1h11l-2.5 3.5L18 11H7V4z" fill="#fff"/>',
-  research: '<circle cx="10" cy="10" r="6" fill="none" stroke="#fff" stroke-width="2"/><path d="M15 15l6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  insight: '<circle cx="10" cy="10" r="6" fill="none" stroke="#fff" stroke-width="2"/><path d="M15 15l6 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
   direction: '<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M14.5 9.5L10 14l1.5-4.5L16 8z" fill="#fff"/>',
   requirement: '<rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="#fff" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
+  uiux: '<rect x="4" y="4" width="16" height="12" rx="1.5" fill="none" stroke="#fff" stroke-width="2"/><circle cx="8" cy="9" r="1.3" fill="#fff"/><path d="M4 14l5-4 3 2.5 4-4 4 4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 19h8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
   design: '<path d="M4 20l3-1 10-10-2-2L5 17l-1 3z" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6l2 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/>',
   release: '<path d="M13 2c3 3 4 6 3 10l-3 3-3-3c-1-4 0-7 3-10z" fill="#fff"/><circle cx="13" cy="9" r="1.6" fill="#4FA0B8"/><path d="M8 15l-3 5 5-3z" fill="#fff"/>',
   communication: '<path d="M4 4h13v9H8l-4 4V4z" fill="#fff"/>',
-  consulting: '<path d="M8 12l3 3 5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/>',
   success: '<path d="M12 21C7 18 4 14 4 9.5A6.5 6.5 0 0117 9.5C17 14 12 21 12 21z" fill="#fff"/>',
   global: '<circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z" fill="none" stroke="#fff" stroke-width="2"/>',
 };
@@ -2475,12 +2458,12 @@ const ORG_AXIS_FRAGMENT = {
 /* 組織文化の各軸が、どのPdMスキルカテゴリの重要度を高めやすいか（両極それぞれ） */
 const ORG_TO_PDM_FOCUS = {
   decision:      { high:{cats:["direction","strategy"], reason:"自律的に動く組織では、現場でスピーディーに意思決定し、自ら戦略を描く力が特に重要になります。"},
-                   low: {cats:["consulting","requirement"], reason:"承認プロセスを重視する組織では、関係者との丁寧な合意形成や、認識のズレを防ぐ要件定義力が重要になります。"} },
+                   low: {cats:["communication","requirement"], reason:"承認プロセスを重視する組織では、関係者との丁寧な合意形成や、認識のズレを防ぐ要件定義力が重要になります。"} },
   evaluation:    { high:{cats:["strategy","global"], reason:"個人成果を重視する組織では、自分の専門性や独自の強みを打ち出す力が評価されやすくなります。"},
                    low: {cats:["communication","success"], reason:"チーム成果を重視する組織では、チームの協働を促す力や、顧客・チーム双方に寄り添う力が重要になります。"} },
-  risk:          { high:{cats:["strategy","research"], reason:"挑戦志向の組織では、新しい仮説を立てて検証しながら前に進む力が重要になります。"},
+  risk:          { high:{cats:["strategy","insight"], reason:"挑戦志向の組織では、新しい仮説を立てて検証しながら前に進む力が重要になります。"},
                    low: {cats:["release","design"], reason:"安定志向の組織では、品質を担保しながら緻密に設計・リリースする力が重要になります。"} },
-  communication: { high:{cats:["consulting","communication"], reason:"率直な文化の組織では、対立を恐れずに期待値調整やフィードバックを行う力が重要になります。"},
+  communication: { high:{cats:["communication","direction"], reason:"率直な文化の組織では、対立を恐れずに期待値調整やフィードバックを行う力が重要になります。"},
                    low: {cats:["success","communication"], reason:"調和を重んじる組織では、関係性を大切にしながら丁寧にコミュニケーションを取る力が重要になります。"} },
 };
 
@@ -2883,6 +2866,22 @@ async function fetchHistory(){
   }catch(e){ return []; }
 }
 
+/* ぼうけんの書（履歴）を1件、論理削除する。自分（state.userId）の記録以外は誤って消せないようidとuser_idの両方で絞り込む */
+async function deleteHistoryEntry(id){
+  if(!supabaseClient || !state.userId) return false;
+  try{
+    const { error } = await supabaseClient.from("diagnoses")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", id).eq("user_id", state.userId);
+    if(!error) return true;
+    // deleted_at列がまだ存在しない環境向けフォールバック
+    const { error: err2 } = await supabaseClient.from("diagnoses")
+      .update({ is_deleted: true })
+      .eq("id", id).eq("user_id", state.userId);
+    return !err2;
+  }catch(e){ return false; }
+}
+
 async function linkEmail(email){
   if(!supabaseClient) return { ok:false, message:"Supabaseが未設定です。" };
   try{
@@ -2996,6 +2995,7 @@ async function renderHistory(){
           </div>
           <p style="margin-top:8px; font-size:12px; color:var(--gold);">タップして当時の詳細結果を見る →</p>
         </div>
+        <button class="history-row-delete" data-id="${r.id}" title="このぼうけんの書を削除する" aria-label="削除">✕</button>
       </div>`;
     }).join("")}
 
@@ -3040,6 +3040,24 @@ async function renderHistory(){
       state.viewingHistoryRpgStats = row.rpg_stats || seededRpgStatsFromRow(row);
       state.screen = "results";
       render(); window.scrollTo(0,0);
+    };
+  });
+
+  app.querySelectorAll(".history-row-delete").forEach(btn=>{
+    btn.onclick = async (e)=>{
+      e.stopPropagation(); // 親カードのクリック（詳細表示）を発火させない
+      const id = btn.getAttribute("data-id");
+      const ok = window.confirm("このぼうけんの書を削除しますか？この操作は取り消せません。");
+      if(!ok) return;
+      btn.disabled = true;
+      const success = await deleteHistoryEntry(id);
+      if(success){
+        await renderHistory(); // 一覧を再取得して再描画
+        window.scrollTo(0,0);
+      }else{
+        btn.disabled = false;
+        window.alert("削除に失敗しました。もう一度お試しください。");
+      }
     };
   });
 }
@@ -4514,13 +4532,13 @@ function resultsRadarSVG(){
 /* ---------------- Results screen ---------------- */
 const ADVICE = {
   strategy: "第三者のセミナーやコーチングを通じて、事業視点でのロードマップ設計の型を学ぶと伸びやすい領域です。",
-  research: "定性・定量それぞれの調査を小さく実践し、仮説検証のサイクルを回す経験を積むと力がつきます。",
+  insight: "定性・定量それぞれの調査を小さく実践し、仮説検証のサイクルを回す経験を積むと力がつきます。",
   direction: "実際のプロジェクトで優先順位付けやリソース配分を任せてもらい、振り返りを重ねるのが近道です。",
   requirement: "ユーザーストーリーの書き方や要件定義のフォーマットを、書籍や実務でのレビューを通じて磨けます。",
-  design: "プロトタイピングツールを使いこなし、ドキュメント化の型を先輩PdMから学ぶと効果的です。",
+  uiux: "プロトタイピングツールを使いこなし、ユーザー体験を可視化・言語化する経験を積むと力がつきます。",
+  design: "仕様書のテンプレートを整備し、エンジニアとの認識合わせを丁寧に行う経験を積むと磨かれます。",
   release: "QAやABテストの設計に自らアサインしてもらい、リリースの一連の流れを経験することが近道です。",
   communication: "社内外でのプレゼン機会を増やし、フィードバックを積極的にもらう習慣が成長を後押しします。",
-  consulting: "クライアントや他部署との折衝を任せてもらい、期待値調整の場数を踏むことが有効です。",
   global: "海外拠点とのミーティングに同席する、英語のプロダクトドキュメントを書いてみるなど、小さな実践から語学と異文化理解を積み上げると伸びやすい領域です。",
   success: "カスタマーサクセスチームに同席し、解約理由のヒアリングやオンボーディング改善の議論に加わることで実践経験を積めます。",
 };
@@ -4531,20 +4549,20 @@ const ADVICE = {
 const GROWTH_REMEDY = {
   strategy:      { training:"グロービス経営大学院のプロダクトマネジメント講座や『INSPIRED』などの書籍で学ぶ", experience:"事業計画のレビュー会議に同席し、意思決定プロセスを観察する", task:"次期ロードマップのドラフト作成を、上長のレビュー付きで担当してみる",
     links:[{label:"Udemyでプロダクト戦略の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E6%88%A6%E7%95%A5"},{label:"グロービス学び放題（サービス概要）",url:"https://hodai.globis.co.jp/"}] },
-  research:      { training:"ユーザーインタビュー・定量分析の入門講座（Udemy等）を受講する", experience:"リサーチャーやデータアナリストのインタビュー同席・分析レビューに参加する", task:"小規模な機能改善で、仮説検証のミニプロジェクトを一件回してみる",
+  insight:       { training:"ユーザーインタビュー・定量分析の入門講座（Udemy等）を受講する", experience:"リサーチャーやデータアナリストのインタビュー同席・分析レビューに参加する", task:"小規模な機能改善で、仮説検証のミニプロジェクトを一件回してみる",
     links:[{label:"Udemyでユーザーリサーチの講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E3%83%AA%E3%82%B5%E3%83%BC%E3%83%81"}] },
   direction:     { training:"アジャイル／スクラムの認定研修（CSPO等）を受講する", experience:"開発チームのスプリントプランニング・振り返りに継続的に参加する", task:"小規模施策のスケジュール見積もりとリソース配分を任せてもらう",
     links:[{label:"Certified Scrum Product Owner（公式情報）",url:"https://www.scrumalliance.org/get-certified/product-owner-track/certified-scrum-product-owner"}] },
   requirement:   { training:"要求定義・要件定義の書籍やテンプレートを使って自己学習する", experience:"エンジニア・デザイナーとの要件レビュー会に同席し、フィードバックをもらう", task:"1つの機能の要件定義書を自分で書き、レビューを受けてみる",
     links:[{label:"Udemyで要件定義の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E8%A6%81%E4%BB%B6%E5%AE%9A%E7%BE%A9"}] },
-  design:        { training:"Figma等のプロトタイピングツールやUXライティングの講座を受講する", experience:"デザイナーのプロトタイプレビューやユーザビリティテストに同席する", task:"小さな画面のプロトタイプを自分で作成し、チームに共有してみる",
+  uiux:          { training:"Figma等のプロトタイピングツールやUXライティングの講座を受講する", experience:"デザイナーのプロトタイプレビューやユーザビリティテストに同席する", task:"小さな画面のプロトタイプを自分で作成し、チームに共有してみる",
     links:[{label:"Figma公式のチュートリアル",url:"https://www.figma.com/resources/learn-design/"},{label:"UdemyでUXライティングの講座を探す",url:"https://www.udemy.com/courses/search/?q=UX%E3%83%A9%E3%82%A4%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0"}] },
+  design:        { training:"仕様書・ドキュメンテーションのテンプレート集や書籍で型を学ぶ", experience:"エンジニアとの仕様レビュー会に同席し、認識合わせの進め方を観察する", task:"1つの機能の仕様書を自分で書き、チームにレビューしてもらう",
+    links:[{label:"Udemyで仕様書・ドキュメント作成の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E4%BB%95%E6%A7%98%E6%9B%B8"}] },
   release:       { training:"QA・テスト設計の基礎講座（JSTQB等）で体系的に学ぶ", experience:"QAチームのテスト計画レビューやリリース判定会議に同席する", task:"次回リリースのテスト観点洗い出しを担当してみる",
     links:[{label:"JSTQB（公式サイト）",url:"https://jstqb.jp/"}] },
   communication: { training:"プレゼンテーションやファシリテーションの社外セミナーに参加する", experience:"社内勉強会や1on1でのフィードバックのやり取りを積極的に行う", task:"次の定例会議のファシリテーションを担当してみる",
     links:[{label:"Udemyでファシリテーションの講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%83%95%E3%82%A1%E3%82%B7%E3%83%AA%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3"}] },
-  consulting:    { training:"交渉術やコンサルティングスキルに関する書籍・研修を受講する", experience:"クライアントや他部署との折衝の場に同席し、進め方を観察する", task:"小規模な期待値調整や交渉を任せてもらう",
-    links:[{label:"Udemyで交渉術の講座を探す",url:"https://www.udemy.com/courses/search/?q=%E4%BA%A4%E6%B8%89%E8%A1%93"}] },
   success:       { training:"カスタマーサクセスの基礎講座や実務コミュニティの勉強会に参加する", experience:"CSチームのオンボーディング・チャーン分析ミーティングに同席する", task:"1顧客分のオンボーディング改善案を企画してみる",
     links:[{label:"Udemyでカスタマーサクセスの講座を探す",url:"https://www.udemy.com/courses/search/?q=%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%9E%E3%83%BC%E3%82%B5%E3%82%AF%E3%82%BB%E3%82%B9"}] },
   global:        { training:"ビジネス英語・TOEIC対策講座やオンライン英会話を継続する", experience:"海外拠点とのミーティングやグローバルGTM会議に同席する", task:"英語でのドキュメント作成や簡単なプレゼンを担当してみる",
