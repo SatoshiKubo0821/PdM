@@ -234,6 +234,32 @@
     60%{transform:translateX(-6px);}
     80%{transform:translateX(6px);}
   }
+  .battle-shake-mega{animation:battleShakeMega 0.55s ease;}
+  @keyframes battleShakeMega{
+    0%,100%{transform:translateX(0);}
+    8%{transform:translateX(-26px);}
+    16%{transform:translateX(24px);}
+    24%{transform:translateX(-22px);}
+    32%{transform:translateX(20px);}
+    40%{transform:translateX(-17px);}
+    48%{transform:translateX(15px);}
+    56%{transform:translateX(-12px);}
+    64%{transform:translateX(10px);}
+    72%{transform:translateX(-7px);}
+    80%{transform:translateX(5px);}
+    88%{transform:translateX(-3px);}
+  }
+  .screen-flash-thunder{animation:screenFlashThunder 0.6s ease-out;}
+  @keyframes screenFlashThunder{
+    0%{background:#fff;}
+    8%{background:#fff;}
+    16%{background:#0a0a14;}
+    24%{background:#F8E88A;}
+    32%{background:#0a0a14;}
+    40%{background:#fff;}
+    48%{background:#0a0a14;}
+    100%{background:transparent;}
+  }
   .battle-flash{background:#3a0000 !important;}
   .battle-log{
     font-family:var(--pixel-font); color:#fff; font-size:15px; text-align:center; min-height:24px;
@@ -3177,6 +3203,11 @@ function renderMonsterBattle(){
   const heroName = state.profile.nickname && state.profile.nickname.trim() ? state.profile.nickname.trim() : "ぼうけんしゃ";
   const myTier = getCurrentTierRank();
   const isLegendary = myTier >= 4;
+  // 特殊設定：ニックネームに「えりか」を含み、勇者系職業（みならいゆうしゃ／ゆうしゃこうほ／ゆうしゃ／でんせつのゆうしゃ）で
+  // サイコパスけいえいしゃと戦うとき、各ターン20%の確率で特殊コマンド「雷撃」が発動する
+  const isErikaHeroVsPsycho = monster.key === "psycho"
+    && (state.profile.nickname || "").includes("えりか")
+    && (isLegendary || determinePdmType().key === "general");
   const rpg = buildRPGStats();
   const maxHp = rpg.hp, maxMp = rpg.maxMp;
   const mStats = MONSTER_STATS[monster.key] || MONSTER_STATS.slime;
@@ -3318,6 +3349,34 @@ function renderMonsterBattle(){
   }
 
   function playerTurn(next){
+    // 特殊コマンド：勇者系職業(でんせつのゆうしゃ含む)のえりかが、サイコパスけいえいしゃとの戦いで20%の確率で発動する渾身の雷撃
+    if(isErikaHeroVsPsycho && Math.random() < 0.2){
+      battleLog.textContent = "أنا حيث تملأ النور السماوات، وأنت حيث تفتح أبواب العالم الآخر";
+      shakeAndFlash();
+      setTimeout(()=>{
+        battleLog.textContent = "فلتنطلق يا صاعقة الله";
+        flashThunderScreen(600);
+        enemyImg.classList.add("battle-shake-mega");
+        setTimeout(()=>enemyImg.classList.remove("battle-shake-mega"), 550);
+
+        setTimeout(()=>{
+          // 通常のわざ1回分の基準ダメージ（jitter・かいしんなしの平均値相当）を求め、その700%を与える
+          const action = myTechniques[Math.floor(Math.random()*myTechniques.length)];
+          const moveMult = 0.7 + (action.v/5)*0.6;
+          const baseAvgDmg = Math.max(6, playerAtk*moveMult - mStats.def*0.5);
+          const dmg = Math.round(baseAvgDmg * 7);
+          mHp = Math.max(0, mHp - Math.min(mHp, dmg));
+          battleLog.textContent = `${monster.name}は　${dmg}の　だいダメージを　うけた！`;
+          monsterHpNum.textContent = mHp;
+          updateHpColor(monsterHpNum, mHp, mStats.hp);
+
+          if(mHp<=0){ setTimeout(()=>endBattle(true), REACTION_DELAY); return; }
+          setTimeout(next, REACTION_DELAY);
+        }, REVEAL_DELAY);
+      }, REVEAL_DELAY);
+      return;
+    }
+
     const action = myTechniques[Math.floor(Math.random()*myTechniques.length)];
     // ぎゃっきょうのちから発動後、HPが30%以下になると、ミス以外はすべて会心の一撃になる
     const desperateMode = legendaryRevived && pHp <= maxHp * 0.3;
@@ -3378,6 +3437,12 @@ function renderMonsterBattle(){
     const scene = document.querySelector(".battle-scene");
     scene.classList.add("screen-flash-red");
     setTimeout(()=>scene.classList.remove("screen-flash-red"), duration || 500);
+  }
+
+  function flashThunderScreen(duration){
+    const scene = document.querySelector(".battle-scene");
+    scene.classList.add("screen-flash-thunder");
+    setTimeout(()=>scene.classList.remove("screen-flash-thunder"), duration || 600);
   }
 
   function playPsychoFx(fx){
