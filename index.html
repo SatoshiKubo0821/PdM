@@ -3373,27 +3373,33 @@ function renderMonsterBattle(){
   function playerTurn(next){
     // 特殊コマンド：勇者系職業(でんせつのゆうしゃ含む)のえりかが、サイコパスけいえいしゃとの戦いで20%の確率で発動する渾身の雷撃
     if(isErikaHeroVsPsycho && Math.random() < 0.2){
-      battleLog.textContent = "أنا حيث تملأ النور السماوات، وأنت حيث تفتح أبواب العالم الآخر";
+      battleLog.textContent = "I, who stand in the full light of the Heavens...";
       shakeAndFlash();
       setTimeout(()=>{
-        battleLog.textContent = "فلتنطلق يا صاعقة الله";
-        flashThunderScreen(600);
-        enemyImg.classList.add("battle-shake-mega");
-        setTimeout(()=>enemyImg.classList.remove("battle-shake-mega"), 550);
-
+        battleLog.textContent = "Command thee, who opens the Gates of Hell...";
         setTimeout(()=>{
-          // 通常のわざ1回分の基準ダメージ（jitter・かいしんなしの平均値相当）を求め、その700%を与える
-          const action = myTechniques[Math.floor(Math.random()*myTechniques.length)];
-          const moveMult = 0.7 + (action.v/5)*0.6;
-          const baseAvgDmg = Math.max(6, playerAtk*moveMult - mStats.def*0.5);
-          const dmg = Math.round(baseAvgDmg * 7);
-          mHp = Math.max(0, mHp - Math.min(mHp, dmg));
-          battleLog.textContent = `${monster.name}は　${dmg}の　だいダメージを　うけた！`;
-          monsterHpNum.textContent = mHp;
-          updateHpColor(monsterHpNum, mHp, mStats.hp);
+          battleLog.textContent = "Come forth, divine lightning!";
+          setTimeout(()=>{
+            battleLog.textContent = "उत्तिष्ठ, इन्द्रस्य बाणः: क्रोधः";
+            flashThunderScreen(600);
+            enemyImg.classList.add("battle-shake-mega");
+            setTimeout(()=>enemyImg.classList.remove("battle-shake-mega"), 550);
 
-          if(mHp<=0){ setTimeout(()=>endBattle(true), REACTION_DELAY); return; }
-          setTimeout(next, REACTION_DELAY);
+            setTimeout(()=>{
+              // 通常のわざ1回分の基準ダメージ（jitter・かいしんなしの平均値相当）を求め、その700%を与える
+              const action = myTechniques[Math.floor(Math.random()*myTechniques.length)];
+              const moveMult = 0.7 + (action.v/5)*0.6;
+              const baseAvgDmg = Math.max(6, playerAtk*moveMult - mStats.def*0.5);
+              const dmg = Math.round(baseAvgDmg * 7);
+              mHp = Math.max(0, mHp - Math.min(mHp, dmg));
+              battleLog.textContent = `${monster.name}は　${dmg}の　だいダメージを　うけた！`;
+              monsterHpNum.textContent = mHp;
+              updateHpColor(monsterHpNum, mHp, mStats.hp);
+
+              if(mHp<=0){ setTimeout(()=>endBattle(true), REACTION_DELAY); return; }
+              setTimeout(next, REACTION_DELAY);
+            }, REVEAL_DELAY);
+          }, REVEAL_DELAY);
         }, REVEAL_DELAY);
       }, REVEAL_DELAY);
       return;
