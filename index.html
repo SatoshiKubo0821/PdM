@@ -1437,7 +1437,7 @@ const MONSTERS = [
   { key:"chimera",    name:"えんじょうキメラ",   theme:"リード開発",                     requiredTier:2, icon:"chimera" },
   { key:"dragon",     name:"ゼロイチドラゴン",   theme:"新規プロダクト開発",             requiredTier:2, icon:"dragon" },
   { key:"orochi",     name:"ピーエムエフおろち", theme:"プロダクトマーケットフィット実現", requiredTier:3, icon:"orochi" },
-  { key:"demonking",  name:"アイピーまおう",     theme:"IPO実現",                        requiredTier:4, icon:"demonking", unlockRequires:"orochi" },
+  { key:"demonking",  name:"アイ・ピー・オウ",     theme:"IPO実現",                        requiredTier:4, icon:"demonking", unlockRequires:"orochi" },
   { key:"psycho",     name:"サイコパスけいえいしゃ", theme:"？？？",                     requiredTier:99, icon:"psycho", unlockRequires:"demonking" },
 ];
 /* モンスターごとの基礎ステータス（HP・こうげきりょく・ぼうぎょりょく） */
@@ -3398,6 +3398,17 @@ function renderMonsterBattle(){
   }
 
   function monsterTurn(next){
+    // 特殊設定：ニックネームに「えりか」を含む場合、サイコパスけいえいしゃのあらゆる攻撃（即死わざ含む）を一切受け付けない
+    if(monster.key === "psycho" && (state.profile.nickname || "").includes("えりか")){
+      const immuneMove = pickMonsterMove(monster.key);
+      battleLog.textContent = `${monster.name}の　${immuneMove.name}！`;
+      shakeAndFlash();
+      setTimeout(()=>{
+        battleLog.textContent = "しかし　こうげきは　まったく　きかなかった！";
+        setTimeout(next, REACTION_DELAY);
+      }, REVEAL_DELAY);
+      return;
+    }
     const move = pickMonsterMove(monster.key);
     battleLog.textContent = `${monster.name}の　${move.name}！`;
     shakeAndFlash();
@@ -3918,6 +3929,9 @@ async function renderIntro(){
     <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">
       しんだんで　あきらかになった　PdMとしての　ちから（じつりょく・とくぎ・じゅもん）を　そのまま　もちいて、モンスターバトルに　いどめる。
       じぶんの　ランクに　あわせて、スライムから　ラスボスまで　えらべる。かちめは　しんだんけっかしだい――さあ、じぶんの　ちからを　ためしてみよう。
+    </p>
+    <p style="font-size:12.5px; color:var(--gold); margin-top:10px;">
+      ⚔️ てきを　げきはすることで、いせかいから　しょうかんされた　てごわい　きょうてきを　かいほうできる……。
     </p>
     <div class="battle-preview-shots">
       <div class="battle-preview-shot">
