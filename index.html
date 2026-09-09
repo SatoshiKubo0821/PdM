@@ -1273,6 +1273,9 @@
     padding-top:18px;
   }
   footer.note a{color:var(--gold);}
+  .game-version{
+    font-family:var(--pixel-font); font-size:11px; color:#5A5E8C; margin-top:14px; text-align:right;
+  }
 
   @media (max-width:600px){
     .hero-title{font-size:28px;}
@@ -2630,6 +2633,7 @@ let state = {
   rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
   selectedMonster: null,   // モンスターとたたかう機能で選択中のモンスターkey
   defeatedMonsters: {},    // 撃破済みモンスター（かくれモンスターの解放条件に使用）
+  steinsGateAchieved: false, // ログイン中のアカウントが、過去にシュタインズ・ゲートへ到達済みかどうか
 };
 
 const STORAGE_KEY = "pdm35:latest";
@@ -2680,7 +2684,17 @@ async function recordSteinsGateAchieved(){
   if(!supabaseClient || !state.userId) return;
   try{
     await supabaseClient.from("boss_challenges").upsert({ user_id: state.userId, steins_gate_achieved_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+    state.steinsGateAchieved = true; // その場でも即座に反映する
   }catch(e){ /* 記録できなくても、演出自体は続行する */ }
+}
+
+/* ログイン中のアカウントが、過去にシュタインズ・ゲートへ到達済みかどうかを確認し、state.steinsGateAchievedへ反映する */
+async function checkSteinsGateStatus(){
+  if(!supabaseClient || !state.userId){ state.steinsGateAchieved = false; return; }
+  try{
+    const { data } = await supabaseClient.from("boss_challenges").select("steins_gate_achieved_at").eq("user_id", state.userId).maybeSingle();
+    state.steinsGateAchieved = !!(data && data.steins_gate_achieved_at);
+  }catch(e){ state.steinsGateAchieved = false; }
 }
 
 async function deleteAllUserData(){
@@ -2968,6 +2982,7 @@ async function signOutUser(){
   try{ await supabaseClient.auth.signOut(); }catch(e){ /* ignore */ }
   state.userId = null;
   state.userEmail = null;
+  state.steinsGateAchieved = false;
   await ensureSession();
   renderHeader();
   render();
@@ -2982,7 +2997,8 @@ function renderHeader(){
     return;
   }
   if(state.userEmail){
-    authArea.innerHTML = `<span class="auth-pill">${state.userEmail}<button id="headerLogoutBtn">ログアウト</button></span>`;
+    const nameStyle = state.steinsGateAchieved ? ` style="color:var(--gold);"` : "";
+    authArea.innerHTML = `<span class="auth-pill"><span${nameStyle}>${state.userEmail}</span><button id="headerLogoutBtn">ログアウト</button></span>`;
     const btn = document.getElementById("headerLogoutBtn");
     if(btn) btn.onclick = signOutUser;
   }else{
@@ -3634,6 +3650,7 @@ function renderMonsterBattle(){
     battleTrueEndBtn.onclick = async ()=>{
       await deleteAllUserData();
       state.screen = "intro";
+      renderHeader();
       render(); window.scrollTo(0,0);
     };
   }
@@ -4066,6 +4083,7 @@ async function renderIntro(){
     <footer class="note">
       この　しんだんは　セルフチェックようの　かんいツールだ。かいとうデータは　きみの　ブラウザないにのみ　ほぞんされる。くわしくは<a href="./privacy.html">プライバシーポリシー</a>を　みてほしい。
       もっと　たいけいてきに　まなびたい　ぼうけんしゃは<a href="./toryumon.html">PdM登竜門</a>も　のぞいてみよう。
+      <div class="game-version">${state.steinsGateAchieved ? "version. 1.048596" : "version. 2.01"}</div>
     </footer>
   `;
 
@@ -5240,6 +5258,7 @@ function renderResults(){
 
 (async function boot(){
   await ensureSession();
+  await checkSteinsGateStatus();
   const params = new URLSearchParams(window.location.search);
   if(params.has("pdmType") || params.has("seniority") || params.has("hensachi")){
     state.applyContext = {
