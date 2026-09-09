@@ -620,6 +620,7 @@
     flex-direction:column;
     align-items:center;
     text-align:center;
+    width:100%;
   }
 
   /* ---------- Assessment (1ページ10問のカードリスト。同意尺度は16personalities風の円サイズ表現) ---------- */
@@ -1292,6 +1293,10 @@
   .game-version{
     font-family:var(--pixel-font); font-size:11px; color:#5A5E8C; margin-top:14px; text-align:right;
   }
+  .new-game-link{
+    color:var(--gold); text-decoration:none;
+  }
+  .new-game-link:hover{text-decoration:underline;}
 
   @media (max-width:600px){
     .hero-title{font-size:28px;}
@@ -4126,7 +4131,7 @@ async function renderIntro(){
     <footer class="note">
       この　しんだんは　セルフチェックようの　かんいツールだ。かいとうデータは　きみの　ブラウザないにのみ　ほぞんされる。くわしくは<a href="./privacy.html">プライバシーポリシー</a>を　みてほしい。
       もっと　たいけいてきに　まなびたい　ぼうけんしゃは<a href="./toryumon.html">PdM登竜門</a>も　のぞいてみよう。
-      <div class="game-version">${state.steinsGateAchieved ? "version. 1.048596" : "version. 2.01"}</div>
+      <div class="game-version">${state.steinsGateAchieved ? `<a href="#" id="newGameLink" class="new-game-link">version. 1.048596</a>` : "version. 2.01"}</div>
     </footer>
   `;
 
@@ -4168,6 +4173,14 @@ async function renderIntro(){
   document.getElementById("startBtn").onclick = handleStartClick;
   const startBtnTop = document.getElementById("startBtnTop");
   if(startBtnTop) startBtnTop.onclick = handleStartClick;
+  const newGameLink = document.getElementById("newGameLink");
+  if(newGameLink){
+    newGameLink.onclick = (e)=>{
+      e.preventDefault();
+      window.scrollTo(0,0);
+      handleStartClick();
+    };
+  }
   const restartBtn = document.getElementById("restartBtn");
   if(restartBtn){
     restartBtn.onclick = async ()=>{
