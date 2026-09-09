@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>PdMクエスト（PdM診断）｜ドット絵で見る49の力</title>
-<meta name="description" content="10カテゴリ・49項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
+<title>PdMクエスト（PdM診断）｜ドット絵で見る43の力</title>
+<meta name="description" content="10カテゴリ・43項目でPdM(プロダクトマネージャー)のスキルを自己診断。強み・弱みのSWOT分析、MBTIとの掛け合わせ分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化できるセルフチェックツールです。">
 
 <!-- favicon: レーダーチャートをモチーフにしたオリジナルの図形（外部ファイル不要のインラインSVG） -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23101C36%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2212%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22%20opacity%3D%220.7%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%236FA0FF%22%20opacity%3D%220.5%22/%3E%3Ccircle%20cx%3D%2242%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23C0812C%22/%3E%3C/svg%3E">
@@ -15,16 +15,16 @@
 <!-- OGP（SNS・チャットでシェアされた際の見え方）。og:image は画像を用意し次第、URLを差し替えて有効化してください -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:title" content="PdMクエスト（PdM診断）｜ドット絵で見る49の力">
-<meta property="og:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
+<meta property="og:title" content="PdMクエスト（PdM診断）｜ドット絵で見る43の力">
+<meta property="og:description" content="10カテゴリ・43項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
 <meta property="og:site_name" content="PdMクエスト（PdM診断）">
 <!-- <meta property="og:image" content="https://pdmquest.com/ogp.png"> -->
 <meta property="og:url" content="https://pdmquest.com/">
 <link rel="canonical" href="https://pdmquest.com/">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="PdMクエスト（PdM診断）｜ドット絵で見る49の力">
-<meta name="twitter:description" content="10カテゴリ・49項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
+<meta name="twitter:title" content="PdMクエスト（PdM診断）｜ドット絵で見る43の力">
+<meta name="twitter:description" content="10カテゴリ・43項目でPdMスキルを自己診断。SWOT分析・MBTI掛け合わせ・PdM偏差値・想定年収・キャリアパスまで無料で見える化。">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2585,7 +2585,7 @@ let state = {
 };
 
 const STORAGE_KEY = "pdm35:latest";
-const PENDING_PROFILE_ENTRY_KEY = "pdm35:pendingProfileEntry"; // Googleログイン→なまえ入力への復帰フラグ
+const PENDING_OAUTH_RETURN_KEY = "pdm35:pendingOAuthReturn"; // Googleログイン→どの画面へ戻るかのフラグ(mypage/intro/profileEntry)
 
 /* claude.aiのアーティファクト内ではwindow.storageを使い、
    一般公開したWebページではブラウザのlocalStorageに自動フォールバックする。 */
@@ -2896,20 +2896,19 @@ async function linkEmail(email){
 /* Googleアカウントでのログイン。
    匿名セッション中なら linkIdentity() で同じuser_idのまま永久アカウントに昇格（履歴を引き継ぐ）。
    すでに永久アカウントの場合は signInWithOAuth() で通常ログイン。 */
-async function signInWithGoogle(returnHash){
+async function signInWithGoogle(returnScreen){
   if(!supabaseClient) return false;
-  let redirectTo = window.location.origin + window.location.pathname + (returnHash || "#mypage");
-  // profileEntryへの復帰だけは、OAuthコールバックのURL操作と干渉しないようハッシュではなくフラグで管理する
-  if(returnHash === "#profileEntry"){
-    try{
-      if(window.storage && typeof window.storage.set === "function"){
-        await window.storage.set(PENDING_PROFILE_ENTRY_KEY, "1", false);
-      }else{
-        localStorage.setItem(PENDING_PROFILE_ENTRY_KEY, "1");
-      }
-    }catch(e){ /* 保存できなくても続行する */ }
-    redirectTo = window.location.origin + window.location.pathname;
-  }
+  // 戻り先は、Supabaseが付与する#access_token=...ハッシュと衝突しないよう、
+  // URLハッシュではなくストレージのフラグで管理する（mypage/intro/profileEntryのいずれか）
+  try{
+    const value = returnScreen || "mypage";
+    if(window.storage && typeof window.storage.set === "function"){
+      await window.storage.set(PENDING_OAUTH_RETURN_KEY, value, false);
+    }else{
+      localStorage.setItem(PENDING_OAUTH_RETURN_KEY, value);
+    }
+  }catch(e){ /* 保存できなくても続行する */ }
+  const redirectTo = window.location.origin + window.location.pathname;
   try{
     const { error } = await supabaseClient.auth.signInWithOAuth({ provider:"google", options:{ redirectTo } });
     if(error) return false;
@@ -2941,7 +2940,7 @@ function renderHeader(){
   }else{
     authArea.innerHTML = `<button class="google-btn" id="headerGoogleBtn"><svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.9 32.6 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4c-7.7 0-14.3 4.3-17.7 10.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.2-2 13.8-5.4l-6.4-5.4C29.3 34.9 26.8 36 24 36c-5.3 0-9.8-3.4-11.4-8.1l-6.6 5.1C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1 3-3.1 5.5-5.9 7.1l6.4 5.4C39.8 37.5 44 31.8 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>ログイン</button>`;
     const btn = document.getElementById("headerGoogleBtn");
-    if(btn) btn.onclick = () => signInWithGoogle("#mypage");
+    if(btn) btn.onclick = () => signInWithGoogle("mypage");
   }
 }
 
@@ -3007,7 +3006,7 @@ async function renderHistory(){
   const toAccountBtn = document.getElementById("toAccountBtn");
   if(toAccountBtn) toAccountBtn.onclick = ()=>{ state.screen="account"; render(); window.scrollTo(0,0); };
   const mypageGoogleBtn = document.getElementById("mypageGoogleBtn");
-  if(mypageGoogleBtn) mypageGoogleBtn.onclick = () => signInWithGoogle("#mypage");
+  if(mypageGoogleBtn) mypageGoogleBtn.onclick = () => signInWithGoogle("mypage");
   const logoutBtnPage = document.getElementById("logoutBtnPage");
   if(logoutBtnPage) logoutBtnPage.onclick = signOutUser;
   document.getElementById("backHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
@@ -3873,7 +3872,7 @@ async function renderIntro(){
     <div class="eyebrow">PdMクエスト（PdM診断）</div>
     <h1 class="hero-title">きみの　PdMとしての　ちからで、<br>モンスターと　たたかおう！</h1>
     <p class="hero-lead">
-      きみの　なかに　ねむる　ちからを、10のぞくせい・49のとくぎに　わけて　しんだんする。
+      きみの　なかに　ねむる　ちからを、10のぞくせい・${TOTAL_SKILLS}のとくぎに　わけて　しんだんする。
       5だんかいで　こたえるだけで、つよみと　のびしろが　ひとめで　わかる。
       けいけんと　せいかくを　かけあわせれば、きみの　しょくぎょうも　みちびきだされる。
     </p>
@@ -3888,7 +3887,7 @@ async function renderIntro(){
 
     <div class="intro-stat-bar">
       <div class="intro-stat-item"><div class="intro-stat-num">10</div><div class="intro-stat-label">ぞくせい</div></div>
-      <div class="intro-stat-item"><div class="intro-stat-num">49</div><div class="intro-stat-label">とくぎ</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">${TOTAL_SKILLS}</div><div class="intro-stat-label">とくぎ</div></div>
       <div class="intro-stat-item"><div class="intro-stat-num">やく5ふん</div><div class="intro-stat-label">しょようじかん</div></div>
     </div>
 
@@ -3978,7 +3977,7 @@ async function renderIntro(){
   `;
 
   const introGoogleBtn = document.getElementById("introGoogleBtn");
-  if(introGoogleBtn) introGoogleBtn.onclick = ()=> signInWithGoogle("#intro");
+  if(introGoogleBtn) introGoogleBtn.onclick = ()=> signInWithGoogle("intro");
   const introEmailBtn = document.getElementById("introEmailBtn");
   if(introEmailBtn){
     introEmailBtn.onclick = async ()=>{
@@ -4005,7 +4004,7 @@ async function renderIntro(){
     // Googleでまだログインしていない場合は、なまえ・けいけん入力の前にSSOをはさむ
     if(supabaseClient && !state.userEmail){
       await saveProgress(); // OAuthリダイレクトでページが再読み込みされる前に、いまの回答をローカルへ保存しておく
-      const redirected = await signInWithGoogle("#profileEntry");
+      const redirected = await signInWithGoogle("profileEntry");
       if(redirected) return; // ここでGoogleへ遷移する
       // Googleログインが開始できなかった場合は、詰まらせずそのまま入力へ進む
     }
@@ -4714,7 +4713,7 @@ function renderResults(){
     <div class="score-hero">
       <div>
         <div class="score-num">${avg.toFixed(1)}</div>
-        <div class="score-den">/ 5.0（49項目の平均）</div>
+        <div class="score-den">/ 5.0（${TOTAL_SKILLS}項目の平均）</div>
       </div>
       <div class="score-tags">
         <span class="tag">診断タイプ：${pdmType.label}</span>
@@ -4815,7 +4814,7 @@ function renderResults(){
 
     <div class="section-label">属性タグ × スキルスコアの掛け合わせ分析</div>
     <p style="font-size:13px; color:#C9CDF5; margin-top:8px;">
-      MBTIの一般的な傾向（性格的な資質）と、実際の49項目診断のスコア（実務経験）を10カテゴリごとに重ね合わせています。
+      MBTIの一般的な傾向（性格的な資質）と、実際の${TOTAL_SKILLS}項目診断のスコア（実務経験）を10カテゴリごとに重ね合わせています。
       両方が高ければ「鉄板の強み」、資質はあるのにスコアが伴っていなければ「伸びしろ大」、資質的には苦手なのにスコアが高ければ「努力で築いた強み」、
       両方低ければ「要フォロー」として最優先の育成ポイントになります。
     </p>
@@ -4838,7 +4837,7 @@ function renderResults(){
     </div>` : `
     <div class="section-label">属性タグ × スキル分析</div>
     <div class="insight" style="border-left-color:#666;">
-      <p>MBTIを選択すると、性格タイプの属性タグと49項目のスコアを掛け合わせた詳細分析（得意・不得意な日常業務、意思決定スタイル、任せると強い仕事など）が表示されます。結果画面下部の「MBTIを選び直す」からいつでも追加できます。</p>
+      <p>MBTIを選択すると、性格タイプの属性タグと${TOTAL_SKILLS}項目のスコアを掛け合わせた詳細分析（得意・不得意な日常業務、意思決定スタイル、任せると強い仕事など）が表示されます。結果画面下部の「MBTIを選び直す」からいつでも追加できます。</p>
     </div>`}
 
     <div class="section-label">タイプ別スコア内訳</div>
@@ -5156,42 +5155,48 @@ function renderResults(){
       hensachi: params.get("hensachi") ? parseInt(params.get("hensachi"),10) : null,
     };
   }
-  if(window.location.hash === "#apply"){
+  // Googleログインからの復帰フラグをチェック（OAuthコールバックでハッシュに#access_token=...が付与され、
+  // 自前のハッシュ指定と衝突してしまうため、ハッシュではなくストレージのフラグで判定する）
+  let pendingReturnScreen = null;
+  try{
+    if(window.storage && typeof window.storage.get === "function"){
+      const r = await window.storage.get(PENDING_OAUTH_RETURN_KEY, false);
+      if(r && r.value){
+        pendingReturnScreen = r.value;
+        await window.storage.delete(PENDING_OAUTH_RETURN_KEY, false);
+      }
+    }else{
+      const v = localStorage.getItem(PENDING_OAUTH_RETURN_KEY);
+      if(v){
+        pendingReturnScreen = v;
+        localStorage.removeItem(PENDING_OAUTH_RETURN_KEY);
+      }
+    }
+  }catch(e){ /* フラグが読めなくても通常のトップ画面へ進むだけなので無視する */ }
+
+  if(pendingReturnScreen === "profileEntry"){
+    const saved = await loadSaved();
+    if(saved){
+      state.answers = saved.answers || {};
+      state.mbti = saved.mbti || null;
+      state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
+      state.orgAnswers = saved.orgAnswers || {};
+      state.orgScores = saved.orgScores || null;
+      state.vitalsAnswers = saved.vitalsAnswers || {};
+      state.rpgMp = saved.rpgMp ?? null;
+      state.defeatedMonsters = saved.defeatedMonsters || {};
+    }
+    state.screen = "profileEntry";
+  }else if(pendingReturnScreen === "mypage"){
+    state.screen = "mypage";
+  }else if(pendingReturnScreen === "intro"){
+    state.screen = "intro";
+  }else if(window.location.hash === "#apply"){
     state.screen = "apply";
   }else if(window.location.hash === "#mypage"){
     state.screen = "mypage";
   }else if(window.location.hash === "#orgculture"){
     state.screen = "orgIntro";
-  }else{
-    // Googleログインからの復帰フラグをチェック（OAuthコールバックのURL書き換えに影響されないよう、ハッシュではなくストレージのフラグで判定する）
-    let pendingProfileEntry = false;
-    try{
-      if(window.storage && typeof window.storage.get === "function"){
-        const r = await window.storage.get(PENDING_PROFILE_ENTRY_KEY, false);
-        if(r && r.value === "1"){
-          pendingProfileEntry = true;
-          await window.storage.delete(PENDING_PROFILE_ENTRY_KEY, false);
-        }
-      }else if(localStorage.getItem(PENDING_PROFILE_ENTRY_KEY) === "1"){
-        pendingProfileEntry = true;
-        localStorage.removeItem(PENDING_PROFILE_ENTRY_KEY);
-      }
-    }catch(e){ /* フラグが読めなくても通常のトップ画面へ進むだけなので無視する */ }
-
-    if(pendingProfileEntry){
-      const saved = await loadSaved();
-      if(saved){
-        state.answers = saved.answers || {};
-        state.mbti = saved.mbti || null;
-        state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
-        state.orgAnswers = saved.orgAnswers || {};
-        state.orgScores = saved.orgScores || null;
-        state.vitalsAnswers = saved.vitalsAnswers || {};
-        state.rpgMp = saved.rpgMp ?? null;
-        state.defeatedMonsters = saved.defeatedMonsters || {};
-      }
-      state.screen = "profileEntry";
-    }
   }
   const navMypageLink = document.getElementById("navMypageLink");
   if(navMypageLink){
