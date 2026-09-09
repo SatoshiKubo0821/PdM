@@ -611,6 +611,11 @@
   }
   button.ghost:hover{background:var(--gold-soft); border-color:var(--gold);}
   .resume-note{font-size:13px;color:#B8BEFF; font-family:var(--pixel-font);}
+  .start-row-centered{
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
 
   /* ---------- Assessment (1ページ10問のカードリスト。同意尺度は16personalities風の円サイズ表現) ---------- */
   .thin-progress{
@@ -3995,7 +4000,7 @@ async function renderIntro(){
       けいけんと　せいかくを　かけあわせれば、きみの　しょくぎょうも　みちびきだされる。
     </p>
 
-    <div class="start-row" style="margin-top:24px;">
+    <div class="start-row start-row-centered" style="margin-top:24px;">
       <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
       ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
     </div>
