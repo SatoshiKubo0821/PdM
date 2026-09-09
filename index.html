@@ -437,8 +437,15 @@
   }
   .hero-visual{
     margin:36px 0 8px;
-    display:flex;
-    justify-content:center;
+    display:flex; flex-direction:column;
+    align-items:center;
+  }
+  .hero-visual-img{
+    max-width:100%; width:520px; display:block;
+    border:3px solid #fff; box-shadow:0 0 0 3px #000, 5px 5px 0 rgba(0,0,0,.4);
+  }
+  .hero-visual-caption{
+    font-family:var(--pixel-font); font-size:11.5px; color:#B8BEFF; text-align:center; margin-top:12px;
   }
   /* イントロ画面の実績バー（バクラク風の大きい数字） */
   .intro-stat-bar{
@@ -3846,7 +3853,10 @@ async function renderIntro(){
     </div>
     </section>
 
-    <div class="hero-visual">${previewRadarSVG()}</div>
+    <div class="hero-visual">
+      <img src="./assets/screenshots/profile_sample.png" alt="しんだんけっか の サンプル がめん" class="hero-visual-img">
+      <div class="hero-visual-caption">しんだんすると、こんな　ドラクエふうの　プロフィールが　できあがる（サンプル）</div>
+    </div>
 
     <div class="intro-stat-bar">
       <div class="intro-stat-item"><div class="intro-stat-num">10</div><div class="intro-stat-label">ぞくせい</div></div>
