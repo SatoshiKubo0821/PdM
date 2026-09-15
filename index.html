@@ -455,8 +455,12 @@
     margin-bottom:10px;
   }
   .eyebrow b{color:var(--gold);}
+  .pdm-quest-logo-wrap{
+    display:flex; justify-content:center; width:min(1120px, calc(100vw - 48px));
+    position:relative; left:50%; transform:translateX(-50%); margin-bottom:8px;
+  }
   .pdm-quest-logo{
-    display:block; width:480px; max-width:100%; height:auto; margin:0 0 12px;
+    display:block; width:420px; max-width:100%; height:auto;
   }
 
   /* ---------- Intro ---------- */
@@ -464,7 +468,7 @@
   /* Intro: large existing hero image to the left of the copy. */
   .intro-hero{
     display:grid;
-    grid-template-columns:220px minmax(0, 1fr);
+    grid-template-columns:240px minmax(0, 1fr);
     align-items:center;
     gap:32px;
     width:min(1120px, calc(100vw - 48px));
@@ -473,16 +477,18 @@
     transform:translateX(-50%);
   }
   .intro-hero-copy{min-width:0;}
-  .intro-hero-art{margin:0; width:220px;}
+  .intro-hero-art{margin:0; width:240px;}
   .intro-hero-art img{
-    display:block; width:100%; height:234px;
+    display:block; width:100%; height:255px;
     object-fit:cover; object-position:center;
     image-rendering:pixelated;
   }
   @media(max-width:800px){
     .intro-hero{grid-template-columns:minmax(0, 1fr); gap:24px; width:100%; left:auto; transform:none;}
-    .intro-hero-art{width:min(200px, 100%); justify-self:center;}
-    .intro-hero-art img{height:200px;}
+    .intro-hero-art{width:min(220px, 100%); justify-self:center;}
+    .intro-hero-art img{height:220px;}
+    .pdm-quest-logo-wrap{width:100%; left:auto; transform:none;}
+    .pdm-quest-logo{width:min(320px, 80%);}
   }
 
   .hero-title{
@@ -4025,12 +4031,14 @@ async function renderIntro(){
   const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
 
   app.innerHTML = `
+    <div class="pdm-quest-logo-wrap">
+      <img src="./assets/branding/pdm_quest_logo.png" alt="PDM QUEST" class="pdm-quest-logo">
+    </div>
     <section class="intro-hero" aria-label="PdMクエストの紹介">
     <figure class="intro-hero-art">
-      <img src="./assets/jobs/general_senior.png" alt="剣と盾を装備した青い髪のゆうしゃ" width="220" height="234" fetchpriority="high">
+      <img src="./assets/jobs/general_senior.png" alt="剣と盾を装備した青い髪のゆうしゃ" width="240" height="255" fetchpriority="high">
     </figure>
     <div class="intro-hero-copy">
-    <img src="./assets/branding/pdm_quest_logo.png" alt="PDM QUEST" class="pdm-quest-logo">
     <h1 class="hero-title">きみの　PdMとしての　ちからで、<br>モンスターと　たたかおう！</h1>
     <p class="hero-lead">
       きみの　なかに　ねむる　ちからを、10のぞくせい・${TOTAL_SKILLS}のとくぎに　わけて　しんだんする。
