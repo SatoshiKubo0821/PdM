@@ -396,32 +396,24 @@
     position:sticky; top:0; z-index:50;
   }
   .site-header-inner{
-    max-width:960px; margin:0 auto; padding:10px 24px;
-    display:flex; flex-direction:column; gap:6px;
-  }
-  .site-header-row2{
-    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:nowrap;
+    max-width:960px; margin:0 auto; padding:8px 24px;
+    display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:16px; flex-wrap:nowrap;
   }
   .site-logo{
-    display:flex; align-items:center; gap:8px; text-decoration:none;
+    display:flex; align-items:center; gap:8px; text-decoration:none; flex-shrink:0;
     font-family:var(--pixel-font); font-weight:700; font-size:13px; color:#fff;
   }
   .site-logo-dot{width:9px; height:9px; background:var(--gold);}
-  .site-nav{display:flex; align-items:center; gap:16px; flex-wrap:wrap; min-width:0;}
+  .site-nav{display:flex; align-items:center; gap:16px; flex-wrap:nowrap; min-width:0;}
   .site-nav a{
     color:rgba(255,255,255,.85); font-size:13px; font-weight:600; text-decoration:none;
-    display:inline-flex; align-items:center; gap:6px; font-family:var(--pixel-font);
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--pixel-font); white-space:nowrap;
   }
   .site-nav a:hover{color:var(--gold);}
   .ext-badge{
     font-size:10px; background:rgba(255,255,255,.15); color:#fff; padding:1px 6px; font-weight:700;
   }
   .site-header-right{display:flex; align-items:center; gap:16px; flex-shrink:0;}
-  .site-header-mypage{
-    color:rgba(255,255,255,.85); font-size:13px; font-weight:600; text-decoration:none;
-    font-family:var(--pixel-font); white-space:nowrap;
-  }
-  .site-header-mypage:hover{color:var(--gold);}
   #navAuthArea{flex-shrink:0;}
   .auth-pill{
     display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.15); padding:5px 6px 5px 12px;
@@ -438,10 +430,9 @@
   }
   .google-btn:hover{border-color:var(--gold);}
   .google-btn svg{width:16px; height:16px;}
-  @media (max-width:700px){
-    .site-header-row2{flex-direction:column; align-items:flex-start; gap:10px;}
-    .site-nav{width:100%; justify-content:space-between;}
-    .site-header-right{align-self:flex-end;}
+  @media (max-width:600px){
+    .site-header-inner{flex-wrap:wrap; row-gap:8px;}
+    .site-nav{order:3; width:100%;}
   }
   h1,h2,h3{
     font-family:var(--pixel-font);
@@ -1321,17 +1312,11 @@
 <header class="site-header" id="siteHeader">
   <div class="site-header-inner">
     <a class="site-logo" href="./index.html" id="siteLogoLink"><span class="site-logo-dot"></span>PdMクエスト（PdM診断）</a>
-    <div class="site-header-row2">
-      <nav class="site-nav">
-        <a href="./toryumon.html">PdM登竜門</a>
-        <a href="./events.html">イベントカレンダー</a>
-        <a href="#" id="navOrgLink">組織タイプ診断</a>
-        <a href="https://discord.gg/YOUR-INVITE-CODE" target="_blank" rel="noopener" title="コミュニティDiscordにJOIN"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="vertical-align:-3px;"><path d="M20.3 4.4A19.8 19.8 0 0015.6 3l-.3.5a13.9 13.9 0 016.1 3.1 18.5 18.5 0 00-15.9 0 13.9 13.9 0 016.1-3.1L11.3 3a19.8 19.8 0 00-4.7 1.4C3.6 8 2.8 11.5 3.1 15c1.6 1.2 3.2 1.9 4.7 2.4l.7-1.2c-.8-.3-1.6-.7-2.3-1.2l.4-.3c3.3 1.5 6.9 1.5 10.2 0l.4.3c-.7.5-1.5.9-2.3 1.2l.7 1.2c1.5-.5 3.1-1.2 4.7-2.4.4-4-.7-7.4-3.1-10.6zM9.7 13.4c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7zm5 0c-.8 0-1.5-.8-1.5-1.7s.7-1.7 1.5-1.7 1.5.8 1.5 1.7-.7 1.7-1.5 1.7z"/></svg> Discord</a>
-      </nav>
-      <div class="site-header-right">
-        <a href="#" id="navMypageLink" class="site-header-mypage">マイページ</a>
-        <span id="navAuthArea"></span>
-      </div>
+    <nav class="site-nav">
+      <a href="#" id="navOrgLink">組織タイプ診断</a>
+    </nav>
+    <div class="site-header-right">
+      <span id="navAuthArea"></span>
     </div>
   </div>
 </header>
@@ -1809,9 +1794,9 @@ function determineSeniority(avg){
    35項目の自己評価平均を、簡易的な偏差値（平均50・標準偏差10）に変換したもの。
    国内PdM人口全体の統計調査ではなく、本ツール上でのセルフチェックを目安化した参考値。 */
 function calcHensachi(avg){
-  const assumedMean = 2.8, assumedSD = 0.7;
+  const assumedMean = 3.5, assumedSD = 1.0;
   const raw = 50 + 10 * (avg - assumedMean) / assumedSD;
-  return Math.max(28, Math.min(82, Math.round(raw)));
+  return Math.max(20, Math.min(80, Math.round(raw)));
 }
 function hensachiComment(h){
   if(h >= 70) return "トップクラス。社内でも希少な即戦力〜牽引役の水準です。";
