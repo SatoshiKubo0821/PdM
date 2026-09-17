@@ -2515,6 +2515,64 @@ const TOTAL_SKILLS = CATEGORIES.reduce((n,c)=>n+c.skills.length,0);
 const CATEGORY_BY_KEY = {};
 CATEGORIES.forEach(c=>{ CATEGORY_BY_KEY[c.key] = c; });
 
+/* ---------------- 未経験者向け・かんたん適性診断（オリジナル） ----------------
+   PdMとしての実務経験がない人でも、スキルではなく性格・興味関心をもとに
+   「どのPdMタイプの種を持っていそうか」を占う、本格診断（47問）への入口版。
+   4つのPdMタイプ（開発系/BizDev系/マーケ系/総合型）それぞれに5問ずつ、計20問。 */
+const BEGINNER_QUESTIONS = [
+  { type:"tech",   statement:"新しい技術やツールが、どういう仕組みで動いているのか気になる方だ" },
+  { type:"tech",   statement:"エンジニアが話す技術的な会話にも、興味を持って耳を傾けられる" },
+  { type:"tech",   statement:"何かを試すときは、まず自分で触って動かしてみたいタイプだ" },
+  { type:"tech",   statement:"複雑な仕組みを、要素に分解して理解するのが好きだ" },
+  { type:"tech",   statement:"新しいガジェットやアプリが出ると、つい使ってみたくなる" },
+  { type:"bizdev", statement:"会社や事業がどうやって儲けているのか、自然と気になる" },
+  { type:"bizdev", statement:"ニュースで新しいビジネスモデルを見ると、成功の理由を考えてしまう" },
+  { type:"bizdev", statement:"数字やデータから、傾向やパターンを見つけるのが好きだ" },
+  { type:"bizdev", statement:"交渉や駆け引きのある場面に、興味を惹かれる" },
+  { type:"bizdev", statement:"「もっと成長させるには？」と考えるのが好きだ" },
+  { type:"pmm",    statement:"商品やサービスの「魅力の伝え方」に関心がある" },
+  { type:"pmm",    statement:"人の悩みや欲求を聞き出すのが得意な方だ" },
+  { type:"pmm",    statement:"SNSや広告で「刺さる言葉」を見ると、つい分析したくなる" },
+  { type:"pmm",    statement:"誰かに何かをおすすめするのが好きだ" },
+  { type:"pmm",    statement:"ユーザーの声を集めて、次に活かすことに興味がある" },
+  { type:"general",statement:"意見が対立する場面で、間に立って調整するのが苦にならない" },
+  { type:"general",statement:"何かを決めるとき、情報が足りなくても前に進める方だ" },
+  { type:"general",statement:"チームやグループをまとめる役割を、進んで引き受けることが多い" },
+  { type:"general",statement:"一つの分野を極めるより、色々な分野に手を広げるのが好きだ" },
+  { type:"general",statement:"「なぜそれをやるのか」を、いつも自分に問いかけている" },
+];
+function beginnerQuestionKey(idx){ return "beginner:"+idx; }
+const BEGINNER_TYPE_SEED_NAME = {
+  tech:    { seed:"かいはつけいのたね", desc:"技術のしくみを知りたい気持ちが強く、開発系PdMの素質が眠っています。エンジニアと二人三脚でプロダクトを形にするタイプに向いているかもしれません。" },
+  bizdev:  { seed:"BizDevけいのたね", desc:"事業や数字への興味が強く、BizDev系PdMの素質が眠っています。事業成長の戦略を描くタイプに向いているかもしれません。" },
+  pmm:     { seed:"マーケけいのたね", desc:"人の気持ちや伝え方への関心が強く、マーケ系PdMの素質が眠っています。市場やユーザーへの届け方を考えるタイプに向いているかもしれません。" },
+  general: { seed:"そうごうがたのたね", desc:"調整力とバランス感覚があり、総合型PdMの素質が眠っています。特定領域に偏らず、チーム全体を導くタイプに向いているかもしれません。" },
+};
+function computeBeginnerTypeScores(beginnerAnswers){
+  const sums = {}, counts = {};
+  BEGINNER_QUESTIONS.forEach((q,i)=>{
+    const raw = beginnerAnswers[beginnerQuestionKey(i)];
+    if(raw==null) return;
+    sums[q.type] = (sums[q.type]||0) + raw;
+    counts[q.type] = (counts[q.type]||0) + 1;
+  });
+  const result = {};
+  ["tech","bizdev","pmm","general"].forEach(t=>{ result[t] = counts[t] ? sums[t]/counts[t] : 0; });
+  return result;
+}
+function determineBeginnerType(scores){
+  let topKey = "general", topVal = -1;
+  Object.entries(scores).forEach(([k,v])=>{ if(v>topVal){ topVal=v; topKey=k; } });
+  return topKey;
+}
+function beginnerOverallLevel(scores){
+  const vals = Object.values(scores);
+  const avg = vals.reduce((a,b)=>a+b,0) / vals.length;
+  if(avg >= 4.0) return { label:"すでに　めがでている", desc:"PdMとしての資質が、すでにしっかりと育ちはじめています。" };
+  if(avg >= 3.0) return { label:"めばえはじめている", desc:"PdMとしての資質の芽が、少しずつ顔を出しはじめています。" };
+  return { label:"これから　たねをまく", desc:"これから経験を積むことで、PdMとしての資質が育っていく段階です。" };
+}
+
 /* ---------------- 組織タイプ診断（オリジナル） ----------------
    意思決定・評価軸・リスク姿勢・コミュニケーション文化という、組織文化論で一般的に使われる
    4つの観点から自社の傾向をセルフチェックする、独自の簡易診断。特定サービスの分類名・設問・
@@ -2670,6 +2728,9 @@ let state = {
   orgAnswers: {},         // 組織タイプ診断の回答（"org:idx" -> 1..5）
   orgScores: null,        // 診断済みの場合、4軸の平均スコアが入る
   orgDisplayOrder: null,  // 組織タイプ診断のシャッフル順（メタ回答対策）
+  beginnerAnswers: {},       // 未経験者向けかんたん適性診断の回答（"beginner:idx" -> 1..5）
+  beginnerScores: null,      // 診断済みの場合、4タイプの平均スコアが入る
+  beginnerDisplayOrder: null,// 未経験者向け診断のシャッフル順
   vitalsAnswers: {},       // 体力・AI設問の回答（"vitals:idx" -> 1..5）。HP/MP算出専用
   vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
   rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
@@ -2699,6 +2760,7 @@ async function saveProgress(){
     const payload = JSON.stringify({
       answers:state.answers, mbti:state.mbti, profile:state.profile,
       orgAnswers:state.orgAnswers, orgScores:state.orgScores,
+      beginnerAnswers:state.beginnerAnswers, beginnerScores:state.beginnerScores,
       vitalsAnswers:state.vitalsAnswers, rpgMp:state.rpgMp,
       defeatedMonsters:state.defeatedMonsters,
     });
@@ -2764,6 +2826,8 @@ async function deleteAllUserData(){
   state.profile = { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
   state.orgAnswers = {};
   state.orgScores = null;
+  state.beginnerAnswers = {};
+  state.beginnerScores = null;
   state.vitalsAnswers = {};
   state.rpgMp = null;
   state.defeatedMonsters = {};
@@ -2883,6 +2947,9 @@ function render(){
   else if(state.screen==="mypage") renderHistory();
   else if(state.screen==="account") renderAccount();
   else if(state.screen==="apply") renderApply();
+  else if(state.screen==="beginnerIntro") renderBeginnerIntro();
+  else if(state.screen==="beginnerAssess") renderBeginnerAssess();
+  else if(state.screen==="beginnerResults") renderBeginnerResults();
   else if(state.screen==="orgIntro") renderOrgIntro();
   else if(state.screen==="orgAssess") renderOrgAssess();
   else if(state.screen==="orgResults") renderOrgResults();
@@ -4034,6 +4101,7 @@ async function renderIntro(){
     <div class="start-row start-row-centered" style="margin-top:24px;">
       <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
       ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
+      <a href="#" id="beginnerLinkTop" style="font-size:12.5px; color:var(--gold); margin-top:8px; text-decoration:underline;">まだ　じっせんけいけんが　ない方は　こちら（かんたん　たねしんだん）</a>
     </div>
 
     </div>
@@ -4152,6 +4220,8 @@ async function renderIntro(){
       state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
       state.orgAnswers = saved.orgAnswers || {};
       state.orgScores = saved.orgScores || null;
+      state.beginnerAnswers = saved.beginnerAnswers || {};
+      state.beginnerScores = saved.beginnerScores || null;
       state.vitalsAnswers = saved.vitalsAnswers || {};
       state.rpgMp = saved.rpgMp ?? null;
       state.defeatedMonsters = saved.defeatedMonsters || {};
@@ -4169,6 +4239,14 @@ async function renderIntro(){
   document.getElementById("startBtn").onclick = handleStartClick;
   const startBtnTop = document.getElementById("startBtnTop");
   if(startBtnTop) startBtnTop.onclick = handleStartClick;
+  const beginnerLinkTop = document.getElementById("beginnerLinkTop");
+  if(beginnerLinkTop){
+    beginnerLinkTop.onclick = (e)=>{
+      e.preventDefault();
+      state.screen = "beginnerIntro";
+      render(); window.scrollTo(0,0);
+    };
+  }
   const newGameLink = document.getElementById("newGameLink");
   if(newGameLink){
     newGameLink.onclick = (e)=>{
@@ -4303,6 +4381,153 @@ function renderAssess(){
 
 /* ---------------- MBTI selection screen ---------------- */
 /* ---------------- 組織タイプ診断（スキルレーダー内蔵） ---------------- */
+/* ---------------- 未経験者向け・かんたん適性診断（3画面） ---------------- */
+function renderBeginnerIntro(){
+  app.innerHTML = `
+    <div class="eyebrow">はじめての方向け</div>
+    <h1 class="hero-title" style="font-size:30px;">まだ　じっせんけいけんが　ないきみへ。<br>PdMの　たねしんだん</h1>
+    <p class="hero-lead">
+      スキルではなく、せいかく・きょうみかんしんから「どのPdMタイプの　たね」を持っていそうかを、20問・約2分でかんたんにしんだんする。
+      けっかをもとに、より本格的な47問しんだんにも　ちょうせんしてみよう。
+    </p>
+    <div class="intro-stat-bar">
+      <div class="intro-stat-item"><div class="intro-stat-num">4</div><div class="intro-stat-label">たねタイプ</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">20</div><div class="intro-stat-label">設問数</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">約2分</div><div class="intro-stat-label">所要時間</div></div>
+    </div>
+    <div class="start-row">
+      <button class="primary" id="beginnerStartBtn">たねしんだんを　はじめる</button>
+      <button class="ghost" id="beginnerBackBtn">もどる</button>
+    </div>
+    <footer class="note">
+      本診断は、まだ実務経験のない方向けの簡易セルフチェックです。けっかは実際の適性を保証するものではなく、本格診断（47問）と合わせて参考にしてください。回答データはお使いのブラウザ内にのみ保存されます。
+    </footer>
+  `;
+  document.getElementById("beginnerStartBtn").onclick = ()=>{
+    state.screen="beginnerAssess";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("beginnerBackBtn").onclick = ()=>{
+    state.screen="intro";
+    render(); window.scrollTo(0,0);
+  };
+}
+
+function shuffledBeginnerOrder(){
+  if(!state.beginnerDisplayOrder){
+    const arr = BEGINNER_QUESTIONS.map((_,i)=>i);
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    state.beginnerDisplayOrder = arr;
+  }
+  return state.beginnerDisplayOrder;
+}
+
+function renderBeginnerAssess(){
+  const order = shuffledBeginnerOrder();
+  const answeredCountBeginner = Object.keys(state.beginnerAnswers).length;
+  const allDone = order.every(idx => state.beginnerAnswers[beginnerQuestionKey(idx)] != null);
+  const pct = Math.round(100*answeredCountBeginner/BEGINNER_QUESTIONS.length);
+
+  app.innerHTML = `
+    <div class="thin-progress"><i style="width:${pct}%;"></i></div>
+    <div class="q-counter">たねしんだん　${answeredCountBeginner} / ${BEGINNER_QUESTIONS.length}問</div>
+
+    <div class="q-card-list">
+      ${order.map((idx)=>{
+        const q = BEGINNER_QUESTIONS[idx];
+        const key = beginnerQuestionKey(idx);
+        const currentVal = state.beginnerAnswers[key];
+        return `
+        <div class="q-card" data-idx="${idx}">
+          <div class="q-card-statement">${q.statement}</div>
+          ${renderScaleRow(key, currentVal)}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="q-nav q-nav-split">
+      <button class="ghost" id="beginnerAssessBackBtn">戻る</button>
+      <button class="primary" id="beginnerAssessNextBtn" ${allDone?"":"disabled style='opacity:.4;cursor:default;'"}>結果を見る →</button>
+    </div>
+  `;
+
+  app.querySelectorAll(".q-card").forEach(card=>{
+    const idx = parseInt(card.getAttribute("data-idx"),10);
+    const key = beginnerQuestionKey(idx);
+    card.querySelectorAll(".scale-circle-wrap").forEach(wrap=>{
+      wrap.onclick = async ()=>{
+        const v = parseInt(wrap.getAttribute("data-v"),10);
+        state.beginnerAnswers[key] = v;
+        await saveProgress();
+        renderBeginnerAssess();
+      };
+    });
+  });
+
+  document.getElementById("beginnerAssessBackBtn").onclick = ()=>{ state.screen="beginnerIntro"; render(); window.scrollTo(0,0); };
+  const nextBtn = document.getElementById("beginnerAssessNextBtn");
+  if(nextBtn && allDone){
+    nextBtn.onclick = async ()=>{
+      state.beginnerScores = computeBeginnerTypeScores(state.beginnerAnswers);
+      await saveProgress();
+      state.screen="beginnerResults";
+      render(); window.scrollTo(0,0);
+    };
+  }
+}
+
+function renderBeginnerResults(){
+  const scores = state.beginnerScores || computeBeginnerTypeScores(state.beginnerAnswers);
+  const topType = determineBeginnerType(scores);
+  const seed = BEGINNER_TYPE_SEED_NAME[topType];
+  const level = beginnerOverallLevel(scores);
+  const typeLabelMap = { tech:"開発系", bizdev:"BizDev系", pmm:"マーケ系", general:"総合型" };
+
+  app.innerHTML = `
+    <div class="eyebrow">たねしんだん　けっか</div>
+    <h1 class="hero-title" style="font-size:28px;">きみは<br><span style="color:var(--gold);">【${seed.seed}】</span>を持つ　ぼうけんしゃだ</h1>
+    <p class="hero-lead">${seed.desc}</p>
+
+    <div class="dq-window" style="margin-top:24px; padding:20px;">
+      <div class="dq-mini-label">せいちょうどあい</div>
+      <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${level.label}</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${level.desc}</div>
+      <div class="dq-mini-label" style="margin-top:18px;">たねタイプべつ　スコア</div>
+      <div class="dq-num-grid" style="margin-top:8px;">
+        ${["tech","bizdev","pmm","general"].map(t=>`<div class="dq-num-cell"><span>${typeLabelMap[t]}</span><b>${(scores[t]||0).toFixed(1)}</b></div>`).join("")}
+      </div>
+    </div>
+
+    <div class="start-row" style="margin-top:28px;">
+      <button class="primary" id="toFullDiagnosisBtn">本格しんだん（47問）に　ちょうせんする →</button>
+    </div>
+    <div class="start-row" style="margin-top:12px;">
+      <button class="ghost" id="beginnerRetryBtn">もういちど　たねしんだんをうける</button>
+      <button class="ghost" id="beginnerBackHomeBtn">トップへもどる</button>
+    </div>
+  `;
+  document.getElementById("toFullDiagnosisBtn").onclick = async ()=>{
+    if(supabaseClient && !state.userEmail){
+      await saveProgress();
+      const redirected = await signInWithGoogle("profileEntry");
+      if(redirected) return;
+    }
+    state.screen = "profileEntry";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("beginnerRetryBtn").onclick = ()=>{
+    state.beginnerAnswers = {};
+    state.beginnerDisplayOrder = null;
+    state.beginnerScores = null;
+    state.screen = "beginnerIntro";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("beginnerBackHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
+}
+
 function renderOrgIntro(){
   app.innerHTML = `
     <div class="eyebrow">組織タイプ診断</div>
@@ -5359,6 +5584,8 @@ function renderResults(){
       state.profile = saved.profile || { toeic:null, certifications:"", nickname:"", experienceYears:null, age:null };
       state.orgAnswers = saved.orgAnswers || {};
       state.orgScores = saved.orgScores || null;
+      state.beginnerAnswers = saved.beginnerAnswers || {};
+      state.beginnerScores = saved.beginnerScores || null;
       state.vitalsAnswers = saved.vitalsAnswers || {};
       state.rpgMp = saved.rpgMp ?? null;
       state.defeatedMonsters = saved.defeatedMonsters || {};
