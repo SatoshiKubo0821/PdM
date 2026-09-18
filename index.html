@@ -604,9 +604,9 @@
   button.primary:hover, a.primary:hover{background:var(--navy-800);}
   button.primary:active, a.primary:active{transform:translate(2px,2px); box-shadow:0 0 0 3px var(--navy-950), 2px 2px 0 rgba(0,0,0,.3);}
   button.secondary{
-    background:#fff;
-    color:var(--navy-900);
-    border:3px solid var(--gold);
+    background:var(--navy-800);
+    color:#fff;
+    border:3px solid #fff;
     box-shadow:0 0 0 3px var(--navy-950), 4px 4px 0 rgba(0,0,0,.3);
     font-family:var(--pixel-font);
     font-weight:700;
@@ -618,7 +618,7 @@
     text-decoration:none;
     box-sizing:border-box;
   }
-  button.secondary:hover{background:#FFF6DE;}
+  button.secondary:hover{background:#2828D6;}
   button.secondary:active{transform:translate(2px,2px); box-shadow:0 0 0 3px var(--navy-950), 2px 2px 0 rgba(0,0,0,.3);}
   button.ghost{
     background:#fff;
@@ -4155,7 +4155,7 @@ async function renderIntro(){
     </div>
 
     <div class="start-row" style="margin-top:18px; flex-direction:column; align-items:flex-start; gap:6px;">
-      <button class="secondary" id="beginnerStartBtnTop">${hasBeginnerSaved ? "つづきから　PdM可能性診断（PdM未経験向け）" : "PdM可能性診断（PdM未経験向け）"}</button>
+      <button class="secondary" id="beginnerStartBtnTop">${hasBeginnerSaved ? "つづきから　PdMポテンシャル診断（PdM未経験向け）" : "PdMポテンシャル診断（PdM未経験向け）"}</button>
       ${hasBeginnerSaved ? `<span class="resume-note">ぜんかいの　たねしんだん（${Object.keys(saved.beginnerAnswers).length}/${BEGINNER_QUESTIONS.length}こう）が　ほぞんされています</span>` : `<span class="resume-note">まだ　じっせんけいけんが　ない方むけ・やく2ふんで　しんだんできます</span>`}
     </div>
 
