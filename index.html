@@ -4151,12 +4151,12 @@ async function renderIntro(){
 
     <div class="start-row" style="margin-top:24px; flex-direction:column; align-items:flex-start; gap:6px;">
       <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　PdMスキル診断（PdM経験者向け）" : "PdMスキル診断（PdM経験者向け）"}</button>
-      ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
+      ${hasSaved ? `<span class="resume-note">ぜんかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
     </div>
 
     <div class="start-row" style="margin-top:18px; flex-direction:column; align-items:flex-start; gap:6px;">
       <button class="secondary" id="beginnerStartBtnTop">${hasBeginnerSaved ? "つづきから　PdM可能性診断（PdM未経験向け）" : "PdM可能性診断（PdM未経験向け）"}</button>
-      ${hasBeginnerSaved ? `<span class="resume-note">まえかいの　たねしんだん（${Object.keys(saved.beginnerAnswers).length}/${BEGINNER_QUESTIONS.length}こう）が　ほぞんされています</span>` : `<span class="resume-note">まだ　じっせんけいけんが　ない方むけ・やく2ふんで　しんだんできます</span>`}
+      ${hasBeginnerSaved ? `<span class="resume-note">ぜんかいの　たねしんだん（${Object.keys(saved.beginnerAnswers).length}/${BEGINNER_QUESTIONS.length}こう）が　ほぞんされています</span>` : `<span class="resume-note">まだ　じっせんけいけんが　ない方むけ・やく2ふんで　しんだんできます</span>`}
     </div>
 
     </div>
@@ -4244,7 +4244,7 @@ async function renderIntro(){
       <button class="primary" id="startBtn">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
       ${hasSaved ? `<button class="ghost" id="restartBtn">さいしょから　やりなおす</button>` : ""}
       ${supabaseClient ? `<button class="ghost" id="historyBtn">ぼうけんのしょを　みる</button>` : ""}
-      ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : ""}
+      ${hasSaved ? `<span class="resume-note">ぜんかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : ""}
     </div>
 
     <footer class="note">
