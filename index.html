@@ -3229,7 +3229,7 @@ async function renderHistory(){
       const jobClass = isLegendaryRow ? LEGENDARY_HERO_DATA : getJobClass(r.pdm_type, r.seniority);
       return `
       <div class="history-row-card" data-id="${r.id}">
-        <div class="history-row-icon"><img src="./assets/jobs/${jobClass.icon}.png" alt="${jobClass.name}"></div>
+        <div class="history-row-icon"><img src="./assets/jobs/${jobClass.icon}.webp" alt="${jobClass.name}"></div>
         <div class="history-row-body">
           <div class="history-row-top">
             <span class="history-row-date">${date}</span>
@@ -3404,7 +3404,7 @@ function renderMonsterSelect(){
       ${visibleMonsters.map(m=>`
         <div class="monster-select-card" data-key="${m.key}">
           <div class="monster-select-icon">
-            <img src="./assets/monsters/${m.icon}.png" alt="${m.name}">
+            <img src="./assets/monsters/${m.icon}.webp" alt="${m.name}">
           </div>
           <div class="monster-select-name">${m.name}</div>
           <div class="monster-select-theme">${m.theme}</div>
@@ -3466,7 +3466,7 @@ function renderMonsterBattle(){
       <div class="battle-center">
         <div class="battle-enemy-area">
           <div class="battle-effect-layer" id="battleEffectLayer"></div>
-          <img src="./assets/monsters/${monster.icon}.png" alt="${monster.name}" class="battle-enemy-img" id="battleEnemyImg">
+          <img src="./assets/monsters/${monster.icon}.webp" alt="${monster.name}" class="battle-enemy-img" id="battleEnemyImg">
         </div>
         <div class="battle-log" id="battleLog">${monster.name}が　あらわれた！</div>
       </div>
@@ -3868,7 +3868,7 @@ function renderBattleDefeat(){
       <div class="battle-center">
         <div class="battle-enemy-area">
           <div class="battle-effect-layer" id="battleEffectLayer"></div>
-          <img src="./assets/battle/demon_king.png" alt="まおう" class="battle-enemy-img" id="battleEnemyImg">
+          <img src="./assets/battle/demon_king.webp" alt="まおう" class="battle-enemy-img" id="battleEnemyImg">
         </div>
         <div class="battle-log" id="battleLog">まおうが　あらわれた！</div>
       </div>
@@ -4170,11 +4170,11 @@ async function renderIntro(){
 
   app.innerHTML = `
     <div class="pdm-quest-logo-wrap">
-      <img src="./assets/branding/pdm_quest_logo.png" alt="PDM QUEST" class="pdm-quest-logo">
+      <img src="./assets/branding/pdm_quest_logo.webp" alt="PDM QUEST" class="pdm-quest-logo">
     </div>
     <section class="intro-hero" aria-label="PdMクエストの紹介">
     <figure class="intro-hero-art">
-      <img src="./assets/jobs/general_senior.png" alt="剣と盾を装備した青い髪のゆうしゃ" width="240" height="255" fetchpriority="high">
+      <img src="./assets/jobs/general_senior.webp" alt="剣と盾を装備した青い髪のゆうしゃ" width="240" height="255" fetchpriority="high">
     </figure>
     <div class="intro-hero-copy">
     <h1 class="hero-title">きみの　PdMとしての　ちからで、<br>モンスターと　たたかおう！</h1>
@@ -4222,7 +4222,7 @@ async function renderIntro(){
             const jc = getJobClass(typeKey, tierKey);
             return `
             <div class="job-showcase-cell">
-              <img src="./assets/jobs/${jc.icon}.png" alt="${jc.name}">
+              <img src="./assets/jobs/${jc.icon}.webp" alt="${jc.name}" loading="lazy">
               <div class="job-showcase-name">${jc.name}</div>
               <div class="job-showcase-tier" style="color:${JOB_TIER_COLOR[tierKey]};">${JOB_TIER_LABEL[tierKey]}</div>
             </div>`;
@@ -4232,7 +4232,7 @@ async function renderIntro(){
     <p class="legendary-teaser">✨ じつは、この12のしょくぎょうの　さらに　うえに――<br>ひめられたる「でんせつのしょくぎょう」も　そんざいするという……</p>
 
     <div class="hero-visual" style="margin-top:44px;">
-      <img src="./assets/screenshots/profile_sample.png" alt="しんだんけっか の サンプル がめん" class="hero-visual-img">
+      <img src="./assets/screenshots/profile_sample.webp" alt="しんだんけっか の サンプル がめん" class="hero-visual-img" loading="lazy">
       <div class="hero-visual-caption">しんだんすると、こんな　ドラクエふうの　プロフィールが　できあがる（サンプル）</div>
     </div>
 
@@ -4246,11 +4246,11 @@ async function renderIntro(){
     </p>
     <div class="battle-preview-shots">
       <div class="battle-preview-shot">
-        <img src="./assets/screenshots/monster_select_preview.png" alt="モンスターせんたく がめん">
+        <img src="./assets/screenshots/monster_select_preview.webp" alt="モンスターせんたく がめん" loading="lazy">
         <div class="battle-preview-caption">じぶんの　ランクに　あわせて、いどむ　モンスターを　えらべる</div>
       </div>
       <div class="battle-preview-shot">
-        <img src="./assets/screenshots/battle_preview.png" alt="バトル がめん">
+        <img src="./assets/screenshots/battle_preview.webp" alt="バトル がめん" loading="lazy">
         <div class="battle-preview-caption">おぼえた　とくぎ・じゅもんで　こうげき。かいしんの　いちげきも　でる</div>
       </div>
     </div>
@@ -5194,7 +5194,7 @@ function renderResults(){
 
     <div class="dq-window" style="margin-top:20px;">
       <div class="dq-status-top">
-        <div class="dq-job-icon"><img src="./assets/jobs/${jobClass.icon}.png" alt="${jobClass.name}"></div>
+        <div class="dq-job-icon"><img src="./assets/jobs/${jobClass.icon}.webp" alt="${jobClass.name}"></div>
         <div>
           <div class="dq-name">${state.profile.nickname || "ぼうけんしゃ"}</div>
           <div class="dq-job">しょくぎょう：${jobClass.name}（${jobClass.en}）<span class="dq-tier-badge" style="background:${JOB_TIER_COLOR[jobClass.tier]};">${jobClass.tierLabel}</span></div>
