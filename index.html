@@ -675,6 +675,18 @@
     text-align:center;
   }
   .q-card:has(.scale-circle.on){border-color:var(--blue-300);}
+  .choice-opt-row{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+  }
+  .choice-opt{
+    background:#fff; border:2px solid var(--blue-300); color:var(--ink);
+    font-family:"Zen Kaku Gothic New",sans-serif; font-weight:600; font-size:14px;
+    padding:10px 18px; border-radius:6px; cursor:pointer; transition:background .1s ease, transform .1s ease;
+  }
+  .choice-opt:hover{background:#F0F4FF;}
+  .choice-opt.selected{background:var(--navy-900); color:#fff; border-color:var(--navy-900);}
+  .q-card:has(.choice-opt.selected){border-color:var(--blue-300);}
+  @media(max-width:600px){ .choice-opt{font-size:13px; padding:9px 14px;} }
   .q-card-statement{
     font-size:17px;
     font-weight:700;
@@ -2636,6 +2648,170 @@ function beginnerOverallLevel(scores){
   return { label:"これから　ポテンシャルを　ひらく", desc:"これから経験を積むことで、PdMとしての資質が育っていく段階です。" };
 }
 
+/* ---------------- PdM副業診断（β） ----------------
+   スキル診断（47問）を終えた人向けの、副業条件の診断。
+   稼働時間・曜日・平日日中の可否・リモート希望・プライベートとの両立・想定時給・期待報酬から
+   最適な副業スタイルを判定し、スキル診断の結果（タイプ・ランク）と掛け合わせて具体的な副業の方向性を提案する。 */
+const SIDEJOB_QUESTIONS = [
+  { key:"hours",    label:"1日に副業にさける時間は？",
+    options:[ {v:"lt1", label:"1時間未満", hours:0.5}, {v:"1to2", label:"1〜2時間", hours:1.5}, {v:"2to4", label:"2〜4時間", hours:3}, {v:"gt4", label:"4時間以上", hours:5} ] },
+  { key:"days",     label:"副業にあてられる曜日は？",
+    options:[ {v:"weekday", label:"平日のみ（夜間など）", daysPerWeek:4}, {v:"weekend", label:"土日のみ", daysPerWeek:2}, {v:"both", label:"平日も土日も", daysPerWeek:5} ] },
+  { key:"daytime",  label:"平日の日中（9〜18時）の稼働は？",
+    options:[ {v:"no", label:"不可"}, {v:"partial", label:"週1〜2日なら可"}, {v:"flexible", label:"柔軟に可"} ] },
+  { key:"remote",   label:"リモートワークの希望は？",
+    options:[ {v:"full", label:"フルリモートのみ"}, {v:"hybrid", label:"リモート中心（一部出社可）"}, {v:"any", label:"出社も問題ない"} ] },
+  { key:"balance",  label:"プライベートとの両立の考え方は？",
+    options:[ {v:"private", label:"プライベート優先"}, {v:"balanced", label:"バランス重視"}, {v:"work", label:"副業に本気で取り組みたい"} ] },
+  { key:"hourly",   label:"想定している時給は？",
+    options:[ {v:"lt3k", label:"〜3,000円", mid:2500}, {v:"3to5k", label:"3,000〜5,000円", mid:4000}, {v:"5to8k", label:"5,000〜8,000円", mid:6500}, {v:"gt8k", label:"8,000円〜", mid:10000} ] },
+  { key:"monthly",  label:"期待する月額報酬は？",
+    options:[ {v:"lt5", label:"〜5万円", mid:30000}, {v:"5to10", label:"5〜10万円", mid:75000}, {v:"10to20", label:"10〜20万円", mid:150000}, {v:"gt20", label:"20万円〜", mid:250000} ] },
+];
+function sidejobOption(key, v){
+  const q = SIDEJOB_QUESTIONS.find(q=>q.key===key);
+  return q ? q.options.find(o=>o.v===v) : null;
+}
+/* 副業スタイル（5タイプ）。判定条件は determineSidejobStyle を参照 */
+const SIDEJOB_STYLES = {
+  spot:     { name:"スポットそうだん型", en:"SPOT ADVISOR",
+    desc:"限られた時間で、経験と知見を活かして単発の相談・壁打ち・レビューに応えるスタイル。時間あたりの単価が高く、プライベートとの両立もしやすい。",
+    fit:"週数時間で高単価を狙いたい人、平日日中は動けない人に向いています。" },
+  weekend:  { name:"しゅうまつプロジェクト型", en:"WEEKEND PROJECT",
+    desc:"土日にまとまった時間を確保し、期間を決めたプロジェクトに腰を据えて取り組むスタイル。平日は本業に集中できる。",
+    fit:"土日中心で稼働でき、ひとつの案件にじっくり関わりたい人に向いています。" },
+  evening:  { name:"へいじつやかん伴走型", en:"EVENING PARTNER",
+    desc:"平日の夜に少しずつ時間を積み上げ、チームの一員として継続的に伴走するスタイル。長く関わることで信頼と単価が育っていく。",
+    fit:"平日夜に安定して時間を取れ、継続案件で経験を積みたい人に向いています。" },
+  remote:   { name:"フルリモート業務委託型", en:"REMOTE CONTRACTOR",
+    desc:"場所に縛られず、リモート前提で業務委託として機能開発や要件定義を担うスタイル。まとまった稼働で本業に近い手触りが得られる。",
+    fit:"フルリモートを前提に、週10時間以上を安定して確保できる人に向いています。" },
+  parallel: { name:"パラレルキャリア型", en:"PARALLEL CAREER",
+    desc:"本業と並ぶ柱として、副業にも本気で時間と熱量を注ぐスタイル。複数のプロダクトを同時に動かし、キャリアの幅を一気に広げる。",
+    fit:"週15時間以上を確保でき、副業を本格的なキャリアの一部として育てたい人に向いています。" },
+};
+function computeSidejobWeeklyHours(ans){
+  const h = sidejobOption("hours", ans.hours);
+  const d = sidejobOption("days", ans.days);
+  if(!h || !d) return 0;
+  return h.hours * d.daysPerWeek;
+}
+function determineSidejobStyle(ans){
+  const weekly = computeSidejobWeeklyHours(ans);
+  if(ans.balance === "work" && weekly >= 15) return "parallel";
+  if(ans.remote === "full" && weekly >= 10) return "remote";
+  if(ans.days === "weekend") return "weekend";
+  if(weekly <= 5 || ans.balance === "private") return "spot";
+  return "evening";
+}
+/* ランク別の副業時給の相場感（副業マッチングサービス各社が公開する目安レンジを参考にした概算） */
+const SIDEJOB_RATE_BANDS = {
+  junior: { min:2000, max:4000, label:"2,000〜4,000円" },
+  middle: { min:4000, max:7000, label:"4,000〜7,000円" },
+  senior: { min:7000, max:15000, label:"7,000〜15,000円" },
+};
+/* ランク×タイプ別の、具体的な副業の方向性 */
+const SIDEJOB_ROLE_BY_SENIORITY = {
+  junior: "PdMアシスタント、ユーザーリサーチの補助、競合調査、仕様ドキュメントの作成支援など、実務経験を積みながら報酬を得られる副業がフィットします。",
+  middle: "機能単位のPdM代行、要件定義・仕様設計の支援、プロジェクト推進、ABテストの設計など、実務を一定範囲で任される副業がフィットします。",
+  senior: "PdM顧問、プロダクト戦略アドバイザー、PMF伴走支援、若手PdMのメンタリングなど、経験を活かして高単価が狙える副業がフィットします。",
+};
+const SIDEJOB_FOCUS_BY_TYPE = {
+  tech:     "とくに、開発チームと連携する技術寄りの案件（仕様設計・技術的な意思決定の支援）で強みが活きます。",
+  bizdev:   "とくに、事業計画・KPI設計・収益モデルの検討など、事業成長に直結する案件で強みが活きます。",
+  pmm:      "とくに、市場投入戦略・ユーザー獲得・ポジショニングなど、届け方を設計する案件で強みが活きます。",
+  designer: "とくに、UX設計・プロトタイピング・ユーザビリティ改善など、体験を形にする案件で強みが活きます。",
+  general:  "とくに、複数領域をまたいで全体を調整するPdM代行や、チーム立ち上げの伴走案件で強みが活きます。",
+};
+function sidejobIncomeFeedback(ans, seniorityKey){
+  const weekly = computeSidejobWeeklyHours(ans);
+  const monthlyHours = weekly * 4;
+  const hourly = sidejobOption("hourly", ans.hourly);
+  const monthly = sidejobOption("monthly", ans.monthly);
+  const band = SIDEJOB_RATE_BANDS[seniorityKey] || SIDEJOB_RATE_BANDS.middle;
+  const estIncome = hourly ? monthlyHours * hourly.mid : 0;
+  const expected = monthly ? monthly.mid : 0;
+  let incomeNote;
+  if(expected === 0 || estIncome === 0) incomeNote = "";
+  else if(expected <= estIncome * 1.1) incomeNote = "想定している稼働時間と時給なら、期待する月額報酬は十分に現実的です。";
+  else if(expected <= estIncome * 1.6) incomeNote = "期待する月額報酬は、いまの稼働時間と時給の想定だとやや高めです。稼働時間を少し増やすか、単価の高い案件を選ぶ工夫が必要です。";
+  else incomeNote = "期待する月額報酬は、いまの稼働時間と時給の想定と比べてかなり高めです。時給か稼働時間のどちらかを見直すと、現実的な計画になります。";
+  let rateNote;
+  if(!hourly) rateNote = "";
+  else if(hourly.mid < band.min) rateNote = `あなたのランクの相場（${band.label}）より控えめな想定です。もう少し高い単価を狙っても十分に通用します。`;
+  else if(hourly.mid > band.max) rateNote = `あなたのランクの相場（${band.label}）よりかなり高い想定です。実績や専門性をしっかり示せる案件に絞ると実現しやすくなります。`;
+  else rateNote = `あなたのランクの相場（${band.label}）に沿った、妥当な想定です。`;
+  return { weekly, monthlyHours, estIncome, expected, incomeNote, rateNote, band };
+}
+
+/* ---------------- PdM転職診断（β） ----------------
+   スキル診断（47問）を終えた人向けの、転職の方向性を診断する。
+   希望時期・現年収・希望年収・会社規模・働き方・キャリア志向・最重視点から転職スタイルを判定し、
+   スキル診断の結果（タイプ・ランク・年収帯）と掛け合わせて具体的な転職の方向性を提案する。 */
+const CAREER_QUESTIONS = [
+  { key:"timing",   label:"転職を考えている時期は？",
+    options:[ {v:"now", label:"すぐにでも"}, {v:"half", label:"半年以内"}, {v:"year", label:"1年以内"}, {v:"someday", label:"良い話があれば"} ] },
+  { key:"salaryNow", label:"現在の年収は？",
+    options:[ {v:"lt500", label:"〜500万円", mid:400}, {v:"500to700", label:"500〜700万円", mid:600}, {v:"700to1000", label:"700〜1,000万円", mid:850}, {v:"gt1000", label:"1,000万円〜", mid:1200} ] },
+  { key:"salaryWant", label:"転職後に希望する年収は？",
+    options:[ {v:"lt500", label:"〜500万円", mid:400}, {v:"500to700", label:"500〜700万円", mid:600}, {v:"700to1000", label:"700〜1,000万円", mid:850}, {v:"gt1000", label:"1,000万円〜", mid:1200} ] },
+  { key:"size",     label:"希望する会社の規模は？",
+    options:[ {v:"startup", label:"スタートアップ（〜50名）"}, {v:"mega", label:"メガベンチャー（50〜500名）"}, {v:"large", label:"大企業（500名〜）"}, {v:"any", label:"こだわらない"} ] },
+  { key:"workstyle", label:"希望する働き方は？",
+    options:[ {v:"full", label:"フルリモート必須"}, {v:"hybrid", label:"ハイブリッド（週数回出社）"}, {v:"office", label:"出社中心でも問題ない"} ] },
+  { key:"direction", label:"これからのキャリアの方向性は？",
+    options:[ {v:"specialist", label:"専門性を深める（スペシャリスト）"}, {v:"manager", label:"組織を率いる（マネジメント）"}, {v:"founder", label:"事業を作る（0→1・起業寄り）"}, {v:"undecided", label:"まだ決めていない"} ] },
+  { key:"priority", label:"転職で最も重視することは？",
+    options:[ {v:"salary", label:"年収"}, {v:"growth", label:"裁量・成長"}, {v:"balance", label:"ワークライフバランス"}, {v:"mission", label:"プロダクトの社会的意義"} ] },
+];
+function careerOption(key, v){
+  const q = CAREER_QUESTIONS.find(q=>q.key===key);
+  return q ? q.options.find(o=>o.v===v) : null;
+}
+const CAREER_STYLES = {
+  salaryUp:   { name:"ねんしゅうアップ型", en:"SALARY UP",
+    desc:"いまの実力に対して評価が追いついていない状態。市場価値を正しく評価してくれる環境に移ることで、年収を大きく引き上げられる余地がある。",
+    fit:"実績を数字で語れるようにし、年収レンジの高い企業群に絞って動くのが有効です。" },
+  startup:    { name:"スタートアップちょうせん型", en:"STARTUP CHALLENGER",
+    desc:"ゼロから事業を立ち上げる熱量と、不確実な環境を楽しめる胆力を持つタイプ。少人数で裁量の大きな環境で、一気に成長できる。",
+    fit:"シード〜シリーズAのスタートアップや、新規事業立ち上げのポジションが候補になります。" },
+  manager:    { name:"マネジメント志向型", en:"MANAGEMENT TRACK",
+    desc:"個人の成果から、チームや組織の成果へ視座を上げていくタイプ。PdM組織の立ち上げやリード、VPoP・CPOへの道が開けている。",
+    fit:"PdM組織が拡大中のメガベンチャーや、PdMリード・マネージャー職の募集が候補になります。" },
+  balance:    { name:"ワークライフちょうわ型", en:"LIFE BALANCE",
+    desc:"仕事の充実と、私生活の豊かさを両立させることを大切にするタイプ。柔軟な働き方を尊重する文化の企業で、長く力を発揮できる。",
+    fit:"フルリモート・フレックス制度が整い、働き方の柔軟性を明文化している企業を優先すると良いでしょう。" },
+  steady:     { name:"じっくりキャリアアップ型", en:"STEADY GROWTH",
+    desc:"急いで動くより、良い機会を見極めて着実にキャリアを積み上げるタイプ。情報収集を続けながら、条件の合う話を待つ余裕がある。",
+    fit:"転職サイトやエージェントに登録して市場感を把握しつつ、副業などで実績を広げておくのが有効です。" },
+};
+function determineCareerStyle(ans){
+  const now = careerOption("salaryNow", ans.salaryNow);
+  const want = careerOption("salaryWant", ans.salaryWant);
+  const salaryJump = (now && want) ? (want.mid - now.mid) : 0;
+  if(ans.priority === "salary" || salaryJump >= 250) return "salaryUp";
+  if(ans.direction === "founder" || ans.size === "startup") return "startup";
+  if(ans.direction === "manager") return "manager";
+  if(ans.priority === "balance" || ans.workstyle === "full") return "balance";
+  return "steady";
+}
+/* 希望年収を、ランク別の年収帯（SALARY_BANDS）と照らし合わせたフィードバック */
+function careerSalaryFeedback(ans, seniorityKey){
+  const want = careerOption("salaryWant", ans.salaryWant);
+  const band = SALARY_BANDS[seniorityKey] || SALARY_BANDS.middle;
+  if(!want) return "";
+  const bandMid = { junior:525, middle:825, senior:1300 }[seniorityKey] || 825;
+  if(want.mid < bandMid * 0.85) return `希望年収（${want.label}）は、あなたのランクの一般的な年収帯（${band.range}）より控えめです。もう一段上を狙っても十分に通用する実力です。`;
+  if(want.mid > bandMid * 1.3) return `希望年収（${want.label}）は、あなたのランクの一般的な年収帯（${band.range}）よりかなり高めです。実績を明確に示せる企業・ポジションに絞ると実現しやすくなります。`;
+  return `希望年収（${want.label}）は、あなたのランクの一般的な年収帯（${band.range}）に沿った妥当な水準です。`;
+}
+const CAREER_TIMING_NOTE = {
+  now: "すぐに動きたいなら、まずは職務経歴書を整え、エージェントと転職サイトを並行して使うのが最短です。",
+  half: "半年という期間があれば、実績を1つ積み増してから動くこともできます。いま何を成果として語れるかを整理しましょう。",
+  year: "1年あれば、今の職場で狙ったスキルを伸ばしてから動けます。市場で求められる経験を意識して日々の仕事を選びましょう。",
+  someday: "良い話を待つスタンスなら、転職サイトへの登録と副業での実績づくりを進めておくと、チャンスを逃しません。",
+};
+
 /* ---------------- 組織タイプ診断（オリジナル） ----------------
    意思決定・評価軸・リスク姿勢・コミュニケーション文化という、組織文化論で一般的に使われる
    4つの観点から自社の傾向をセルフチェックする、独自の簡易診断。特定サービスの分類名・設問・
@@ -2796,6 +2972,10 @@ let state = {
   beginnerScores: null,      // 診断済みの場合、4タイプの平均スコアが入る
   beginnerDisplayOrder: null,// 未経験者向け診断のシャッフル順
   beginnerProfile: { nickname:"", industry:"", occupation:"" }, // 未経験者向け診断で入力する、なまえ・現在の業界・現在の職種
+  sidejobAnswers: {},   // PdM副業診断（β）の回答（"sidejob:key" -> option value）
+  sidejobResult: null,  // 診断済みの場合、判定されたスタイルキーが入る
+  careerAnswers: {},    // PdM転職診断（β）の回答（"career:key" -> option value）
+  careerResult: null,   // 診断済みの場合、判定されたスタイルキーが入る
   vitalsAnswers: {},       // 体力・AI設問の回答（"vitals:idx" -> 1..5）。HP/MP算出専用
   vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
   rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
@@ -2826,6 +3006,8 @@ async function saveProgress(){
       answers:state.answers, mbti:state.mbti, profile:state.profile,
       orgAnswers:state.orgAnswers, orgScores:state.orgScores,
       beginnerAnswers:state.beginnerAnswers, beginnerScores:state.beginnerScores, beginnerProfile:state.beginnerProfile,
+      sidejobAnswers:state.sidejobAnswers, sidejobResult:state.sidejobResult,
+      careerAnswers:state.careerAnswers, careerResult:state.careerResult,
       vitalsAnswers:state.vitalsAnswers, rpgMp:state.rpgMp,
       defeatedMonsters:state.defeatedMonsters,
     });
@@ -2894,6 +3076,10 @@ async function deleteAllUserData(){
   state.beginnerAnswers = {};
   state.beginnerScores = null;
   state.beginnerProfile = { nickname:"", industry:"", occupation:"" };
+  state.sidejobAnswers = {};
+  state.sidejobResult = null;
+  state.careerAnswers = {};
+  state.careerResult = null;
   state.vitalsAnswers = {};
   state.rpgMp = null;
   state.defeatedMonsters = {};
@@ -3027,6 +3213,12 @@ function render(){
   else if(state.screen==="apply") renderApply();
   else if(state.screen==="beginnerIntro") renderBeginnerIntro();
   else if(state.screen==="beginnerProfile") renderBeginnerProfile();
+  else if(state.screen==="sidejobIntro") renderSidejobIntro();
+  else if(state.screen==="sidejobAssess") renderSidejobAssess();
+  else if(state.screen==="sidejobResults") renderSidejobResults();
+  else if(state.screen==="careerIntro") renderCareerIntro();
+  else if(state.screen==="careerAssess") renderCareerAssess();
+  else if(state.screen==="careerResults") renderCareerResults();
   else if(state.screen==="beginnerAssess") renderBeginnerAssess();
   else if(state.screen==="beginnerResults") renderBeginnerResults();
   else if(state.screen==="orgIntro") renderOrgIntro();
@@ -4001,16 +4193,22 @@ function renderBattleDefeat(){
 
 function renderApply(){
   const ctx = state.applyContext;
+  const source = ctx && ctx.source;
+  const heading = source==="sidejob" ? "副業のご紹介を希望する"
+    : source==="career" ? "求人のご紹介を希望する"
+    : "PdM登竜門に応募する";
+  const leadText = source==="sidejob"
+    ? "PdM副業診断（β）の結果をもとに、あなたに合いそうな副業案件をご紹介するためのフォームです。いただいた情報をもとに、担当者よりご案内をお送りします。"
+    : source==="career"
+    ? "PdM転職診断（β）の結果をもとに、あなたに合いそうな求人をご紹介するためのフォームです。いただいた情報をもとに、担当者よりご案内をお送りします。"
+    : "実践的なプロダクトマネジメントを体系的に学べる「PdM登竜門」への応募フォームです。いただいた情報をもとに、担当者よりご案内をお送りします。";
   app.innerHTML = `
-    <div class="eyebrow">PdM登竜門</div>
-    <h1 class="hero-title" style="font-size:28px;">PdM登竜門に応募する</h1>
-    <p class="hero-lead">
-      実践的なプロダクトマネジメントを体系的に学べる「PdM登竜門」への応募フォームです。
-      いただいた情報をもとに、担当者よりご案内をお送りします。
-    </p>
+    <div class="eyebrow">${source==="sidejob" ? "PdM副業診断（β）" : source==="career" ? "PdM転職診断（β）" : "PdM登竜門"}</div>
+    <h1 class="hero-title" style="font-size:28px;">${heading}</h1>
+    <p class="hero-lead">${leadText}</p>
     ${ctx ? `
     <div class="insight fusion">
-      <p>あなたの診断結果（${PDM_TYPES[ctx.pdmType] ? PDM_TYPES[ctx.pdmType].label : ""}／${SENIORITY[ctx.seniority] ? SENIORITY[ctx.seniority].label : ""}／偏差値${ctx.hensachi}）を参考情報として添えて送信します。</p>
+      <p>あなたの診断結果（${PDM_TYPES[ctx.pdmType] ? PDM_TYPES[ctx.pdmType].label : ""}／${SENIORITY[ctx.seniority] ? SENIORITY[ctx.seniority].label : ""}／偏差値${ctx.hensachi}${ctx.sidejobStyle ? "／"+SIDEJOB_STYLES[ctx.sidejobStyle].name : ""}${ctx.careerStyle ? "／"+CAREER_STYLES[ctx.careerStyle].name : ""}）を参考情報として添えて送信します。</p>
     </div>` : ""}
 
     <div class="profile-form" id="applyForm">
@@ -4480,6 +4678,244 @@ function renderAssess(){
 /* ---------------- MBTI selection screen ---------------- */
 /* ---------------- 組織タイプ診断（スキルレーダー内蔵） ---------------- */
 /* ---------------- 未経験者向け・かんたん適性診断（3画面） ---------------- */
+/* ---------------- 選択肢式アセスメント（副業診断・転職診断で共用のUIパーツ） ---------------- */
+function renderChoiceQuestions(questions, answers, prefix){
+  return questions.map(q=>{
+    const current = answers[prefix+":"+q.key];
+    return `
+    <div class="q-card" data-key="${q.key}">
+      <div class="q-card-statement">${q.label}</div>
+      <div class="choice-opt-row">
+        ${q.options.map(o=>`<button type="button" class="choice-opt ${current===o.v?'selected':''}" data-v="${o.v}">${o.label}</button>`).join("")}
+      </div>
+    </div>`;
+  }).join("");
+}
+function wireChoiceQuestions(questions, answers, prefix, onChange){
+  app.querySelectorAll(".q-card").forEach(card=>{
+    const key = card.getAttribute("data-key");
+    card.querySelectorAll(".choice-opt").forEach(btn=>{
+      btn.onclick = ()=>{
+        answers[prefix+":"+key] = btn.getAttribute("data-v");
+        onChange();
+      };
+    });
+  });
+}
+
+/* ---------------- PdM副業診断（β） ---------------- */
+function renderSidejobIntro(){
+  app.innerHTML = `
+    <div class="eyebrow">PdM副業診断（β）</div>
+    <h1 class="hero-title" style="font-size:28px;">きみに　あった<br>ふくぎょうスタイルを　しんだんする</h1>
+    <p class="hero-lead">
+      1日にさける時間・曜日・リモートの可否・プライベートとの両立・想定時給や報酬など、7つの質問から、
+      あなたに合う副業のスタイルと、いま診断したPdMランクにふさわしい単価の目安を診断します。
+    </p>
+    <div class="intro-stat-bar">
+      <div class="intro-stat-item"><div class="intro-stat-num">5</div><div class="intro-stat-label">副業スタイル</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">7</div><div class="intro-stat-label">設問数</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">約1分</div><div class="intro-stat-label">所要時間</div></div>
+    </div>
+    <div class="start-row" style="margin-top:22px; flex-direction:column; align-items:flex-start; gap:6px;">
+      <button class="primary" id="sidejobStartBtn">副業診断を　はじめる</button>
+    </div>
+    <div class="start-row" style="margin-top:12px;">
+      <button class="ghost" id="sidejobBackBtn">結果にもどる</button>
+    </div>
+    <footer class="note">β版のため、判定ロジックは今後改善されます。回答データはお使いのブラウザに保存されます。</footer>
+  `;
+  document.getElementById("sidejobStartBtn").onclick = ()=>{ state.screen="sidejobAssess"; render(); window.scrollTo(0,0); };
+  document.getElementById("sidejobBackBtn").onclick = ()=>{ state.screen="results"; render(); window.scrollTo(0,0); };
+}
+function renderSidejobAssess(){
+  const answeredN = SIDEJOB_QUESTIONS.filter(q=>state.sidejobAnswers["sidejob:"+q.key]!=null).length;
+  const allDone = answeredN === SIDEJOB_QUESTIONS.length;
+  const pct = Math.round(100*answeredN/SIDEJOB_QUESTIONS.length);
+  app.innerHTML = `
+    <div class="eyebrow">PdM副業診断（β）</div>
+    <div class="thin-progress"><i style="width:${pct}%;"></i></div>
+    <div class="q-counter">${answeredN} / ${SIDEJOB_QUESTIONS.length}問</div>
+    <div class="q-card-list">${renderChoiceQuestions(SIDEJOB_QUESTIONS, state.sidejobAnswers, "sidejob")}</div>
+    <div class="q-nav q-nav-split">
+      <button class="ghost" id="sidejobAssessBackBtn">戻る</button>
+      <button class="primary" id="sidejobAssessNextBtn" ${allDone?"":"disabled style='opacity:.4;cursor:default;'"}>結果を見る →</button>
+    </div>
+  `;
+  wireChoiceQuestions(SIDEJOB_QUESTIONS, state.sidejobAnswers, "sidejob", ()=>{ saveProgress(); renderSidejobAssess(); });
+  document.getElementById("sidejobAssessBackBtn").onclick = ()=>{ state.screen="sidejobIntro"; render(); window.scrollTo(0,0); };
+  const nextBtn = document.getElementById("sidejobAssessNextBtn");
+  if(nextBtn && allDone){
+    nextBtn.onclick = async ()=>{
+      const ans = {};
+      SIDEJOB_QUESTIONS.forEach(q=>{ ans[q.key] = state.sidejobAnswers["sidejob:"+q.key]; });
+      state.sidejobResult = determineSidejobStyle(ans);
+      await saveProgress();
+      state.screen = "sidejobResults";
+      render(); window.scrollTo(0,0);
+    };
+  }
+}
+function renderSidejobResults(){
+  const ans = {};
+  SIDEJOB_QUESTIONS.forEach(q=>{ ans[q.key] = state.sidejobAnswers["sidejob:"+q.key]; });
+  const styleKey = state.sidejobResult || determineSidejobStyle(ans);
+  const style = SIDEJOB_STYLES[styleKey];
+  const typeResult = determinePdmType();
+  const seniorityKey = determineSeniorityKey(overallAverage());
+  const seniority = SENIORITY[seniorityKey];
+  const income = sidejobIncomeFeedback(ans, seniorityKey);
+  const roleNote = SIDEJOB_ROLE_BY_SENIORITY[seniorityKey];
+  const focusNote = SIDEJOB_FOCUS_BY_TYPE[typeResult.key] || "";
+
+  app.innerHTML = `
+    <div class="eyebrow">PdM副業診断（β）　結果</div>
+    <h1 class="hero-title" style="font-size:28px;">あなたに合うのは<br><span style="color:var(--gold);">【${style.name}】</span></h1>
+    <div class="result-job-en">${style.en}</div>
+    <p class="hero-lead">${style.desc}</p>
+    <div class="insight" style="margin-top:14px;"><p>${style.fit}</p></div>
+
+    <div class="dq-window" style="margin-top:24px; padding:20px;">
+      <div class="dq-mini-label">週あたりの想定稼働</div>
+      <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">約${income.weekly}時間／週（月${income.monthlyHours}時間ほど）</div>
+
+      <div class="dq-mini-label" style="margin-top:18px;">単価の目安（${seniority.label}）</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${income.rateNote}</div>
+
+      ${income.incomeNote ? `<div class="dq-mini-label" style="margin-top:18px;">報酬イメージ</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${income.incomeNote}</div>` : ""}
+
+      <div class="dq-mini-label" style="margin-top:18px;">おすすめの副業内容</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${roleNote}${focusNote}</div>
+    </div>
+
+    <div class="section-label" style="margin-top:32px;">条件に合う副業を、担当者からご案内します</div>
+    <p class="section-sub">診断結果をもとに、あなたに合いそうな副業案件をご紹介できる場合があります。ご興味があれば、下のフォームからご登録ください。</p>
+    <div class="start-row" style="margin-top:18px;">
+      <button class="primary" id="sidejobApplyBtn">副業の紹介を希望する →</button>
+    </div>
+    <div class="start-row" style="margin-top:12px;">
+      <button class="ghost" id="sidejobRetryBtn">もういちど診断する</button>
+      <button class="ghost" id="sidejobBackResultsBtn">スキル診断結果にもどる</button>
+    </div>
+    <footer class="note">β版の簡易診断です。実際のご紹介は、ご経験・ご希望条件をあらためて確認のうえ行います。</footer>
+  `;
+  document.getElementById("sidejobApplyBtn").onclick = ()=>{
+    state.applyContext = { pdmType:typeResult.key, seniority:seniorityKey, hensachi:calcHensachi(overallAverage()), sidejobStyle:styleKey, source:"sidejob" };
+    state.screen = "apply";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("sidejobRetryBtn").onclick = ()=>{
+    state.sidejobAnswers = {}; state.sidejobResult = null;
+    state.screen = "sidejobAssess";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("sidejobBackResultsBtn").onclick = ()=>{ state.screen="results"; render(); window.scrollTo(0,0); };
+}
+
+/* ---------------- PdM転職診断（β） ---------------- */
+function renderCareerIntro(){
+  app.innerHTML = `
+    <div class="eyebrow">PdM転職診断（β）</div>
+    <h1 class="hero-title" style="font-size:28px;">きみに　あった<br>てんしょくの　ほうこうせいを　しんだんする</h1>
+    <p class="hero-lead">
+      転職時期・現在と希望の年収・希望する会社規模や働き方・キャリアの方向性・最重視することから、
+      あなたに合う転職スタイルと、いま診断したPdMランクにふさわしい年収の目安を診断します。
+    </p>
+    <div class="intro-stat-bar">
+      <div class="intro-stat-item"><div class="intro-stat-num">5</div><div class="intro-stat-label">転職スタイル</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">7</div><div class="intro-stat-label">設問数</div></div>
+      <div class="intro-stat-item"><div class="intro-stat-num">約1分</div><div class="intro-stat-label">所要時間</div></div>
+    </div>
+    <div class="start-row" style="margin-top:22px; flex-direction:column; align-items:flex-start; gap:6px;">
+      <button class="primary" id="careerStartBtn">転職診断を　はじめる</button>
+    </div>
+    <div class="start-row" style="margin-top:12px;">
+      <button class="ghost" id="careerBackBtn">結果にもどる</button>
+    </div>
+    <footer class="note">β版のため、判定ロジックは今後改善されます。回答データはお使いのブラウザに保存されます。</footer>
+  `;
+  document.getElementById("careerStartBtn").onclick = ()=>{ state.screen="careerAssess"; render(); window.scrollTo(0,0); };
+  document.getElementById("careerBackBtn").onclick = ()=>{ state.screen="results"; render(); window.scrollTo(0,0); };
+}
+function renderCareerAssess(){
+  const answeredN = CAREER_QUESTIONS.filter(q=>state.careerAnswers["career:"+q.key]!=null).length;
+  const allDone = answeredN === CAREER_QUESTIONS.length;
+  const pct = Math.round(100*answeredN/CAREER_QUESTIONS.length);
+  app.innerHTML = `
+    <div class="eyebrow">PdM転職診断（β）</div>
+    <div class="thin-progress"><i style="width:${pct}%;"></i></div>
+    <div class="q-counter">${answeredN} / ${CAREER_QUESTIONS.length}問</div>
+    <div class="q-card-list">${renderChoiceQuestions(CAREER_QUESTIONS, state.careerAnswers, "career")}</div>
+    <div class="q-nav q-nav-split">
+      <button class="ghost" id="careerAssessBackBtn">戻る</button>
+      <button class="primary" id="careerAssessNextBtn" ${allDone?"":"disabled style='opacity:.4;cursor:default;'"}>結果を見る →</button>
+    </div>
+  `;
+  wireChoiceQuestions(CAREER_QUESTIONS, state.careerAnswers, "career", ()=>{ saveProgress(); renderCareerAssess(); });
+  document.getElementById("careerAssessBackBtn").onclick = ()=>{ state.screen="careerIntro"; render(); window.scrollTo(0,0); };
+  const nextBtn = document.getElementById("careerAssessNextBtn");
+  if(nextBtn && allDone){
+    nextBtn.onclick = async ()=>{
+      const ans = {};
+      CAREER_QUESTIONS.forEach(q=>{ ans[q.key] = state.careerAnswers["career:"+q.key]; });
+      state.careerResult = determineCareerStyle(ans);
+      await saveProgress();
+      state.screen = "careerResults";
+      render(); window.scrollTo(0,0);
+    };
+  }
+}
+function renderCareerResults(){
+  const ans = {};
+  CAREER_QUESTIONS.forEach(q=>{ ans[q.key] = state.careerAnswers["career:"+q.key]; });
+  const styleKey = state.careerResult || determineCareerStyle(ans);
+  const style = CAREER_STYLES[styleKey];
+  const typeResult = determinePdmType();
+  const seniorityKey = determineSeniorityKey(overallAverage());
+  const seniority = SENIORITY[seniorityKey];
+  const salaryNote = careerSalaryFeedback(ans, seniorityKey);
+  const timingNote = CAREER_TIMING_NOTE[ans.timing] || "";
+
+  app.innerHTML = `
+    <div class="eyebrow">PdM転職診断（β）　結果</div>
+    <h1 class="hero-title" style="font-size:28px;">あなたに合うのは<br><span style="color:var(--gold);">【${style.name}】</span></h1>
+    <div class="result-job-en">${style.en}</div>
+    <p class="hero-lead">${style.desc}</p>
+    <div class="insight" style="margin-top:14px;"><p>${style.fit}</p></div>
+
+    <div class="dq-window" style="margin-top:24px; padding:20px;">
+      <div class="dq-mini-label">年収の目安（${seniority.label}）</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${salaryNote}</div>
+
+      <div class="dq-mini-label" style="margin-top:18px;">動きだすタイミング</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${timingNote}</div>
+    </div>
+
+    <div class="section-label" style="margin-top:32px;">条件に合う求人を、担当者からご案内します</div>
+    <p class="section-sub">診断結果をもとに、あなたに合いそうな求人をご紹介できる場合があります。ご興味があれば、下のフォームからご登録ください。</p>
+    <div class="start-row" style="margin-top:18px;">
+      <button class="primary" id="careerApplyBtn">求人の紹介を希望する →</button>
+    </div>
+    <div class="start-row" style="margin-top:12px;">
+      <button class="ghost" id="careerRetryBtn">もういちど診断する</button>
+      <button class="ghost" id="careerBackResultsBtn">スキル診断結果にもどる</button>
+    </div>
+    <footer class="note">β版の簡易診断です。実際のご紹介は、ご経験・ご希望条件をあらためて確認のうえ行います。</footer>
+  `;
+  document.getElementById("careerApplyBtn").onclick = ()=>{
+    state.applyContext = { pdmType:typeResult.key, seniority:seniorityKey, hensachi:calcHensachi(overallAverage()), careerStyle:styleKey, source:"career" };
+    state.screen = "apply";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("careerRetryBtn").onclick = ()=>{
+    state.careerAnswers = {}; state.careerResult = null;
+    state.screen = "careerAssess";
+    render(); window.scrollTo(0,0);
+  };
+  document.getElementById("careerBackResultsBtn").onclick = ()=>{ state.screen="results"; render(); window.scrollTo(0,0); };
+}
+
 function renderBeginnerIntro(){
   app.innerHTML = `
     <div class="eyebrow">はじめての方向け</div>
@@ -4531,7 +4967,6 @@ function renderBeginnerProfile(){
 
       <label class="profile-label" for="beginnerOccupationSelect" style="margin-top:18px;">いまの職種</label>
       <select id="beginnerOccupationSelect" class="profile-input">${optionsHtml(BEGINNER_OCCUPATIONS, bp.occupation)}</select>
-      <p style="font-size:11.5px; color:#8A8EC4; margin-top:12px;">※業界・職種の区分は、ビズリーチ（BIZREACH）の分類を参考にしています。</p>
     </div>
 
     <div class="q-nav q-nav-split" style="margin-top:24px;">
@@ -5545,6 +5980,13 @@ function renderResults(){
     </div>
     `}
 
+    <div class="section-label">つぎのアクションを　しんだんする（β）</div>
+    <p class="section-sub">スキル診断の結果をもとに、あなたに合う副業・転職の方向性も診断できます。</p>
+    <div class="start-row" style="margin-top:14px; flex-wrap:wrap;">
+      <button class="secondary" id="sidejobDiagLink">PdM副業診断（β）を受ける →</button>
+      <button class="secondary" id="careerDiagLink">PdM転職診断（β）を受ける →</button>
+    </div>
+
     <div class="section-label">気が合いやすいメンバー</div>
     <div class="insight">
       <h4>スキルタイプの相性</h4>
@@ -5625,6 +6067,10 @@ function renderResults(){
   }
   const orgDiagLink = document.getElementById("orgDiagLink");
   if(orgDiagLink) orgDiagLink.onclick = ()=>{ state.screen="orgIntro"; render(); window.scrollTo(0,0); };
+  const sidejobDiagLink = document.getElementById("sidejobDiagLink");
+  if(sidejobDiagLink) sidejobDiagLink.onclick = ()=>{ state.screen="sidejobIntro"; render(); window.scrollTo(0,0); };
+  const careerDiagLink = document.getElementById("careerDiagLink");
+  if(careerDiagLink) careerDiagLink.onclick = ()=>{ state.screen="careerIntro"; render(); window.scrollTo(0,0); };
   const orgRedoLink = document.getElementById("orgRedoLink");
   if(orgRedoLink) orgRedoLink.onclick = ()=>{
     state.orgAnswers = {}; state.orgScores = null; state.orgDisplayOrder = null;
