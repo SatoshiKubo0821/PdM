@@ -603,6 +603,23 @@
   }
   button.primary:hover, a.primary:hover{background:var(--navy-800);}
   button.primary:active, a.primary:active{transform:translate(2px,2px); box-shadow:0 0 0 3px var(--navy-950), 2px 2px 0 rgba(0,0,0,.3);}
+  button.secondary{
+    background:#fff;
+    color:var(--navy-900);
+    border:3px solid var(--gold);
+    box-shadow:0 0 0 3px var(--navy-950), 4px 4px 0 rgba(0,0,0,.3);
+    font-family:var(--pixel-font);
+    font-weight:700;
+    font-size:15px;
+    padding:14px 28px;
+    cursor:pointer;
+    transition:transform .1s ease;
+    display:inline-block;
+    text-decoration:none;
+    box-sizing:border-box;
+  }
+  button.secondary:hover{background:#FFF6DE;}
+  button.secondary:active{transform:translate(2px,2px); box-shadow:0 0 0 3px var(--navy-950), 2px 2px 0 rgba(0,0,0,.3);}
   button.ghost{
     background:#fff;
     border:2px solid var(--navy-950);
@@ -1582,6 +1599,9 @@ function getCurrentTierRank(){
     const seniorityKey = determineSeniorityKey(overallAverage());
     return TIER_RANK[seniorityKey] || 1;
   }
+  // 未経験者向けかんたん診断(たねしんだん)のみで、本格診断(47問)が未回答の場合は、
+  // 経験に基づくランク付け（ミドル・シニア・でんせつ）を行わず、常にみならい(junior)扱いにする
+  if(!answeredCount() && state.beginnerScores) return 1;
   const avg = overallAverage();
   const typeResult = determinePdmType();
   const seniorityKey = determineSeniorityKey(avg);
@@ -2034,6 +2054,25 @@ const SKILL_FLAVOR_DESC = {
 
 function buildSkillTechniques(){
   const flat = allSkillsFlat().sort((a,b)=>b.v-a.v).slice(0,5);
+  if(flat.length===0 && state.beginnerScores){
+    // 未経験者向けかんたん診断(たねしんだん)のみの場合、4タイプのスコアから疑似的な「とくぎ」を合成する
+    const typeMeta = {
+      tech:    { name:"ぎじゅつへの　こうきしん", catName:"開発系" },
+      bizdev:  { name:"じぎょうを　よみとくちから", catName:"BizDev系" },
+      pmm:     { name:"つたえる　ちから", catName:"マーケ系" },
+      general: { name:"ぜんたいを　まとめるちから", catName:"総合型" },
+    };
+    return Object.entries(state.beginnerScores)
+      .filter(([,v])=>v>0)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,4)
+      .map(([k,v])=>{
+        const meta = typeMeta[k] || { name:k, catName:k };
+        const kind = SKILL_KIND_BY_CATEGORY[k] || "とくぎ";
+        const cost = Math.max(1, 6 - Math.round(v));
+        return { name:meta.name, kind, cost, v:Math.round(v), catName:meta.catName, desc:"" };
+      });
+  }
   return flat.map(s=>{
     const cat = CATEGORIES.find(c=>c.skills.some(sk=>sk[0]===s.name));
     const kind = cat ? SKILL_KIND_BY_CATEGORY[cat.key] : "とくぎ";
@@ -2882,7 +2921,14 @@ function overallAverage(){
       if(v!=null) vals.push(v);
     });
   });
-  if(vals.length===0) return 0;
+  if(vals.length===0){
+    // 本格診断(47問)が未回答でも、未経験者向けかんたん診断(たねしんだん)の回答があれば、その平均をそのまま使う
+    if(state.beginnerScores){
+      const bvals = Object.values(state.beginnerScores).filter(v=>v>0);
+      if(bvals.length>0) return bvals.reduce((a,b)=>a+b,0)/bvals.length;
+    }
+    return 0;
+  }
   return vals.reduce((a,b)=>a+b,0)/vals.length;
 }
 function clusterAverage(clusterKey){
@@ -2895,6 +2941,10 @@ function clusterAverage(clusterKey){
       }
     });
   });
+  if(n===0 && state.beginnerScores && state.beginnerScores[clusterKey]!=null){
+    // 本格診断が未回答の場合、未経験者向けかんたん診断の同名タイプのスコアをそのまま使う(tech/bizdev/pmm/generalのみ対応)
+    return state.beginnerScores[clusterKey];
+  }
   return n===0 ? 0 : sum/n;
 }
 function determinePdmType(){
@@ -3331,7 +3381,10 @@ function renderMonsterSelect(){
     </div>
   `;
 
-  document.getElementById("monsterBackBtn").onclick = ()=>{ state.screen="results"; render(); window.scrollTo(0,0); };
+  document.getElementById("monsterBackBtn").onclick = ()=>{
+    state.screen = (!answeredCount() && state.beginnerScores) ? "beginnerResults" : "results";
+    render(); window.scrollTo(0,0);
+  };
   app.querySelectorAll(".monster-select-card").forEach(card=>{
     card.onclick = ()=>{
       state.selectedMonster = card.getAttribute("data-key");
@@ -4078,6 +4131,7 @@ function renderProfileEntry(){
 async function renderIntro(){
   const saved = await loadSaved();
   const hasSaved = saved && Object.keys(saved.answers||{}).length>0;
+  const hasBeginnerSaved = saved && Object.keys(saved.beginnerAnswers||{}).length>0;
 
   app.innerHTML = `
     <div class="pdm-quest-logo-wrap">
@@ -4095,10 +4149,14 @@ async function renderIntro(){
       けいけんと　せいかくを　かけあわせれば、きみの　しょくぎょうも　みちびきだされる。
     </p>
 
-    <div class="start-row start-row-centered" style="margin-top:24px;">
-      <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　しんだんする" : "しんだんを　はじめる"}</button>
+    <div class="start-row" style="margin-top:24px; flex-direction:column; align-items:flex-start; gap:6px;">
+      <button class="primary" id="startBtnTop">${hasSaved ? "つづきから　PdMスキル診断（PdM経験者向け）" : "PdMスキル診断（PdM経験者向け）"}</button>
       ${hasSaved ? `<span class="resume-note">まえかいの　かいとう（${Object.keys(saved.answers).length}/${TOTAL_SKILLS}こう）が　ほぞんされています</span>` : `<span class="resume-note">やく5ふん・とうろくふようで　すぐ　けっかが　みられます</span>`}
-      <a href="#" id="beginnerLinkTop" style="font-size:12.5px; color:var(--gold); margin-top:8px; text-decoration:underline;">まだ　じっせんけいけんが　ない方は　こちら（かんたん　たねしんだん）</a>
+    </div>
+
+    <div class="start-row" style="margin-top:18px; flex-direction:column; align-items:flex-start; gap:6px;">
+      <button class="secondary" id="beginnerStartBtnTop">${hasBeginnerSaved ? "つづきから　PdM可能性診断（PdM未経験向け）" : "PdM可能性診断（PdM未経験向け）"}</button>
+      ${hasBeginnerSaved ? `<span class="resume-note">まえかいの　たねしんだん（${Object.keys(saved.beginnerAnswers).length}/${BEGINNER_QUESTIONS.length}こう）が　ほぞんされています</span>` : `<span class="resume-note">まだ　じっせんけいけんが　ない方むけ・やく2ふんで　しんだんできます</span>`}
     </div>
 
     </div>
@@ -4236,11 +4294,17 @@ async function renderIntro(){
   document.getElementById("startBtn").onclick = handleStartClick;
   const startBtnTop = document.getElementById("startBtnTop");
   if(startBtnTop) startBtnTop.onclick = handleStartClick;
-  const beginnerLinkTop = document.getElementById("beginnerLinkTop");
-  if(beginnerLinkTop){
-    beginnerLinkTop.onclick = (e)=>{
+  const beginnerStartBtnTop = document.getElementById("beginnerStartBtnTop");
+  if(beginnerStartBtnTop){
+    beginnerStartBtnTop.onclick = (e)=>{
       e.preventDefault();
-      state.screen = "beginnerIntro";
+      if(hasBeginnerSaved){
+        state.beginnerAnswers = saved.beginnerAnswers || {};
+        state.beginnerScores = saved.beginnerScores || null;
+        state.screen = "beginnerAssess";
+      }else{
+        state.screen = "beginnerIntro";
+      }
       render(); window.scrollTo(0,0);
     };
   }
@@ -4478,10 +4542,13 @@ function renderBeginnerAssess(){
 
 function renderBeginnerResults(){
   const scores = state.beginnerScores || computeBeginnerTypeScores(state.beginnerAnswers);
+  state.beginnerScores = scores; // buildRPGStats等が参照できるよう、必ずstateに保持しておく
   const topType = determineBeginnerType(scores);
   const seed = BEGINNER_TYPE_SEED_NAME[topType];
   const level = beginnerOverallLevel(scores);
   const typeLabelMap = { tech:"開発系", bizdev:"BizDev系", pmm:"マーケ系", general:"総合型" };
+  const jobClass = getJobClass(topType, "junior");
+  const rpg = buildRPGStats();
 
   app.innerHTML = `
     <div class="eyebrow">たねしんだん　けっか</div>
@@ -4489,7 +4556,10 @@ function renderBeginnerResults(){
     <p class="hero-lead">${seed.desc}</p>
 
     <div class="dq-window" style="margin-top:24px; padding:20px;">
-      <div class="dq-mini-label">せいちょうどあい</div>
+      <div class="dq-mini-label">いまの　しょくぎょう</div>
+      <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${jobClass.name}（みならい）</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">HP ${rpg.hp}　/　MP ${rpg.mp}</div>
+      <div class="dq-mini-label" style="margin-top:18px;">せいちょうどあい</div>
       <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${level.label}</div>
       <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${level.desc}</div>
       <div class="dq-mini-label" style="margin-top:18px;">たねタイプべつ　スコア</div>
@@ -4498,7 +4568,10 @@ function renderBeginnerResults(){
       </div>
     </div>
 
-    <div class="start-row" style="margin-top:28px;">
+    <div class="start-row" style="margin-top:24px;">
+      <button class="primary" id="beginnerMonsterFightBtn">その　ちからで　モンスターと　たたかう →</button>
+    </div>
+    <div class="start-row" style="margin-top:20px;">
       <button class="primary" id="toFullDiagnosisBtn">本格しんだん（47問）に　ちょうせんする →</button>
     </div>
     <div class="start-row" style="margin-top:12px;">
@@ -4506,6 +4579,10 @@ function renderBeginnerResults(){
       <button class="ghost" id="beginnerBackHomeBtn">トップへもどる</button>
     </div>
   `;
+  document.getElementById("beginnerMonsterFightBtn").onclick = ()=>{
+    state.screen = "monsterSelect";
+    render(); window.scrollTo(0,0);
+  };
   document.getElementById("toFullDiagnosisBtn").onclick = async ()=>{
     if(supabaseClient && !state.userEmail){
       await saveProgress();
