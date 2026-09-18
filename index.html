@@ -835,6 +835,8 @@
   }
   .profile-input::placeholder{color:rgba(255,255,255,.4);}
   .profile-input:focus{outline:none; border-color:var(--gold);}
+  select.profile-input{width:100%; cursor:pointer; appearance:auto;}
+  select.profile-input option{background:#000; color:#fff;}
   .profile-textarea{resize:vertical; font-family:inherit;}
 
   @media (max-width:600px){
@@ -2559,6 +2561,27 @@ CATEGORIES.forEach(c=>{ CATEGORY_BY_KEY[c.key] = c; });
    PdMとしての実務経験がない人でも、スキルではなく性格・興味関心をもとに
    「どのPdMタイプの種を持っていそうか」を占う、本格診断（47問）への入口版。
    4つのPdMタイプ（開発系/BizDev系/マーケ系/総合型）それぞれに5問ずつ、計20問。 */
+/* 現在の業界・職種の選択肢。ビズリーチ（BIZREACH）の「業種」「職種」分類を参考に、
+   未経験者向け診断で選びやすい粒度に整理したもの。 */
+const BEGINNER_INDUSTRIES = [
+  "IT（インターネットサービス）", "IT（SIer・ソフトウェア）", "IT（ハードウェア・通信）",
+  "コンサル・士業（コンサル・シンクタンク・法律事務所など）",
+  "メーカー（電気・電子・半導体・機械・精密機器・自動車）", "メーカー（化学・素材・食品・化粧品・日用品・アパレル）",
+  "商社（総合商社・専門商社）", "金融・保険", "建設・不動産", "流通・小売・サービス",
+  "メディカル（製薬・医療機器・医療サービス）", "マスコミ・メディア", "エンターテインメント",
+  "運輸・物流", "エネルギー", "教育", "官公庁・団体", "学生・就業経験なし", "その他",
+];
+const BEGINNER_OCCUPATIONS = [
+  "経営・経営企画", "事業企画・事業開発", "管理（経理・財務・法務・総務など）", "人事・採用・労務",
+  "マーケティング・デジタルマーケティング・広告", "営業・セールス", "カスタマーサクセス・カスタマーサポート",
+  "コンサルタント・ITコンサルタント", "プロジェクトマネジメント・PMO",
+  "ITエンジニア（開発・アプリ・Web）", "ITエンジニア（インフラ・ネットワーク・セキュリティ）", "データサイエンス・データ分析",
+  "Webサービス・制作・ディレクション", "デザイン（UI/UX・グラフィック・プロダクト）",
+  "研究・開発・技術職（電気・電子・機械・化学・素材など）", "生産管理・品質管理・品質保証",
+  "建築・土木・施工管理", "金融専門職", "医療・臨床開発・薬事", "新聞・出版・映像・放送",
+  "販売・サービス・接客", "学生・就業経験なし", "その他",
+];
+
 const BEGINNER_QUESTIONS = [
   { type:"tech",   statement:"新しい技術やツールが、どういう仕組みで動いているのか気になる方だ" },
   { type:"tech",   statement:"エンジニアが話す技術的な会話にも、興味を持って耳を傾けられる" },
@@ -2772,6 +2795,7 @@ let state = {
   beginnerAnswers: {},       // 未経験者向けかんたん適性診断の回答（"beginner:idx" -> 1..5）
   beginnerScores: null,      // 診断済みの場合、4タイプの平均スコアが入る
   beginnerDisplayOrder: null,// 未経験者向け診断のシャッフル順
+  beginnerProfile: { nickname:"", industry:"", occupation:"" }, // 未経験者向け診断で入力する、なまえ・現在の業界・現在の職種
   vitalsAnswers: {},       // 体力・AI設問の回答（"vitals:idx" -> 1..5）。HP/MP算出専用
   vitalsDisplayOrder: null, // 体力・AI設問のシャッフル順
   rpgMp: null,             // ランダムに決定するMP値（一度決めたら固定）
@@ -2801,7 +2825,7 @@ async function saveProgress(){
     const payload = JSON.stringify({
       answers:state.answers, mbti:state.mbti, profile:state.profile,
       orgAnswers:state.orgAnswers, orgScores:state.orgScores,
-      beginnerAnswers:state.beginnerAnswers, beginnerScores:state.beginnerScores,
+      beginnerAnswers:state.beginnerAnswers, beginnerScores:state.beginnerScores, beginnerProfile:state.beginnerProfile,
       vitalsAnswers:state.vitalsAnswers, rpgMp:state.rpgMp,
       defeatedMonsters:state.defeatedMonsters,
     });
@@ -2869,6 +2893,7 @@ async function deleteAllUserData(){
   state.orgScores = null;
   state.beginnerAnswers = {};
   state.beginnerScores = null;
+  state.beginnerProfile = { nickname:"", industry:"", occupation:"" };
   state.vitalsAnswers = {};
   state.rpgMp = null;
   state.defeatedMonsters = {};
@@ -3001,6 +3026,7 @@ function render(){
   else if(state.screen==="account") renderAccount();
   else if(state.screen==="apply") renderApply();
   else if(state.screen==="beginnerIntro") renderBeginnerIntro();
+  else if(state.screen==="beginnerProfile") renderBeginnerProfile();
   else if(state.screen==="beginnerAssess") renderBeginnerAssess();
   else if(state.screen==="beginnerResults") renderBeginnerResults();
   else if(state.screen==="orgIntro") renderOrgIntro();
@@ -4286,6 +4312,7 @@ async function renderIntro(){
       state.orgScores = saved.orgScores || null;
       state.beginnerAnswers = saved.beginnerAnswers || {};
       state.beginnerScores = saved.beginnerScores || null;
+      state.beginnerProfile = saved.beginnerProfile || { nickname:"", industry:"", occupation:"" };
       state.vitalsAnswers = saved.vitalsAnswers || {};
       state.rpgMp = saved.rpgMp ?? null;
       state.defeatedMonsters = saved.defeatedMonsters || {};
@@ -4310,6 +4337,7 @@ async function renderIntro(){
       if(hasBeginnerSaved){
         state.beginnerAnswers = saved.beginnerAnswers || {};
         state.beginnerScores = saved.beginnerScores || null;
+        state.beginnerProfile = saved.beginnerProfile || { nickname:"", industry:"", occupation:"" };
         state.screen = "beginnerAssess";
       }else{
         state.screen = "beginnerIntro";
@@ -4474,11 +4502,53 @@ function renderBeginnerIntro(){
     </footer>
   `;
   document.getElementById("beginnerStartBtn").onclick = ()=>{
-    state.screen="beginnerAssess";
+    state.screen="beginnerProfile";
     render(); window.scrollTo(0,0);
   };
   document.getElementById("beginnerBackBtn").onclick = ()=>{
     state.screen="intro";
+    render(); window.scrollTo(0,0);
+  };
+}
+
+/* ポテンシャル診断のプロフィール入力：なまえ・現在の業界・現在の職種 */
+function renderBeginnerProfile(){
+  const bp = state.beginnerProfile || { nickname:"", industry:"", occupation:"" };
+  const optionsHtml = (list, current)=>
+    `<option value="">えらんでください</option>` +
+    list.map(v=>`<option value="${v}" ${current===v?"selected":""}>${v}</option>`).join("");
+  app.innerHTML = `
+    <div class="eyebrow">ポテンシャルしんだん　その1</div>
+    <h1 class="hero-title" style="font-size:28px;">きみのことを<br>すこし　おしえてほしい</h1>
+    <p class="hero-lead">いまの業界・職種をおしえてもらうと、けっかがより　きみに合ったものになる。</p>
+
+    <div class="profile-form" style="max-width:520px; margin-top:28px;">
+      <label class="profile-label" for="beginnerNicknameInput">なまえ（ニックネーム）</label>
+      <input type="text" id="beginnerNicknameInput" class="profile-input" placeholder="れい：ゆうしゃ" value="${bp.nickname || ""}" maxlength="20">
+
+      <label class="profile-label" for="beginnerIndustrySelect" style="margin-top:18px;">いまの業界</label>
+      <select id="beginnerIndustrySelect" class="profile-input">${optionsHtml(BEGINNER_INDUSTRIES, bp.industry)}</select>
+
+      <label class="profile-label" for="beginnerOccupationSelect" style="margin-top:18px;">いまの職種</label>
+      <select id="beginnerOccupationSelect" class="profile-input">${optionsHtml(BEGINNER_OCCUPATIONS, bp.occupation)}</select>
+      <p style="font-size:11.5px; color:#8A8EC4; margin-top:12px;">※業界・職種の区分は、ビズリーチ（BIZREACH）の分類を参考にしています。</p>
+    </div>
+
+    <div class="q-nav q-nav-split" style="margin-top:24px;">
+      <button class="ghost" id="beginnerProfileBackBtn">もどる</button>
+      <button class="primary" id="beginnerProfileNextBtn">つぎへ →</button>
+    </div>
+  `;
+  document.getElementById("beginnerProfileBackBtn").onclick = ()=>{ state.screen="beginnerIntro"; render(); window.scrollTo(0,0); };
+  document.getElementById("beginnerProfileNextBtn").onclick = async ()=>{
+    const nickname = document.getElementById("beginnerNicknameInput").value.trim();
+    const industry = document.getElementById("beginnerIndustrySelect").value;
+    const occupation = document.getElementById("beginnerOccupationSelect").value;
+    state.beginnerProfile = { nickname, industry, occupation };
+    // なまえはモンスターバトルなど共通の表示にも使う
+    if(nickname){ state.profile.nickname = nickname; }
+    await saveProgress();
+    state.screen="beginnerAssess";
     render(); window.scrollTo(0,0);
   };
 }
@@ -4537,7 +4607,7 @@ function renderBeginnerAssess(){
     });
   });
 
-  document.getElementById("beginnerAssessBackBtn").onclick = ()=>{ state.screen="beginnerIntro"; render(); window.scrollTo(0,0); };
+  document.getElementById("beginnerAssessBackBtn").onclick = ()=>{ state.screen="beginnerProfile"; render(); window.scrollTo(0,0); };
   const nextBtn = document.getElementById("beginnerAssessNextBtn");
   if(nextBtn && allDone){
     nextBtn.onclick = async ()=>{
@@ -4565,7 +4635,11 @@ function renderBeginnerResults(){
     <p class="hero-lead">${seed.desc}</p>
 
     <div class="dq-window" style="margin-top:24px; padding:20px;">
-      <div class="dq-mini-label">いまの　しょくぎょう</div>
+      ${(state.beginnerProfile && (state.beginnerProfile.industry || state.beginnerProfile.occupation)) ? `
+      <div class="dq-mini-label">いまの　ぎょうかい・しょくしゅ</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${[state.beginnerProfile.industry, state.beginnerProfile.occupation].filter(Boolean).join("　／　")}</div>
+      <div class="dq-mini-label" style="margin-top:18px;">いまの　しょくぎょう</div>` : `
+      <div class="dq-mini-label">いまの　しょくぎょう</div>`}
       <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${jobClass.name}（みならい）</div>
       <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">HP ${rpg.hp}　/　MP ${rpg.mp}</div>
       <div class="dq-mini-label" style="margin-top:18px;">せいちょうどあい</div>
@@ -4605,6 +4679,7 @@ function renderBeginnerResults(){
     state.beginnerAnswers = {};
     state.beginnerDisplayOrder = null;
     state.beginnerScores = null;
+    state.beginnerProfile = { nickname:"", industry:"", occupation:"" };
     state.screen = "beginnerIntro";
     render(); window.scrollTo(0,0);
   };
@@ -5671,6 +5746,7 @@ function renderResults(){
       state.orgScores = saved.orgScores || null;
       state.beginnerAnswers = saved.beginnerAnswers || {};
       state.beginnerScores = saved.beginnerScores || null;
+      state.beginnerProfile = saved.beginnerProfile || { nickname:"", industry:"", occupation:"" };
       state.vitalsAnswers = saved.vitalsAnswers || {};
       state.rpgMp = saved.rpgMp ?? null;
       state.defeatedMonsters = saved.defeatedMonsters || {};
