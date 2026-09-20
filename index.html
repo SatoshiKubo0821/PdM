@@ -2595,26 +2595,41 @@ const BEGINNER_OCCUPATIONS = [
 ];
 
 const BEGINNER_QUESTIONS = [
-  { type:"tech",   statement:"新しい技術やツールが、どういう仕組みで動いているのか気になる方だ" },
-  { type:"tech",   statement:"エンジニアが話す技術的な会話にも、興味を持って耳を傾けられる" },
-  { type:"tech",   statement:"何かを試すときは、まず自分で触って動かしてみたいタイプだ" },
-  { type:"tech",   statement:"複雑な仕組みを、要素に分解して理解するのが好きだ" },
-  { type:"tech",   statement:"新しいガジェットやアプリが出ると、つい使ってみたくなる" },
-  { type:"bizdev", statement:"会社や事業がどうやって儲けているのか、自然と気になる" },
-  { type:"bizdev", statement:"ニュースで新しいビジネスモデルを見ると、成功の理由を考えてしまう" },
-  { type:"bizdev", statement:"数字やデータから、傾向やパターンを見つけるのが好きだ" },
-  { type:"bizdev", statement:"交渉や駆け引きのある場面に、興味を惹かれる" },
-  { type:"bizdev", statement:"「もっと成長させるには？」と考えるのが好きだ" },
-  { type:"pmm",    statement:"商品やサービスの「魅力の伝え方」に関心がある" },
-  { type:"pmm",    statement:"人の悩みや欲求を聞き出すのが得意な方だ" },
-  { type:"pmm",    statement:"SNSや広告で「刺さる言葉」を見ると、つい分析したくなる" },
-  { type:"pmm",    statement:"誰かに何かをおすすめするのが好きだ" },
-  { type:"pmm",    statement:"ユーザーの声を集めて、次に活かすことに興味がある" },
-  { type:"general",statement:"意見が対立する場面で、間に立って調整するのが苦にならない" },
-  { type:"general",statement:"何かを決めるとき、情報が足りなくても前に進める方だ" },
-  { type:"general",statement:"チームやグループをまとめる役割を、進んで引き受けることが多い" },
-  { type:"general",statement:"一つの分野を極めるより、色々な分野に手を広げるのが好きだ" },
-  { type:"general",statement:"「なぜそれをやるのか」を、いつも自分に問いかけている" },
+  { kind:"type", type:"tech",   statement:"新しい技術やツールが、どういう仕組みで動いているのか気になる方だ" },
+  { kind:"type", type:"tech",   statement:"エンジニアが話す技術的な会話にも、興味を持って耳を傾けられる" },
+  { kind:"type", type:"tech",   statement:"何かを試すときは、まず自分で触って動かしてみたいタイプだ" },
+  { kind:"type", type:"tech",   statement:"複雑な仕組みを、要素に分解して理解するのが好きだ" },
+  { kind:"type", type:"tech",   statement:"新しいガジェットやアプリが出ると、つい使ってみたくなる" },
+  { kind:"type", type:"bizdev", statement:"会社や事業がどうやって儲けているのか、自然と気になる" },
+  { kind:"type", type:"bizdev", statement:"ニュースで新しいビジネスモデルを見ると、成功の理由を考えてしまう" },
+  { kind:"type", type:"bizdev", statement:"数字やデータから、傾向やパターンを見つけるのが好きだ" },
+  { kind:"type", type:"bizdev", statement:"交渉や駆け引きのある場面に、興味を惹かれる" },
+  { kind:"type", type:"bizdev", statement:"「もっと成長させるには？」と考えるのが好きだ" },
+  { kind:"type", type:"pmm",    statement:"商品やサービスの「魅力の伝え方」に関心がある" },
+  { kind:"type", type:"pmm",    statement:"人の悩みや欲求を聞き出すのが得意な方だ" },
+  { kind:"type", type:"pmm",    statement:"SNSや広告で「刺さる言葉」を見ると、つい分析したくなる" },
+  { kind:"type", type:"pmm",    statement:"誰かに何かをおすすめするのが好きだ" },
+  { kind:"type", type:"pmm",    statement:"ユーザーの声を集めて、次に活かすことに興味がある" },
+  { kind:"type", type:"general",statement:"意見が対立する場面で、間に立って調整するのが苦にならない" },
+  { kind:"type", type:"general",statement:"何かを決めるとき、情報が足りなくても前に進める方だ" },
+  { kind:"type", type:"general",statement:"チームやグループをまとめる役割を、進んで引き受けることが多い" },
+  { kind:"type", type:"general",statement:"一つの分野を極めるより、色々な分野に手を広げるのが好きだ" },
+  { kind:"type", type:"general",statement:"「なぜそれをやるのか」を、いつも自分に問いかけている" },
+  /* ここから性格軸の設問（MBTIのように、タイプ判定とは別のもう一段の軸で深みを出す）。
+     軸LS：主導型(Lead) か 伴走型(Support) か。軸IA：直感型(Instinct) か 分析型(Analysis) か。
+     各軸3問ずつの対で構成し、平均の差で判定する。 */
+  { kind:"axis", axis:"LS", pole:"L", statement:"何かを決めるとき、自分から声を上げて場をリードすることが多い" },
+  { kind:"axis", axis:"LS", pole:"S", statement:"誰かの相談に乗り、後ろから支えることにやりがいを感じる" },
+  { kind:"axis", axis:"LS", pole:"L", statement:"グループの中で、自然と旗振り役になることが多い" },
+  { kind:"axis", axis:"LS", pole:"S", statement:"目立つより、誰かの成功を支える役回りが好きだ" },
+  { kind:"axis", axis:"LS", pole:"L", statement:"新しい企画は、まず自分から提案することが多い" },
+  { kind:"axis", axis:"LS", pole:"S", statement:"チームの雰囲気やメンバーの状態に、いつも気を配っている" },
+  { kind:"axis", axis:"IA", pole:"I", statement:"何かを判断するとき、まず直感で決めてから動くことが多い" },
+  { kind:"axis", axis:"IA", pole:"A", statement:"決断の前に、データや裏付けをできる限り集めたくなる" },
+  { kind:"axis", axis:"IA", pole:"I", statement:"スピード重視で、走りながら考えるタイプだ" },
+  { kind:"axis", axis:"IA", pole:"A", statement:"石橋を叩いてから渡る方が性に合っている" },
+  { kind:"axis", axis:"IA", pole:"I", statement:"「なんとなく良さそう」で動き出すことがよくある" },
+  { kind:"axis", axis:"IA", pole:"A", statement:"数字やロジックで説明できないと、納得しにくい" },
 ];
 function beginnerQuestionKey(idx){ return "beginner:"+idx; }
 const BEGINNER_TYPE_SEED_NAME = {
@@ -2623,9 +2638,33 @@ const BEGINNER_TYPE_SEED_NAME = {
   pmm:     { seed:"マーケけいのポテンシャル", desc:"人の気持ちや伝え方への関心が強く、マーケ系PdMの素質が眠っています。市場やユーザーへの届け方を考えるタイプに向いているかもしれません。" },
   general: { seed:"そうごうがたのポテンシャル", desc:"調整力とバランス感覚があり、総合型PdMの素質が眠っています。特定領域に偏らず、チーム全体を導くタイプに向いているかもしれません。" },
 };
-function computeBeginnerTypeScores(beginnerAnswers){
+/* 現在の職業が、すでにPdMに近い業務内容の場合、該当タイプのスコアにボーナスを加える。
+   IT関連職種は開発系(tech)、企画・事業開発・コンサル・PMO系はBizDev系/総合型に、それぞれ適性を高めに反映する。 */
+const OCCUPATION_TYPE_BOOST = {
+  "ITエンジニア（開発・アプリ・Web）":            { tech: 0.9 },
+  "ITエンジニア（インフラ・ネットワーク・セキュリティ）": { tech: 0.7 },
+  "データサイエンス・データ分析":                  { tech: 0.6, bizdev: 0.3 },
+  "Webサービス・制作・ディレクション":              { tech: 0.5, pmm: 0.3 },
+  "デザイン（UI/UX・グラフィック・プロダクト）":      { pmm: 0.4, tech: 0.2 },
+  "コンサルタント・ITコンサルタント":               { bizdev: 0.5, general: 0.4, tech: 0.2 },
+  "プロジェクトマネジメント・PMO":                 { general: 0.7, bizdev: 0.3 },
+  "経営・経営企画":                              { bizdev: 0.6, general: 0.5 },
+  "事業企画・事業開発":                           { bizdev: 0.8 },
+  "マーケティング・デジタルマーケティング・広告":      { pmm: 0.7 },
+};
+function applyOccupationBoost(rawScores, occupation){
+  const boost = OCCUPATION_TYPE_BOOST[occupation];
+  if(!boost) return rawScores;
+  const boosted = { ...rawScores };
+  Object.entries(boost).forEach(([type, amount])=>{
+    if(boosted[type] != null) boosted[type] = Math.min(5, boosted[type] + amount);
+  });
+  return boosted;
+}
+function computeBeginnerTypeScores(beginnerAnswers, occupation){
   const sums = {}, counts = {};
   BEGINNER_QUESTIONS.forEach((q,i)=>{
+    if(q.kind !== "type") return;
     const raw = beginnerAnswers[beginnerQuestionKey(i)];
     if(raw==null) return;
     sums[q.type] = (sums[q.type]||0) + raw;
@@ -2633,7 +2672,7 @@ function computeBeginnerTypeScores(beginnerAnswers){
   });
   const result = {};
   ["tech","bizdev","pmm","general"].forEach(t=>{ result[t] = counts[t] ? sums[t]/counts[t] : 0; });
-  return result;
+  return applyOccupationBoost(result, occupation);
 }
 function determineBeginnerType(scores){
   let topKey = "general", topVal = -1;
@@ -2646,6 +2685,36 @@ function beginnerOverallLevel(scores){
   if(avg >= 4.0) return { label:"すでに　めがでている", desc:"PdMとしての資質が、すでにしっかりと育ちはじめています。" };
   if(avg >= 3.0) return { label:"めばえはじめている", desc:"PdMとしての資質の芽が、少しずつ顔を出しはじめています。" };
   return { label:"これから　ポテンシャルを　ひらく", desc:"これから経験を積むことで、PdMとしての資質が育っていく段階です。" };
+}
+/* 性格軸（LS/IA）の判定。MBTIのように、タイプ診断と組み合わせて16通りの結果を作る */
+function computeBeginnerAxisScores(beginnerAnswers){
+  const sums = {}, counts = {};
+  BEGINNER_QUESTIONS.forEach((q,i)=>{
+    if(q.kind !== "axis") return;
+    const raw = beginnerAnswers[beginnerQuestionKey(i)];
+    if(raw==null) return;
+    const k = q.axis+":"+q.pole;
+    sums[k] = (sums[k]||0) + raw;
+    counts[k] = (counts[k]||0) + 1;
+  });
+  const avg = k => counts[k] ? sums[k]/counts[k] : 0;
+  return {
+    LS: avg("LS:L") >= avg("LS:S") ? "L" : "S",
+    IA: avg("IA:I") >= avg("IA:A") ? "I" : "A",
+  };
+}
+const BEGINNER_AXIS_LABEL = {
+  L: { name:"しゅどう型", desc:"自分から声を上げ、周りを引っ張っていくスタイル。" },
+  S: { name:"ばんそう型", desc:"メンバーに寄り添い、後ろから支えていくスタイル。" },
+  I: { name:"ちょっかん型", desc:"スピード重視で、まず動きながら考えるスタイル。" },
+  A: { name:"ぶんせき型", desc:"データや裏付けを重視し、じっくり考えてから動くスタイル。" },
+};
+function beginnerPersonalityCode(axes){
+  return axes.LS + axes.IA; // 例: "LI"（しゅどう×ちょっかん）
+}
+function beginnerFullTypeCode(topType, axes){
+  const typeLetter = { tech:"T", bizdev:"B", pmm:"M", general:"G" }[topType] || "G";
+  return typeLetter + "-" + beginnerPersonalityCode(axes);
 }
 
 /* ---------------- PdM副業診断（β） ----------------
@@ -2958,11 +3027,13 @@ let state = {
   userId: null,           // Supabaseの匿名/永久ユーザーID
   userEmail: null,        // メール連携済みの場合のみ入る
   savedThisResult: false, // 今回の診断結果をクラウドに保存済みか（二重保存防止）
+  savedThisBeginnerResult: false, // 今回のポテンシャル診断結果をクラウドに保存済みか（二重保存防止）
   history: [],            // クラウドから取得した過去の診断履歴
   displayOrder: {},       // 全設問のランダム化した表示順（キャッシュ）
   viewingHistory: null,   // 過去の診断結果を閲覧中の場合、その日時が入る
   viewingHistoryIsLegendary: null, // 履歴閲覧中、その記録がでんせつのゆうしゃだったかどうか（trueで確定表示）
   viewingHistorySeniority: null,   // 履歴閲覧中、保存時点のランク(junior/middle/senior)。生のvitalsデータが無く再判定できないため、保存値をそのまま使う
+  viewingHistoryBeginnerAxisCode: null, // ポテンシャル診断の履歴閲覧中、保存時点の性格軸コード(例:"LI")
   viewingHistoryRpgStats: null,    // 履歴閲覧中、その記録の保存時点のRPGステータス（HP/MP等が毎回変わらないよう固定する）
   applyContext: null,     // 応募フォームに渡す診断結果の参考情報（任意）
   orgAnswers: {},         // 組織タイプ診断の回答（"org:idx" -> 1..5）
@@ -3085,9 +3156,11 @@ async function deleteAllUserData(){
   state.defeatedMonsters = {};
   state.selectedMonster = null;
   state.savedThisResult = false;
+  state.savedThisBeginnerResult = false;
   state.viewingHistory = null;
   state.viewingHistoryIsLegendary = null;
   state.viewingHistorySeniority = null;
+  state.viewingHistoryBeginnerAxisCode = null;
   state.viewingHistoryRpgStats = null;
   state.displayOrder = {};
   state.pageIndex = 0;
@@ -3286,13 +3359,52 @@ async function saveDiagnosisToCloud(payload){
   }catch(e){ /* オフライン等の場合は次回の保存タイミングで再試行される */ }
 }
 
+/* ポテンシャル診断（β）の結果を「ぼうけんの書」に保存する。answers/mbti/experience_yearsなど
+   本格診断専用の列は空のまま、beginner_scores・axis_code・industry・occupation列に情報を入れる。
+   is_beginner・beginner_scores等の新しい列がまだ存在しない環境でも壊れないよう、段階的にフォールバックする。 */
+async function saveBeginnerDiagnosisToCloud(payload){
+  if(!supabaseClient || state.savedThisBeginnerResult) return;
+  if(!state.userId){
+    await ensureSession();
+    if(!state.userId) return;
+  }
+  const baseRow = {
+    user_id: state.userId,
+    answers: {},
+    mbti: null,
+    toeic: null,
+    certifications: null,
+    nickname: (state.beginnerProfile && state.beginnerProfile.nickname) || state.profile.nickname || null,
+    experience_years: null,
+    overall_avg: payload.avg,
+    pdm_type: payload.pdmTypeKey,
+    seniority: "junior",
+    hensachi: payload.hensachi,
+  };
+  const attempts = [
+    { ...baseRow, is_legendary:false, rpg_stats:null, is_beginner:true, beginner_scores:payload.scores, axis_code:payload.axisCode,
+      industry:(state.beginnerProfile && state.beginnerProfile.industry) || null, occupation:(state.beginnerProfile && state.beginnerProfile.occupation) || null },
+    { ...baseRow, is_legendary:false, rpg_stats:null, is_beginner:true, beginner_scores:payload.scores },
+    { ...baseRow, is_legendary:false, rpg_stats:null },
+    baseRow,
+  ];
+  try{
+    for(const row of attempts){
+      const { error } = await supabaseClient.from("diagnoses").insert(row);
+      if(!error){ state.savedThisBeginnerResult = true; return; }
+    }
+  }catch(e){ /* オフライン等の場合は次回の保存タイミングで再試行される */ }
+}
+
 async function fetchHistory(){
   if(!supabaseClient || !state.userId) return [];
   const colsFull = "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary, rpg_stats";
+  const colsBeginner = colsFull + ", is_beginner, beginner_scores, axis_code, industry, occupation";
   const colsMid = "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications, is_legendary";
   const colsBase = "id, created_at, overall_avg, pdm_type, seniority, hensachi, mbti, nickname, experience_years, answers, toeic, certifications";
   // deleted_at列があればそれで論理削除済みの記録を除外し、無ければ列なしのままフォールバックする
   const attempts = [
+    { cols: colsBeginner, filterDeleted:true }, { cols: colsBeginner, filterDeleted:false },
     { cols: colsFull, filterDeleted:true }, { cols: colsFull, filterDeleted:false },
     { cols: colsMid,  filterDeleted:true }, { cols: colsMid,  filterDeleted:false },
     { cols: colsBase, filterDeleted:true }, { cols: colsBase, filterDeleted:false },
@@ -3415,6 +3527,31 @@ async function renderHistory(){
     <div class="insight" style="margin-top:14px;"><p>まだ保存された診断履歴がありません。診断を完了すると、ここに記録されていきます。</p></div>
     ` : rows.map(r=>{
       const date = new Date(r.created_at).toLocaleDateString("ja-JP", {year:"numeric", month:"short", day:"numeric"});
+      if(r.is_beginner){
+        const jobClass = getJobClass(r.pdm_type, "junior");
+        const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
+        const axisCode = r.axis_code || "";
+        return `
+        <div class="history-row-card" data-id="${r.id}">
+          <div class="history-row-icon"><img src="./assets/jobs/${jobClass.icon}.webp" alt="${jobClass.name}"></div>
+          <div class="history-row-body">
+            <div class="history-row-top">
+              <span class="history-row-date">${date}</span>
+              ${r.nickname ? `<span class="history-row-nick">${r.nickname}さん</span>` : ""}
+            </div>
+            <div class="history-row-job">${jobClass.name}（みならい）</div>
+            <div class="history-row-tags">
+              <span class="pill" style="background:var(--gold); color:var(--navy-950);">ポテンシャル診断β</span>
+              <span class="pill">${typeLabel}</span>
+              <span class="pill">偏差値<b>${r.hensachi}</b></span>
+              ${axisCode ? `<span class="pill">TYPE ${axisCode}</span>` : ""}
+              ${r.occupation ? `<span class="pill">${r.occupation}</span>` : ""}
+            </div>
+            <p style="margin-top:8px; font-size:12px; color:var(--gold);">タップして当時の詳細結果を見る →</p>
+          </div>
+          <button class="history-row-delete" data-id="${r.id}" title="このぼうけんの書を削除する" aria-label="削除">✕</button>
+        </div>`;
+      }
       const typeLabel = PDM_TYPES[r.pdm_type] ? PDM_TYPES[r.pdm_type].label : r.pdm_type;
       const seniorityLabel = SENIORITY[r.seniority] ? SENIORITY[r.seniority].label : r.seniority;
       const isLegendaryRow = r.is_legendary === true || (r.pdm_type === "general" && r.seniority === "senior" && r.experience_years != null && r.experience_years >= 7 && r.toeic != null && r.toeic >= 900);
@@ -3460,6 +3597,22 @@ async function renderHistory(){
       const id = el.getAttribute("data-id");
       const row = rows.find(r=>String(r.id)===String(id));
       if(!row) return;
+      if(row.is_beginner){
+        // ポテンシャル診断（β）の記録は、専用の結果画面（renderBeginnerResults）で保存済みスコアをそのまま再現する
+        state.beginnerScores = row.beginner_scores || null;
+        state.beginnerProfile = {
+          nickname: row.nickname || "",
+          industry: row.industry || "",
+          occupation: row.occupation || "",
+        };
+        // 保存済みの性格軸コード（例:"LI"）を、再質問なしでそのまま再現するための一時保管
+        state.viewingHistoryBeginnerAxisCode = row.axis_code || null;
+        state.savedThisBeginnerResult = true; // 過去の結果を開いただけなので、新規保存はしない
+        state.viewingHistory = row.created_at;
+        state.screen = "beginnerResults";
+        render(); window.scrollTo(0,0);
+        return;
+      }
       state.answers = row.answers || {};
       state.mbti = row.mbti || null;
       state.profile = {
@@ -5046,7 +5199,7 @@ function renderBeginnerAssess(){
   const nextBtn = document.getElementById("beginnerAssessNextBtn");
   if(nextBtn && allDone){
     nextBtn.onclick = async ()=>{
-      state.beginnerScores = computeBeginnerTypeScores(state.beginnerAnswers);
+      state.beginnerScores = computeBeginnerTypeScores(state.beginnerAnswers, state.beginnerProfile && state.beginnerProfile.occupation);
       await saveProgress();
       state.screen="beginnerResults";
       render(); window.scrollTo(0,0);
@@ -5055,7 +5208,8 @@ function renderBeginnerAssess(){
 }
 
 function renderBeginnerResults(){
-  const scores = state.beginnerScores || computeBeginnerTypeScores(state.beginnerAnswers);
+  const occupation = state.beginnerProfile && state.beginnerProfile.occupation;
+  const scores = state.beginnerScores || computeBeginnerTypeScores(state.beginnerAnswers, occupation);
   state.beginnerScores = scores; // buildRPGStats等が参照できるよう、必ずstateに保持しておく
   const topType = determineBeginnerType(scores);
   const seed = BEGINNER_TYPE_SEED_NAME[topType];
@@ -5063,10 +5217,20 @@ function renderBeginnerResults(){
   const typeLabelMap = { tech:"開発系", bizdev:"BizDev系", pmm:"マーケ系", general:"総合型" };
   const jobClass = getJobClass(topType, "junior");
   const rpg = buildRPGStats();
+  const axes = (state.viewingHistory && state.viewingHistoryBeginnerAxisCode)
+    ? { LS: state.viewingHistoryBeginnerAxisCode[0], IA: state.viewingHistoryBeginnerAxisCode[1] }
+    : computeBeginnerAxisScores(state.beginnerAnswers);
+  const personalityCode = beginnerFullTypeCode(topType, axes);
+  const lsLabel = BEGINNER_AXIS_LABEL[axes.LS];
+  const iaLabel = BEGINNER_AXIS_LABEL[axes.IA];
+  const hensachi = calcHensachi(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length);
+
+  saveBeginnerDiagnosisToCloud({ avg: Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length, pdmTypeKey: topType, hensachi, scores, axisCode: beginnerPersonalityCode(axes) });
 
   app.innerHTML = `
     <div class="eyebrow">ポテンシャルしんだん　けっか</div>
     <h1 class="hero-title" style="font-size:28px;">きみは<br><span style="color:var(--gold);">【${seed.seed}】</span>を持つ　ぼうけんしゃだ</h1>
+    <div class="result-job-en">TYPE：${personalityCode}</div>
     <p class="hero-lead">${seed.desc}</p>
 
     <div class="dq-window" style="margin-top:24px; padding:20px;">
@@ -5077,13 +5241,24 @@ function renderBeginnerResults(){
       <div class="dq-mini-label">いまの　しょくぎょう</div>`}
       <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${jobClass.name}（みならい）</div>
       <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">HP ${rpg.hp}　/　MP ${rpg.mp}</div>
+
       <div class="dq-mini-label" style="margin-top:18px;">せいちょうどあい</div>
       <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${level.label}</div>
       <div style="font-size:12.5px; color:#B8BEFF; margin-top:6px;">${level.desc}</div>
+
       <div class="dq-mini-label" style="margin-top:18px;">PdMタイプべつ　スコア</div>
       <div class="dq-num-grid" style="margin-top:8px;">
         ${["tech","bizdev","pmm","general"].map(t=>`<div class="dq-num-cell"><span>${typeLabelMap[t]}</span><b>${(scores[t]||0).toFixed(1)}</b></div>`).join("")}
       </div>
+
+      <div class="dq-mini-label" style="margin-top:18px;">はたらき方のタイプ（せいかく診断）</div>
+      <div style="font-size:12.5px; color:#B8BEFF; margin-top:8px; line-height:1.8;">
+        <b style="color:var(--gold);">${lsLabel.name}</b>：${lsLabel.desc}<br>
+        <b style="color:var(--gold);">${iaLabel.name}</b>：${iaLabel.desc}
+      </div>
+
+      <div class="dq-mini-label" style="margin-top:18px;">PdM偏差値（参考）</div>
+      <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${hensachi}</div>
     </div>
 
     <div class="start-row" style="margin-top:24px;">
@@ -5094,14 +5269,18 @@ function renderBeginnerResults(){
     </div>
     <div class="start-row" style="margin-top:12px;">
       <button class="ghost" id="beginnerRetryBtn">もういちど　ポテンシャルしんだんをうける</button>
-      <button class="ghost" id="beginnerBackHomeBtn">トップへもどる</button>
+      <button class="ghost" id="beginnerBackHomeBtn">${state.viewingHistory ? "マイページにもどる" : "トップへもどる"}</button>
     </div>
   `;
   document.getElementById("beginnerMonsterFightBtn").onclick = ()=>{
+    state.viewingHistory = null;
+    state.viewingHistoryBeginnerAxisCode = null;
     state.screen = "monsterSelect";
     render(); window.scrollTo(0,0);
   };
   document.getElementById("toFullDiagnosisBtn").onclick = async ()=>{
+    state.viewingHistory = null;
+    state.viewingHistoryBeginnerAxisCode = null;
     if(supabaseClient && !state.userEmail){
       await saveProgress();
       const redirected = await signInWithGoogle("profileEntry");
@@ -5115,10 +5294,19 @@ function renderBeginnerResults(){
     state.beginnerDisplayOrder = null;
     state.beginnerScores = null;
     state.beginnerProfile = { nickname:"", industry:"", occupation:"" };
+    state.savedThisBeginnerResult = false;
+    state.viewingHistory = null;
+    state.viewingHistoryBeginnerAxisCode = null;
     state.screen = "beginnerIntro";
     render(); window.scrollTo(0,0);
   };
-  document.getElementById("beginnerBackHomeBtn").onclick = ()=>{ state.screen="intro"; render(); window.scrollTo(0,0); };
+  document.getElementById("beginnerBackHomeBtn").onclick = ()=>{
+    const wasViewingHistory = !!state.viewingHistory;
+    state.viewingHistory = null;
+    state.viewingHistoryBeginnerAxisCode = null;
+    state.screen = wasViewingHistory ? "mypage" : "intro";
+    render(); window.scrollTo(0,0);
+  };
 }
 
 function renderOrgIntro(){
@@ -6063,7 +6251,7 @@ function renderResults(){
 
   const backToHistoryLink = document.getElementById("backToHistoryLink");
   if(backToHistoryLink){
-    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.viewingHistoryIsLegendary=null; state.viewingHistorySeniority=null; state.viewingHistoryRpgStats=null; state.screen="history"; render(); window.scrollTo(0,0); };
+    backToHistoryLink.onclick = (e)=>{ e.preventDefault(); state.viewingHistory=null; state.viewingHistoryIsLegendary=null; state.viewingHistorySeniority=null; state.viewingHistoryBeginnerAxisCode=null; state.viewingHistoryRpgStats=null; state.screen="history"; render(); window.scrollTo(0,0); };
   }
   const orgDiagLink = document.getElementById("orgDiagLink");
   if(orgDiagLink) orgDiagLink.onclick = ()=>{ state.screen="orgIntro"; render(); window.scrollTo(0,0); };
@@ -6097,6 +6285,7 @@ function renderResults(){
       state.viewingHistory=null;
       state.viewingHistoryIsLegendary=null;
       state.viewingHistorySeniority=null;
+      state.viewingHistoryBeginnerAxisCode=null;
       state.viewingHistoryRpgStats=null;
       state.screen="history";
       render(); window.scrollTo(0,0);
@@ -6105,6 +6294,7 @@ function renderResults(){
       state.viewingHistory=null;
       state.viewingHistoryIsLegendary=null;
       state.viewingHistorySeniority=null;
+      state.viewingHistoryBeginnerAxisCode=null;
       state.viewingHistoryRpgStats=null;
       state.answers = {};
       state.mbti = null;

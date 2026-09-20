@@ -23,6 +23,12 @@ create table if not exists public.diagnoses (
 -- 既存プロジェクト用：すでにテーブルがある場合でも安全に追加カラムを反映する
 alter table public.diagnoses add column if not exists nickname text;
 alter table public.diagnoses add column if not exists experience_years numeric(4,1);
+-- ポテンシャル診断（未経験者向け・PdM可能性診断）用のカラム
+alter table public.diagnoses add column if not exists is_beginner boolean default false;      -- true: ポテンシャル診断(β)の記録
+alter table public.diagnoses add column if not exists beginner_scores jsonb;                  -- 4タイプ(tech/bizdev/pmm/general)の平均スコア
+alter table public.diagnoses add column if not exists axis_code text;                         -- 性格軸コード（例: "LI" = しゅどう×ちょっかん）
+alter table public.diagnoses add column if not exists industry text;                          -- 回答時点の現在の業界
+alter table public.diagnoses add column if not exists occupation text;                        -- 回答時点の現在の職種
 
 -- 2) Row Level Security（自分の行しか読み書きできないようにする）
 alter table public.diagnoses enable row level security;
