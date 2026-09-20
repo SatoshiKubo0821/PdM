@@ -1814,8 +1814,16 @@ function determineSeniorityKey(avg){
   if(state.viewingHistory && state.viewingHistorySeniority) return state.viewingHistorySeniority;
   const vitals = computeVitalsScores(state.vitalsAnswers || {});
   const expAvg = vitals.experience;
-  // プロダクトリード・PMF経験の有無を強く反映する（スキル平均40%：経験スコア60%）
-  const blended = expAvg != null ? (avg*0.4 + expAvg*0.6) : avg;
+  const scopeAvg = vitals.scope; // リード規模・権限・IPO実績など、実績の大きさを示すスコア
+  // プロダクトリード・PMF経験の有無に加え、リードした規模・権限・実績の大きさも強く反映する
+  let blended;
+  if(expAvg != null && scopeAvg != null){
+    blended = avg*0.35 + expAvg*0.30 + scopeAvg*0.35;
+  }else if(expAvg != null){
+    blended = avg*0.4 + expAvg*0.6;
+  }else{
+    blended = avg;
+  }
   if(blended < 3) return "junior";
   if(blended < 4) return "middle";
   return "senior";
@@ -1923,6 +1931,12 @@ const VITALS_QUESTIONS = [
   { kind:"agile",      statement:"アジャイル開発（スクラムやカンバンなど）を、実務で継続的に実践してきた経験がある", reverse:false },
   { kind:"agile_sm",   statement:"スクラム開発において、スクラムマスターとしての役割を担った経験がある", reverse:false },
   { kind:"agile_po",   statement:"スクラム開発において、プロダクトオーナーとしての役割を担った経験がある", reverse:false },
+  /* ここから、リードした経験の「規模・権限・実績の大きさ」を測る設問（HP/MP/Lv/けいけんち・ランク判定に強く影響） */
+  { kind:"scope",      statement:"私は、機能の一部ではなく、プロダクト全体の意思決定をリードしてきた", reverse:false },
+  { kind:"scope",      statement:"担当していた領域において、コスト・納期・クオリティを総合的に判断できる権限を持っていた", reverse:false },
+  { kind:"scope",      statement:"自分がリードしたプロダクトは、IPO・上場など、事業として大きな成功を収めたことがある", reverse:false },
+  { kind:"scope",      statement:"複数のPdMを束ねるプロダクト組織の責任者（VPoP・CPOなど）を務めた経験がある", reverse:false },
+  { kind:"scope",      statement:"バリュエーションの向上などについて、VCなどの投資家と建設的な議論ができる", reverse:false },
 ];
 function vitalsQuestionKey(idx){ return "vitals:"+idx; }
 function vitalsEffectiveScore(qIndex, raw){
@@ -1943,6 +1957,7 @@ function computeVitalsScores(vitalsAnswers){
     stamina: counts.stamina ? sums.stamina/counts.stamina : null,
     ai: counts.ai ? sums.ai/counts.ai : null,
     experience: counts.experience ? sums.experience/counts.experience : null,
+    scope: counts.scope ? sums.scope/counts.scope : null,
   };
 }
 
@@ -1969,28 +1984,49 @@ function buildRPGStats(){
 
   const vitals = computeVitalsScores(state.vitalsAnswers || {});
   const staminaAvg = vitals.stamina != null ? vitals.stamina : 3;
-  const expAvg = vitals.experience; // 1〜5、未回答ならnull
+  let expAvg = vitals.experience; // 1〜5、未回答ならnull
+  let scopeAvg = vitals.scope;    // 1〜5、リード規模・権限・IPO実績など。未回答ならnull
+  const aiAvg = vitals.ai != null ? vitals.ai : 3;
+
+  // 本格診断(47問)が未回答で、ポテンシャル診断のみの場合は、選んだ職業がPdM業務にどれだけ近いか
+  // （職業ブースト）を、簡易的な経験値の代わりに使う。IT関連・企画関連職ほど、HP/MPも高めに出る。
+  if(expAvg == null && !answeredCount() && state.beginnerScores){
+    const occupation = state.beginnerProfile && state.beginnerProfile.occupation;
+    const boost = OCCUPATION_TYPE_BOOST[occupation];
+    if(boost){
+      const maxBoost = Math.max(...Object.values(boost));
+      const pseudoExp = 3 + maxBoost * 2; // ブースト量(0〜0.9程度)を3〜5のスコア感覚に変換
+      expAvg = pseudoExp;
+      scopeAvg = pseudoExp;
+    }
+  }
 
   const age = state.profile.age;
   const baseLv = (age != null && age > 0)
     ? Math.max(1, Math.min(99, Math.round(age)))
     : Math.max(1, Math.min(99, Math.round((overallAverage()-1)/4*98)+1));
-  // プロダクトリード・PMF経験の度合いに応じて、Lvに±10の補正をかける（経験が強く反映されるように）
+  // プロダクトリード・PMF経験や、リードした規模・実績の大きさに応じて、Lvに補正をかける（経験が強く反映されるように）
   const expBonus = expAvg != null ? Math.round((expAvg - 3) * 5) : 0;
-  const lv = Math.max(1, Math.min(99, baseLv + expBonus));
+  const scopeBonus = scopeAvg != null ? Math.round((scopeAvg - 3) * 6) : 0;
+  const lv = Math.max(1, Math.min(99, baseLv + expBonus + scopeBonus));
 
-  // けいけんち（EXP）：経験スコアが高いほど非線形に大きく増える、RPG風のフレーバー数値
-  const exp = expAvg != null
-    ? Math.round(Math.pow(expAvg, 3) * lv * 40)
+  // けいけんち（EXP）：経験スコア・実績の規模が高いほど非線形に大きく増える、RPG風のフレーバー数値
+  const expFactor = expAvg != null ? expAvg : 3;
+  const scopeFactor = scopeAvg != null ? scopeAvg : 3;
+  const exp = (expAvg != null || scopeAvg != null)
+    ? Math.round(Math.pow((expFactor*0.5 + scopeFactor*0.5), 3) * lv * 40)
     : Math.round(lv * 1000);
 
-  const hp = Math.max(10, Math.round(staminaAvg * 40));
+  // HP：体力スコアをベースに、経験・実績の規模が大きいほど上乗せされる（修羅場をくぐった分、打たれ強くなるイメージ）
+  const expHpBonus = expAvg != null ? (expAvg - 3) * 8 : 0;
+  const scopeHpBonus = scopeAvg != null ? (scopeAvg - 3) * 10 : 0;
+  const hp = Math.max(10, Math.round(staminaAvg * 32 + expHpBonus + scopeHpBonus));
+
+  // MP：以前は完全ランダムだったが、AI活用力・経験・実績の規模から算出するように変更（大きな意思決定ほど「知略」が求められるイメージ）
   const maxMp = 150;
-  // MPはランダムに決定する。診断のたびに毎回変わらないよう、一度決めたらstateにキャッシュする
-  if(state.rpgMp == null){
-    state.rpgMp = Math.floor(Math.random() * (maxMp - 5 + 1)) + 5;
-  }
-  const mp = state.rpgMp;
+  const expMpBonus = expAvg != null ? (expAvg - 3) * 12 : 0;
+  const scopeMpBonus = scopeAvg != null ? (scopeAvg - 3) * 14 : 0;
+  const mp = Math.max(5, Math.min(maxMp, Math.round(aiAvg * 16 + 30 + expMpBonus + scopeMpBonus)));
 
   return { lv, hp, mp, maxMp, exp };
 }
@@ -5568,7 +5604,9 @@ function renderVitals(){
     <div class="eyebrow">最後にもう少し（HP・MP・けいけんち算出用）</div>
     <h1 class="hero-title" style="font-size:28px;">体力・AI活用力・経験について</h1>
     <p class="hero-lead">
-      体力・AIの回答はステータス画面のHP・MPにのみ使われます。プロダクトを自らリードしPMFに導いた経験についての回答は「けいけんち」に反映されるほか、<b style="color:var(--gold);">ジュニア／ミドル／シニアの判定にも強く影響</b>します。
+      体力・AIの回答はステータス画面のHP・MPに反映されます。プロダクトを自らリードしPMFに導いた経験や、
+      リードした規模・権限・実績の大きさ（プロダクト全体か一部か、コスト・納期・クオリティの決裁権、IPO実績、
+      複数PdMを束ねる組織責任者の経験、VCとの対話力）についての回答は、<b style="color:var(--gold);">HP・MP・けいけんちに加え、ジュニア／ミドル／シニアの判定にも強く影響</b>します。
     </p>
 
     <div class="q-card-list" style="margin-top:24px;">
