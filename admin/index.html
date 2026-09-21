@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>冒険者ギルド管理室 | PdMQuest Admin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+  :root{
+    color-scheme: light;
+    --bg: #f4f3ef;
+    --surface: #ffffff;
+    --surface-2: #fbfaf7;
+    --border: #e2e0d8;
+    --text-primary: #1c1c22;
+    --text-secondary: #5b5c6b;
+    --text-muted: #90909e;
+    --series-diag: #2a78d6;
+    --series-leads: #d1670e;
+    --series-apps: #128a63;
+    --series-diag-bg: #2a78d61a;
+    --series-leads-bg: #d1670e1a;
+    --series-apps-bg: #128a631a;
+    --track: #ece9e1;
+    --focus: #2a78d6;
+    --danger: #c0392b;
+    --danger-bg: #c0392b14;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #131318;
+      --surface: #1b1c22;
+      --surface-2: #202128;
+      --border: #302f38;
+      --text-primary: #f1f1f4;
+      --text-secondary: #b3b3c0;
+      --text-muted: #77778a;
+      --series-diag: #5b9ce8;
+      --series-leads: #e8894a;
+      --series-apps: #3fbd94;
+      --series-diag-bg: #5b9ce826;
+      --series-leads-bg: #e8894a26;
+      --series-apps-bg: #3fbd9426;
+      --track: #2a2b33;
+      --focus: #5b9ce8;
+      --danger: #e8735f;
+      --danger-bg: #e8735f1f;
+    }
+  }
+  *{ box-sizing: border-box; }
+  html, body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: "Noto Sans JP", "Zen Kaku Gothic New", system-ui, sans-serif;
+    padding-inline: 16px;
+    padding-block: 28px 48px;
+  }
+  .wrap{ max-width: 1040px; margin: 0 auto; }
+  h1, h2, h3{ font-family: "Zen Kaku Gothic New", "Noto Sans JP", sans-serif; margin: 0; text-wrap: balance; }
+  .num{ font-variant-numeric: tabular-nums; }
+  a{ color: var(--focus); }
+
+  /* ---------- Login screen ---------- */
+  .login-screen{
+    min-height: calc(100dvh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card{
+    width: 100%;
+    max-width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+  }
+  .login-eyebrow{
+    font-size: 11.5px;
+    letter-spacing: .12em;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .login-title{ font-size: 22px; font-weight: 900; margin-top: 4px; margin-bottom: 22px; }
+  .field{ display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field label{ font-size: 12.5px; font-weight: 700; color: var(--text-secondary); }
+  .field input{
+    font: inherit;
+    font-size: 14.5px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+  }
+  .field input:focus-visible{ outline: 2px solid var(--focus); outline-offset: 1px; }
+  button.primary{
+    width: 100%;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--focus);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 12px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  button.primary:disabled{ opacity: .6; cursor: default; }
+  button.primary:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+  .login-error{
+    font-size: 12.5px;
+    color: var(--danger);
+    background: var(--danger-bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .login-error.show{ display: block; }
+  .login-note{ font-size: 11.5px; color: var(--text-muted); margin-top: 18px; line-height: 1.6; }
+  .denied-card{ text-align: center; }
+  .denied-card .login-title{ margin-bottom: 10px; }
+  .denied-card p{ font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin: 0 0 18px; }
+
+  /* ---------- Dashboard chrome ---------- */
+  header.top{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px 20px;
+    margin-bottom: 22px;
+  }
+  .eyebrow{
+    font-size: 11.5px;
+    letter-spacing: .12em;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  h1.title{ font-size: 25px; font-weight: 900; margin-top: 2px; }
+  .top-actions{ display:flex; align-items:center; gap: 10px; }
+  .top-actions .who{ font-size: 12.5px; color: var(--text-secondary); }
+  button.ghost{
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.ghost:hover{ border-color: var(--focus); }
+  button.ghost:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+  button.ghost svg{ width: 13px; height: 13px; }
+  button.ghost.spinning svg{ animation: spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ button.ghost.spinning svg{ animation: none; } }
+
+  .nav-tabs{ display:flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .nav-tab{
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .nav-tab.active{ color: #fff; background: var(--focus); border-color: var(--focus); }
+  .nav-tab:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .kpi-row{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .kpi{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 16px 14px;
+    border-left: 3px solid var(--kc);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .kpi .kpi-label{ font-size: 12.5px; font-weight: 700; color: var(--text-secondary); }
+  .kpi .kpi-value{ font-size: 30px; font-weight: 900; line-height: 1; }
+  .kpi .kpi-sub{ font-size: 12px; color: var(--text-muted); }
+  .kpi .kpi-sub b{ color: var(--kc); font-weight: 700; }
+
+  section.block{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 20px 22px;
+    margin-bottom: 16px;
+  }
+  section.block > .head{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  section.block > .head .dot{ width: 10px; height: 10px; border-radius: 50%; background: var(--kc); flex: none; }
+  section.block > .head h2{ font-size: 16.5px; font-weight: 700; }
+  section.block > .head .count{ margin-left: auto; font-size: 12.5px; color: var(--text-muted); }
+
+  .grid-2{ display: grid; grid-template-columns: 1.3fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 720px){ .grid-2{ grid-template-columns: 1fr; } .kpi-row{ grid-template-columns: 1fr; } }
+
+  .trend-wrap{ position: relative; }
+  .trend-caption{ font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
+  svg.trend{ width: 100%; height: 96px; display: block; overflow: visible; }
+  .bar{ fill: var(--kc); }
+  .bar:hover{ opacity: .75; }
+  .tooltip{
+    position: absolute;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--bg);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transform: translate(-50%, -130%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .1s;
+    z-index: 5;
+  }
+  .tooltip.show{ opacity: 1; }
+
+  .breakdown{ display: flex; flex-direction: column; gap: 10px; }
+  .bd-row{ display: grid; grid-template-columns: 84px 1fr 46px; align-items: center; gap: 10px; }
+  .bd-label{ font-size: 12.5px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bd-track{ height: 9px; background: var(--track); border-radius: 5px; overflow: hidden; }
+  .bd-fill{ height: 100%; background: var(--kc); border-radius: 5px; min-width: 3px; }
+  .bd-value{ font-size: 12.5px; font-weight: 700; text-align: right; }
+  .empty-note{ font-size: 12.5px; color: var(--text-muted); padding: 6px 0 2px; }
+
+  .privacy-banner{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size: 12px; color: var(--danger);
+    background: var(--danger-bg);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .table-wrap{ overflow-x: auto; }
+  table.records{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  table.records th{
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  table.records td{
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.records tr:last-child td{ border-bottom: none; }
+  .cell-date{ white-space: nowrap; color: var(--text-secondary); }
+  .cell-name{ font-weight: 700; white-space: nowrap; }
+  .cell-contact{ white-space: nowrap; }
+  .cell-contact a{ color: var(--kc); text-decoration: none; }
+  .cell-contact a:hover{ text-decoration: underline; }
+  .cell-contact .phone{ display:block; color: var(--text-secondary); font-size: 11.5px; }
+  .cell-msg{ max-width: 260px; color: var(--text-secondary); white-space: pre-wrap; }
+  .pill{
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--kc-bg);
+    color: var(--kc);
+    white-space: nowrap;
+  }
+
+  footer.foot{
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div id="loginScreen" class="login-screen">
+    <form id="loginForm" class="login-card" autocomplete="on">
+      <div class="login-eyebrow">PdMQuest / Admin</div>
+      <div class="login-title">冒険者ギルド管理室</div>
+      <div id="loginError" class="login-error"></div>
+      <div class="field">
+        <label for="loginEmail">メールアドレス</label>
+        <input id="loginEmail" type="email" required autocomplete="username" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="loginPassword">パスワード</label>
+        <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button type="submit" class="primary" id="loginSubmit">ログイン</button>
+      <div class="login-note">管理者アカウントのみアクセスできます。<a href="#" id="forgotPasswordLink">パスワードを忘れた場合はこちら</a></div>
+    </form>
+  </div>
+
+  <div id="deniedScreen" class="login-screen" hidden>
+    <div class="login-card denied-card">
+      <div class="login-eyebrow">PdMQuest / Admin</div>
+      <div class="login-title">アクセス権がありません</div>
+      <p>このアカウントには管理室の閲覧権限がありません。<br>管理者アカウントでログインし直してください。</p>
+      <button type="button" class="primary" id="deniedLogout">ログアウトして戻る</button>
+    </div>
+  </div>
+
+  <div id="dashboard" hidden>
+    <header class="top">
+      <div>
+        <div class="eyebrow">PdMQuest / Admin</div>
+        <h1 class="title">冒険者ギルド管理室</h1>
+      </div>
+      <div class="top-actions">
+        <div class="who" id="whoLabel"></div>
+        <button class="ghost" id="refreshBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+          更新
+        </button>
+        <button class="ghost" id="logoutBtn" type="button">ログアウト</button>
+      </div>
+    </header>
+
+    <div class="nav-tabs" role="tablist">
+      <button class="nav-tab active" data-view="overview" type="button">概要</button>
+      <button class="nav-tab" data-view="leads" type="button">リード一覧</button>
+      <button class="nav-tab" data-view="applications" type="button">応募一覧</button>
+    </div>
+
+    <div class="view active" id="view-overview">
+      <div class="kpi-row">
+        <div class="kpi" style="--kc: var(--series-diag)">
+          <div class="kpi-label">診断実施数</div>
+          <div class="kpi-value num" id="kpiDiagTotal">—</div>
+          <div class="kpi-sub" id="kpiDiagSub">&nbsp;</div>
+        </div>
+        <div class="kpi" style="--kc: var(--series-leads)">
+          <div class="kpi-label">資料DL・動画視聴リード</div>
+          <div class="kpi-value num" id="kpiLeadsTotal">—</div>
+          <div class="kpi-sub" id="kpiLeadsSub">&nbsp;</div>
+        </div>
+        <div class="kpi" style="--kc: var(--series-apps)">
+          <div class="kpi-label">転職・求人紹介の応募</div>
+          <div class="kpi-value num" id="kpiAppsTotal">—</div>
+          <div class="kpi-sub" id="kpiAppsSub">&nbsp;</div>
+        </div>
+      </div>
+
+      <section class="block" style="--kc: var(--series-diag)">
+        <div class="head"><span class="dot"></span><h2>スキル診断（diagnoses）</h2><span class="count" id="diagHeadCount"></span></div>
+        <div class="grid-2">
+          <div>
+            <div class="trend-wrap">
+              <svg class="trend" id="diagTrend"></svg>
+              <div class="tooltip" id="diagTooltip"></div>
+            </div>
+            <div class="trend-caption">直近30日の診断件数</div>
+          </div>
+          <div><div class="breakdown" id="diagByType"></div></div>
+        </div>
+      </section>
+
+      <section class="block" style="--kc: var(--series-leads)">
+        <div class="head"><span class="dot"></span><h2>リード（leads）</h2><span class="count" id="leadsHeadCount"></span></div>
+        <div class="grid-2">
+          <div>
+            <div class="trend-wrap">
+              <svg class="trend" id="leadsTrend"></svg>
+              <div class="tooltip" id="leadsTooltip"></div>
+            </div>
+            <div class="trend-caption">直近30日のリード件数</div>
+          </div>
+          <div><div class="breakdown" id="leadsBySource"></div></div>
+        </div>
+      </section>
+
+      <section class="block" style="--kc: var(--series-apps)">
+        <div class="head"><span class="dot"></span><h2>転職診断 応募（applications）</h2><span class="count" id="appsHeadCount"></span></div>
+        <div class="grid-2">
+          <div>
+            <div class="trend-wrap">
+              <svg class="trend" id="appsTrend"></svg>
+              <div class="tooltip" id="appsTooltip"></div>
+            </div>
+            <div class="trend-caption">直近30日の応募件数</div>
+          </div>
+          <div><div class="breakdown" id="appsByIntent"></div></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="view" id="view-leads">
+      <div class="privacy-banner">氏名・メールアドレス・電話番号などの個人情報が含まれます。取り扱いにご注意ください。</div>
+      <section class="block" style="--kc: var(--series-leads)">
+        <div class="table-wrap">
+          <table class="records" id="leadsTable">
+            <thead><tr><th>日時</th><th>種別</th><th>氏名</th><th>連絡先</th><th>会社・役職</th><th>メモ</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="view" id="view-applications">
+      <div class="privacy-banner">氏名・メールアドレス・電話番号などの個人情報が含まれます。取り扱いにご注意ください。</div>
+      <section class="block" style="--kc: var(--series-apps)">
+        <div class="table-wrap">
+          <table class="records" id="appsTable">
+            <thead><tr><th>日時</th><th>転職意欲</th><th>氏名</th><th>連絡先</th><th>現職</th><th>診断結果</th><th>メモ</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer class="foot">
+      このページはSupabase Authでログインした管理者アカウントのみアクセスできます（Row Level Securityで保護）。データはリアルタイムでSupabaseから取得しています。
+    </footer>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var SUPABASE_URL = "https://qdwiaedhairoythkqxoh.supabase.co";
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkd2lhZWRoYWlyb3l0aGtxeG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTY3NDUsImV4cCI6MjEwMzczMjc0NX0.zMy2DCPil6T59RgSddJmKkELkh5mZpMRrKvufzXP51A";
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var loginScreen = document.getElementById("loginScreen");
+  var deniedScreen = document.getElementById("deniedScreen");
+  var dashboard = document.getElementById("dashboard");
+  var loginForm = document.getElementById("loginForm");
+  var loginError = document.getElementById("loginError");
+  var loginSubmit = document.getElementById("loginSubmit");
+
+  function showError(msg){
+    loginError.textContent = msg;
+    loginError.classList.add("show");
+  }
+  function hideError(){ loginError.classList.remove("show"); }
+
+  function fmtDateTime(iso){
+    if(!iso) return "―";
+    var d = new Date(iso);
+    if(isNaN(d)) return "―";
+    var p = new Intl.DateTimeFormat("ja-JP", { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" });
+    return p.format(d);
+  }
+  function fmtDay(dstr){
+    var d = new Date(dstr + "T00:00:00");
+    return (d.getMonth()+1) + "/" + d.getDate();
+  }
+  function esc(s){
+    return String(s == null || s === "" ? "―" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function renderTrend(svgEl, tooltipEl, daily){
+    daily = daily || [];
+    var w = 600, h = 96, padTop = 10, padBottom = 18;
+    var n = daily.length || 1;
+    var gap = 3;
+    var barW = Math.max(2, (w - gap*(n-1)) / n);
+    var max = Math.max.apply(null, daily.map(function(d){ return d.count; }).concat([1]));
+    svgEl.setAttribute("viewBox", "0 0 " + w + " " + h);
+    var parts = [];
+    daily.forEach(function(d, i){
+      var x = i * (barW + gap);
+      var barH = d.count === 0 ? 2 : Math.max(3, (d.count / max) * (h - padTop - padBottom));
+      var y = h - padBottom - barH;
+      parts.push('<rect class="bar" data-i="' + i + '" x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + barW.toFixed(2) + '" height="' + barH.toFixed(2) + '" rx="' + Math.min(3, barW/2).toFixed(2) + '"></rect>');
+    });
+    parts.push('<line x1="0" y1="' + (h-padBottom) + '" x2="' + w + '" y2="' + (h-padBottom) + '" stroke="var(--border)" stroke-width="1"></line>');
+    svgEl.innerHTML = parts.join("");
+    var rects = svgEl.querySelectorAll("rect.bar");
+    rects.forEach(function(r){
+      r.addEventListener("mousemove", function(){
+        var i = +r.getAttribute("data-i");
+        var d = daily[i];
+        var box = svgEl.getBoundingClientRect();
+        var relX = ((r.x.baseVal.value + r.width.baseVal.value/2) / w) * box.width;
+        tooltipEl.style.left = relX + "px";
+        tooltipEl.style.top = "0px";
+        tooltipEl.textContent = fmtDay(d.day) + "：" + d.count + "件";
+        tooltipEl.classList.add("show");
+      });
+      r.addEventListener("mouseleave", function(){ tooltipEl.classList.remove("show"); });
+    });
+  }
+
+  function renderBreakdown(containerEl, items, labelKey, emptyText){
+    items = (items || []).filter(function(it){ return it[labelKey] != null; });
+    if(items.length === 0){
+      containerEl.innerHTML = '<div class="empty-note">' + esc(emptyText) + '</div>';
+      return;
+    }
+    var max = Math.max.apply(null, items.map(function(it){ return it.count; }).concat([1]));
+    containerEl.innerHTML = items.map(function(it){
+      var pct = Math.max(4, Math.round((it.count / max) * 100));
+      return '<div class="bd-row">' +
+        '<div class="bd-label" title="' + esc(it[labelKey]) + '">' + esc(it[labelKey]) + '</div>' +
+        '<div class="bd-track"><div class="bd-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="bd-value num">' + it.count + '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  function contactCell(email, phone){
+    var mail = email ? '<a href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '―';
+    var ph = phone ? '<span class="phone">' + esc(phone) + '</span>' : '';
+    return mail + ph;
+  }
+
+  function renderAggregate(stats){
+    var d = stats.diagnoses || {};
+    var l = stats.leads || {};
+    var a = stats.applications || {};
+
+    document.getElementById("kpiDiagTotal").textContent = (d.total_diagnoses ?? "―");
+    document.getElementById("kpiDiagSub").innerHTML = d.avg_hensachi != null ? "平均偏差値 <b>" + d.avg_hensachi + "</b>" : "―";
+    document.getElementById("diagHeadCount").textContent = (d.total_diagnoses ?? 0) + "件";
+    renderTrend(document.getElementById("diagTrend"), document.getElementById("diagTooltip"), d.daily_last_30d);
+    renderBreakdown(document.getElementById("diagByType"), d.by_type, "pdm_type", "データがありません");
+
+    document.getElementById("kpiLeadsTotal").textContent = (l.total_leads ?? "―");
+    document.getElementById("kpiLeadsSub").innerHTML = l.last_7d != null ? "直近7日 <b>" + l.last_7d + "</b>件" : "―";
+    document.getElementById("leadsHeadCount").textContent = (l.total_leads ?? 0) + "件";
+    renderTrend(document.getElementById("leadsTrend"), document.getElementById("leadsTooltip"), l.daily_last_30d);
+    renderBreakdown(document.getElementById("leadsBySource"), l.by_source, "source", "まだリードがありません");
+
+    document.getElementById("kpiAppsTotal").textContent = (a.total_applications ?? "―");
+    document.getElementById("kpiAppsSub").innerHTML = a.last_7d != null ? "直近7日 <b>" + a.last_7d + "</b>件" : "―";
+    document.getElementById("appsHeadCount").textContent = (a.total_applications ?? 0) + "件";
+    renderTrend(document.getElementById("appsTrend"), document.getElementById("appsTooltip"), a.daily_last_30d);
+    renderBreakdown(document.getElementById("appsByIntent"), a.by_job_change_intent, "intent", "まだ応募がありません");
+  }
+
+  var PDM_TYPE_LABELS = { tech:"開発系PdM", bizdev:"BizDev系PdM", pmm:"マーケ系PdM", general:"総合型PdM" };
+  var SENIORITY_LABELS = { junior:"ジュニア", middle:"ミドル", senior:"シニア〜CPO" };
+
+  function renderLeadsTable(records){
+    var tbody = document.querySelector("#leadsTable tbody");
+    if(!records || records.length === 0){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-note">まだリードがありません</td></tr>';
+      return;
+    }
+    tbody.innerHTML = records.map(function(r){
+      return '<tr>' +
+        '<td class="cell-date">' + fmtDateTime(r.created_at) + '</td>' +
+        '<td><span class="pill" style="--kc-bg: var(--series-leads-bg); color: var(--series-leads)">' + esc(r.source) + '</span></td>' +
+        '<td class="cell-name">' + esc(r.name) + '</td>' +
+        '<td class="cell-contact">' + contactCell(r.email, r.phone) + '</td>' +
+        '<td>' + esc(r.company_name) + (r.role ? '<br><span class="cell-msg">' + esc(r.role) + '</span>' : '') + '</td>' +
+        '<td class="cell-msg">' + esc(r.message) + '</td>' +
+      '</tr>';
+    }).join("");
+  }
+
+  function renderAppsTable(records){
+    var tbody = document.querySelector("#appsTable tbody");
+    if(!records || records.length === 0){
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-note">まだ応募がありません</td></tr>';
+      return;
+    }
+    tbody.innerHTML = records.map(function(r){
+      var resultLabel = [PDM_TYPE_LABELS[r.referred_pdm_type] || r.referred_pdm_type, SENIORITY_LABELS[r.referred_seniority] || r.referred_seniority, r.referred_hensachi != null ? ("偏差値" + r.referred_hensachi) : null].filter(Boolean).join(" / ");
+      return '<tr>' +
+        '<td class="cell-date">' + fmtDateTime(r.created_at) + '</td>' +
+        '<td><span class="pill" style="--kc-bg: var(--series-apps-bg); color: var(--series-apps)">' + esc(r.job_change_intent) + '</span></td>' +
+        '<td class="cell-name">' + esc(r.name) + '</td>' +
+        '<td class="cell-contact">' + contactCell(r.email, r.phone) + '</td>' +
+        '<td>' + esc(r.company_name) + (r.current_role ? '<br><span class="cell-msg">' + esc(r.current_role) + '</span>' : '') + '</td>' +
+        '<td class="cell-msg">' + esc(resultLabel) + '</td>' +
+        '<td class="cell-msg">' + esc(r.message) + '</td>' +
+      '</tr>';
+    }).join("");
+  }
+
+  function wireTabs(){
+    var tabs = document.querySelectorAll(".nav-tab");
+    tabs.forEach(function(tab){
+      tab.addEventListener("click", function(){
+        tabs.forEach(function(t){ t.classList.remove("active"); });
+        document.querySelectorAll(".view").forEach(function(v){ v.classList.remove("active"); });
+        tab.classList.add("active");
+        document.getElementById("view-" + tab.dataset.view).classList.add("active");
+      });
+    });
+  }
+
+  async function loadDashboard(){
+    var btn = document.getElementById("refreshBtn");
+    btn.classList.add("spinning");
+    try{
+      var [diagRes, leadsRes, appsRes, leadRecordsRes, appRecordsRes] = await Promise.all([
+        sb.rpc("get_aggregate_stats"),
+        sb.rpc("get_leads_stats"),
+        sb.rpc("get_applications_stats"),
+        sb.from("leads").select("id, created_at, source, name, email, phone, company_name, current_role, message").order("created_at", { ascending:false }).limit(200),
+        sb.from("applications").select("id, created_at, name, email, phone, company_name, current_role, job_change_intent, message, referred_pdm_type, referred_seniority, referred_hensachi").order("created_at", { ascending:false }).limit(200)
+      ]);
+      renderAggregate({
+        diagnoses: diagRes.data || {},
+        leads: leadsRes.data || {},
+        applications: appsRes.data || {}
+      });
+      renderLeadsTable((leadRecordsRes.data || []).map(function(r){ return Object.assign({}, r, { role: r.current_role }); }));
+      renderAppsTable(appRecordsRes.data || []);
+    }catch(e){
+      console.error(e);
+    }
+    setTimeout(function(){ btn.classList.remove("spinning"); }, 350);
+  }
+
+  async function enterDashboard(user){
+    document.getElementById("whoLabel").textContent = user.email;
+    loginScreen.hidden = true;
+    deniedScreen.hidden = true;
+    dashboard.hidden = false;
+    wireTabs();
+    document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
+    document.getElementById("logoutBtn").addEventListener("click", function(){ sb.auth.signOut(); });
+    await loadDashboard();
+  }
+
+  function showDenied(){
+    loginScreen.hidden = true;
+    dashboard.hidden = true;
+    deniedScreen.hidden = false;
+    document.getElementById("deniedLogout").addEventListener("click", function(){ sb.auth.signOut(); }, { once:true });
+  }
+
+  var ADMIN_EMAIL = "satoshi.kubo@metalandtokyo.xyz";
+
+  async function checkAccess(session){
+    if(!session){
+      loginScreen.hidden = false;
+      dashboard.hidden = true;
+      deniedScreen.hidden = true;
+      return;
+    }
+    // The real security boundary is the RLS policy on leads/applications (restricted
+    // to ADMIN_EMAIL server-side). This client-side check just gives a clear message
+    // instead of a silently-empty dashboard for anyone else who signs in.
+    if((session.user.email || "").toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+      showDenied();
+      return;
+    }
+    enterDashboard(session.user);
+  }
+
+  document.getElementById("forgotPasswordLink").addEventListener("click", async function(ev){
+    ev.preventDefault();
+    hideError();
+    var email = document.getElementById("loginEmail").value.trim();
+    if(!email){
+      showError("先にメールアドレスを入力してください。");
+      return;
+    }
+    var { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+    if(error){
+      showError(error.message);
+      return;
+    }
+    loginError.textContent = "パスワード再設定用のメールを送信しました。メールをご確認ください。";
+    loginError.style.color = "var(--focus)";
+    loginError.style.background = "var(--series-diag-bg)";
+    loginError.classList.add("show");
+  });
+
+  loginForm.addEventListener("submit", async function(ev){
+    ev.preventDefault();
+    hideError();
+    loginSubmit.disabled = true;
+    loginSubmit.textContent = "ログイン中…";
+    var email = document.getElementById("loginEmail").value.trim();
+    var password = document.getElementById("loginPassword").value;
+    var { data, error } = await sb.auth.signInWithPassword({ email: email, password: password });
+    loginSubmit.disabled = false;
+    loginSubmit.textContent = "ログイン";
+    if(error){
+      showError(error.message === "Invalid login credentials" ? "メールアドレスまたはパスワードが正しくありません。" : error.message);
+      return;
+    }
+    await checkAccess(data.session);
+  });
+
+  sb.auth.getSession().then(function(res){ checkAccess(res.data.session); });
+  sb.auth.onAuthStateChange(function(event, session){
+    if(event === "SIGNED_OUT"){
+      loginScreen.hidden = false;
+      dashboard.hidden = true;
+      deniedScreen.hidden = true;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
