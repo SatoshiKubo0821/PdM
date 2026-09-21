@@ -13,19 +13,22 @@
 <!-- favicon: レーダーチャートをモチーフにしたオリジナルの図形（外部ファイル不要のインラインSVG） -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23101C36%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2212%22%20fill%3D%22none%22%20stroke%3D%22%236FA0FF%22%20stroke-width%3D%222.5%22%20opacity%3D%220.7%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%236FA0FF%22%20opacity%3D%220.5%22/%3E%3Ccircle%20cx%3D%2242%22%20cy%3D%2220%22%20r%3D%224%22%20fill%3D%22%23C0812C%22/%3E%3C/svg%3E">
 
-<!-- OGP（SNS・チャットでシェアされた際の見え方）。og:image は画像を用意し次第、URLを差し替えて有効化してください -->
+<!-- OGP（SNS・チャットでシェアされた際の見え方） -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:title" content="PdM診断｜プロダクトマネージャーのスキルを無料セルフチェック【PdMクエスト】">
 <meta property="og:description" content="PdM(プロダクトマネージャー)のスキルを10カテゴリ・47項目で無料診断。強み・弱み分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化するプロダクトマネージャー向けセルフチェックツール。">
 <meta property="og:site_name" content="PdMクエスト（PdM診断）">
-<!-- <meta property="og:image" content="https://pdmquest.com/ogp.png"> -->
+<meta property="og:image" content="https://pdmquest.com/assets/branding/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://pdmquest.com/">
 <link rel="canonical" href="https://pdmquest.com/">
 
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PdM診断｜プロダクトマネージャーのスキルを無料セルフチェック【PdMクエスト】">
 <meta name="twitter:description" content="PdM(プロダクトマネージャー)のスキルを10カテゴリ・47項目で無料診断。強み・弱み分析、PdM偏差値、想定年収、キャリアパスまで無料で見える化するプロダクトマネージャー向けセルフチェックツール。">
+<meta name="twitter:image" content="https://pdmquest.com/assets/branding/ogp.png">
 
 <!-- 構造化データ（JSON-LD）: 検索エンジンにアプリの内容を正確に伝え、リッチリザルト表示を狙う -->
 <script type="application/ld+json">
@@ -107,6 +110,14 @@
     padding:20px 22px;
     position:relative;
   }
+  .share-x-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#000; color:#fff; border:2px solid #fff;
+    font-family:var(--pixel-font); font-weight:700; font-size:13.5px;
+    padding:11px 20px; cursor:pointer; transition:background .1s ease;
+  }
+  .share-x-btn:hover{background:#1a1a1a;}
+  .share-x-btn svg{flex-shrink:0;}
   .dq-window::before{
     content:"";
     position:absolute; inset:5px;
@@ -3105,6 +3116,15 @@ async function loadSaved(){
   }catch(e){ /* no saved data, or storage unavailable (e.g. private browsing) */ }
   return null;
 }
+/* 診断結果をX(Twitter)でシェアする共通ヘルパー。トップページURL(OGP画像付き)への導線とハッシュタグを添える */
+function shareToX(text){
+  const url = "https://pdmquest.com/";
+  const shareUrl = "https://twitter.com/intent/tweet"
+    + "?text=" + encodeURIComponent(text)
+    + "&url=" + encodeURIComponent(url)
+    + "&hashtags=" + encodeURIComponent("PdMクエスト,PdM診断");
+  window.open(shareUrl, "_blank", "noopener,noreferrer");
+}
 async function saveProgress(){
   try{
     const payload = JSON.stringify({
@@ -5295,6 +5315,10 @@ function renderBeginnerResults(){
       <div style="font-family:var(--pixel-font); font-size:16px; color:var(--gold); margin-top:6px;">${hensachi}</div>
     </div>
 
+    <div class="start-row" style="margin-top:18px;">
+      <button class="share-x-btn" id="beginnerResultShareBtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22H16.8l-5.2-6.6L5.6 22H2.5l8.1-9.3L1.7 2h6.7l4.6 6.1L18.9 2zm-1.2 18h1.7L7.4 4H5.6l12.1 16z"/></svg>診断結果をXでシェアする</button>
+    </div>
+
     <div class="start-row" style="margin-top:24px;">
       <button class="primary" id="beginnerMonsterFightBtn">その　ちからで　モンスターと　たたかう →</button>
     </div>
@@ -5306,6 +5330,10 @@ function renderBeginnerResults(){
       <button class="ghost" id="beginnerBackHomeBtn">${state.viewingHistory ? "マイページにもどる" : "トップへもどる"}</button>
     </div>
   `;
+  document.getElementById("beginnerResultShareBtn").onclick = ()=>{
+    const text = `PdMポテンシャル診断で【${seed.seed}】タイプでした！\nTYPE：${personalityCode}\n\nあなたのPdM適性もチェックしてみよう👇`;
+    shareToX(text);
+  };
   document.getElementById("beginnerMonsterFightBtn").onclick = ()=>{
     state.viewingHistory = null;
     state.viewingHistoryBeginnerAxisCode = null;
@@ -5922,6 +5950,10 @@ function renderResults(){
         </div>`).join("")}
     </div>
 
+    <div class="start-row" style="margin-top:18px;">
+      <button class="share-x-btn" id="resultShareBtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22H16.8l-5.2-6.6L5.6 22H2.5l8.1-9.3L1.7 2h6.7l4.6 6.1L18.9 2zm-1.2 18h1.7L7.4 4H5.6l12.1 16z"/></svg>診断結果をXでシェアする</button>
+    </div>
+
     <div class="section-label" style="margin-top:28px;">モンスターと　たたかう</div>
     <p style="font-size:12.5px; color:#B8BEFF; margin-top:8px;">きみの　しんだんけっかを　たずさえて、モンスターに　いどんでみよう。</p>
     <div class="start-row" style="margin-top:14px;">
@@ -6300,6 +6332,13 @@ function renderResults(){
     state.orgAnswers = {}; state.orgScores = null; state.orgDisplayOrder = null;
     state.screen="orgAssess"; render(); window.scrollTo(0,0);
   };
+  const resultShareBtn = document.getElementById("resultShareBtn");
+  if(resultShareBtn){
+    resultShareBtn.onclick = ()=>{
+      const text = `私は【${jobClass.name}（${jobClass.tierLabel}）】でした！\nPdM偏差値：${hensachi}\n\nあなたのPdM力もチェックしてみよう👇`;
+      shareToX(text);
+    };
+  }
 
   const monsterFightBtn = document.getElementById("monsterFightBtn");
   if(monsterFightBtn){
