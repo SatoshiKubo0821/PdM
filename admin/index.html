@@ -339,6 +339,23 @@
     </form>
   </div>
 
+  <div id="resetScreen" class="login-screen" hidden>
+    <form id="resetForm" class="login-card" autocomplete="off">
+      <div class="login-eyebrow">PdMQuest / Admin</div>
+      <div class="login-title">新しいパスワードを設定</div>
+      <div id="resetError" class="login-error"></div>
+      <div class="field">
+        <label for="resetPassword1">新しいパスワード</label>
+        <input id="resetPassword1" type="password" required autocomplete="new-password" placeholder="8文字以上" minlength="8">
+      </div>
+      <div class="field">
+        <label for="resetPassword2">新しいパスワード（確認）</label>
+        <input id="resetPassword2" type="password" required autocomplete="new-password" placeholder="もう一度入力" minlength="8">
+      </div>
+      <button type="submit" class="primary" id="resetSubmit">パスワードを設定してログイン</button>
+    </form>
+  </div>
+
   <div id="deniedScreen" class="login-screen" hidden>
     <div class="login-card denied-card">
       <div class="login-eyebrow">PdMQuest / Admin</div>
@@ -478,6 +495,11 @@
   var loginForm = document.getElementById("loginForm");
   var loginError = document.getElementById("loginError");
   var loginSubmit = document.getElementById("loginSubmit");
+  var resetScreen = document.getElementById("resetScreen");
+  var resetForm = document.getElementById("resetForm");
+  var resetError = document.getElementById("resetError");
+  var resetSubmit = document.getElementById("resetSubmit");
+  var isPasswordRecovery = false;
 
   function showError(msg){
     loginError.textContent = msg;
@@ -673,16 +695,29 @@
   function showDenied(){
     loginScreen.hidden = true;
     dashboard.hidden = true;
+    resetScreen.hidden = true;
     deniedScreen.hidden = false;
     document.getElementById("deniedLogout").addEventListener("click", function(){ sb.auth.signOut(); }, { once:true });
+  }
+
+  function showReset(){
+    loginScreen.hidden = true;
+    dashboard.hidden = true;
+    deniedScreen.hidden = true;
+    resetScreen.hidden = false;
   }
 
   var ADMIN_EMAIL = "satoshi.kubo@metalandtokyo.xyz";
 
   async function checkAccess(session){
+    if(isPasswordRecovery && session){
+      showReset();
+      return;
+    }
     if(!session){
       loginScreen.hidden = false;
       dashboard.hidden = true;
+      resetScreen.hidden = true;
       deniedScreen.hidden = true;
       return;
     }
@@ -695,6 +730,36 @@
     }
     enterDashboard(session.user);
   }
+
+  resetForm.addEventListener("submit", async function(ev){
+    ev.preventDefault();
+    resetError.classList.remove("show");
+    var p1 = document.getElementById("resetPassword1").value;
+    var p2 = document.getElementById("resetPassword2").value;
+    if(p1.length < 8){
+      resetError.textContent = "パスワードは8文字以上にしてください。";
+      resetError.classList.add("show");
+      return;
+    }
+    if(p1 !== p2){
+      resetError.textContent = "パスワードが一致しません。";
+      resetError.classList.add("show");
+      return;
+    }
+    resetSubmit.disabled = true;
+    resetSubmit.textContent = "設定中…";
+    var { data, error } = await sb.auth.updateUser({ password: p1 });
+    resetSubmit.disabled = false;
+    resetSubmit.textContent = "パスワードを設定してログイン";
+    if(error){
+      resetError.textContent = error.message;
+      resetError.classList.add("show");
+      return;
+    }
+    isPasswordRecovery = false;
+    var sess = (await sb.auth.getSession()).data.session || (data && data.session);
+    await checkAccess(sess);
+  });
 
   document.getElementById("forgotPasswordLink").addEventListener("click", async function(ev){
     ev.preventDefault();
@@ -732,14 +797,20 @@
     await checkAccess(data.session);
   });
 
-  sb.auth.getSession().then(function(res){ checkAccess(res.data.session); });
   sb.auth.onAuthStateChange(function(event, session){
+    if(event === "PASSWORD_RECOVERY"){
+      isPasswordRecovery = true;
+      showReset();
+      return;
+    }
     if(event === "SIGNED_OUT"){
       loginScreen.hidden = false;
       dashboard.hidden = true;
+      resetScreen.hidden = true;
       deniedScreen.hidden = true;
     }
   });
+  sb.auth.getSession().then(function(res){ checkAccess(res.data.session); });
 })();
 </script>
 
