@@ -810,7 +810,73 @@
       deniedScreen.hidden = true;
     }
   });
-  sb.auth.getSession().then(function(res){ checkAccess(res.data.session); });
+
+  // Supabase recovery links arrive in one of two shapes depending on the
+  // project's auth flow setting:
+  //   - implicit:  .../admin/#access_token=...&type=recovery  (handled above
+  //     via onAuthStateChange's PASSWORD_RECOVERY event, fired automatically
+  //     by detectSessionInUrl during client init)
+  //   - PKCE:      .../admin/?code=xxxxx&type=recovery  (NOT auto-detected;
+  //     must be exchanged explicitly, otherwise the app falls straight
+  //     through to the plain login screen with no error at all)
+  // A link that was already used, or has expired, comes back as
+  // .../admin/#error=...&error_description=...  in either flow. Handling
+  // that case explicitly turns a silent dead end into an actionable message.
+  function parseParams(str){
+    var out = {};
+    if(!str) return out;
+    if(str.charAt(0) === "#" || str.charAt(0) === "?") str = str.slice(1);
+    str.split("&").forEach(function(pair){
+      if(!pair) return;
+      var idx = pair.indexOf("=");
+      var k = decodeURIComponent(idx === -1 ? pair : pair.slice(0, idx));
+      var v = decodeURIComponent((idx === -1 ? "" : pair.slice(idx+1)).replace(/\+/g, " "));
+      out[k] = v;
+    });
+    return out;
+  }
+
+  async function handleAuthRedirect(){
+    var hashParams = parseParams(window.location.hash);
+    var queryParams = parseParams(window.location.search);
+
+    var errDesc = hashParams.error_description || queryParams.error_description;
+    if(errDesc || hashParams.error || queryParams.error){
+      history.replaceState(null, "", window.location.pathname);
+      showError("リンクの有効期限が切れているか、既に使用されています。お手数ですが下の「パスワードを忘れた場合はこちら」からもう一度お試しください。" + (errDesc ? "（" + errDesc + "）" : ""));
+      return true;
+    }
+
+    if(queryParams.code){
+      var wasRecovery = queryParams.type === "recovery";
+      try{
+        var exch = await sb.auth.exchangeCodeForSession(window.location.href);
+        history.replaceState(null, "", window.location.pathname);
+        if(exch.error){
+          showError("パスワード再設定リンクの検証に失敗しました：" + exch.error.message);
+          return true;
+        }
+        if(wasRecovery){
+          isPasswordRecovery = true;
+          showReset();
+          return true;
+        }
+        await checkAccess(exch.data.session);
+        return true;
+      }catch(e){
+        history.replaceState(null, "", window.location.pathname);
+        showError("パスワード再設定リンクの検証に失敗しました。もう一度お試しください。");
+        return true;
+      }
+    }
+    return false;
+  }
+
+  handleAuthRedirect().then(function(handled){
+    if(!handled){
+      sb.auth.getSession().then(function(res){ checkAccess(res.data.session); });
+    }
+  });
 })();
 </script>
 
