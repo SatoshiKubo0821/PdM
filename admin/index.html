@@ -361,14 +361,14 @@
       <div class="login-eyebrow">PdMQuest / Admin</div>
       <div class="login-title">コードでパスワードを再設定</div>
       <div id="otpError" class="login-error"></div>
-      <p class="login-note" style="margin-top:-4px">メールに記載の6桁の確認コードを入力してください（リンクではなくコードをご利用ください）。</p>
+      <p class="login-note" style="margin-top:-4px">メールに記載の数字の確認コードを入力してください（リンクではなくコードをご利用ください）。</p>
       <div class="field">
         <label for="otpEmail">メールアドレス</label>
         <input id="otpEmail" type="email" required autocomplete="username" placeholder="you@example.com">
       </div>
       <div class="field">
         <label for="otpCode">確認コード</label>
-        <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" required autocomplete="one-time-code" placeholder="123456" maxlength="6">
+        <input id="otpCode" type="text" inputmode="numeric" pattern="[0-9]*" required autocomplete="one-time-code" placeholder="12345678" maxlength="10">
       </div>
       <div class="field">
         <label for="otpPassword1">新しいパスワード</label>
@@ -819,11 +819,18 @@
     // one-time recovery link before the person ever clicks it. A code typed
     // in by hand isn't affected by that.
     var { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
-    if(error){
+    // Supabase refuses a second send within ~60s. The mail from the first
+    // click is still valid, so move on to the code screen instead of stopping.
+    var wait = error && /after (\d+) seconds?/i.exec(error.message || "");
+    if(error && !wait){
       showError(error.message);
       return;
     }
     showOtp(email);
+    if(wait){
+      otpError.textContent = "直前に送信したメールの確認コードを入力してください（新しいメールの再送信は" + wait[1] + "秒後から可能です）。";
+      otpError.classList.add("show");
+    }
   });
 
   document.getElementById("backToLoginLink").addEventListener("click", function(ev){
@@ -836,7 +843,8 @@
     ev.preventDefault();
     otpError.classList.remove("show");
     var email = document.getElementById("otpEmail").value.trim();
-    var code = document.getElementById("otpCode").value.trim();
+    // Codes are copied out of mail clients, so drop spaces/other stray chars.
+    var code = document.getElementById("otpCode").value.replace(/[^0-9]/g, "");
     var p1 = document.getElementById("otpPassword1").value;
     var p2 = document.getElementById("otpPassword2").value;
     if(!email || !code){
