@@ -149,3 +149,9 @@ create policy "anyone can submit lead"
 -- 4. Project Settings → API から Project URL と anon / publishable key を控えて
 --    pdm-skill-radar.html の SUPABASE_URL / SUPABASE_ANON_KEY に設定
 -- ============================================================
+
+-- 管理画面の集計関数（get_leads_stats / get_applications_stats）は、呼び出した人の権限で動かす。
+-- SECURITY DEFINER のままだと、ログインしていない人でも件数の内訳を取得できてしまうため。
+-- leads / applications の RLS（管理者メールのみ SELECT 可）がそのまま効き、管理者以外には 0 件が返る。
+alter function public.get_leads_stats() security invoker;
+alter function public.get_applications_stats() security invoker;
