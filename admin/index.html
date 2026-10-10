@@ -516,7 +516,14 @@
 
   var SUPABASE_URL = "https://qdwiaedhairoythkqxoh.supabase.co";
   var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkd2lhZWRoYWlyb3l0aGtxeG9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgxNTY3NDUsImV4cCI6MjEwMzczMjc0NX0.zMy2DCPil6T59RgSddJmKkELkh5mZpMRrKvufzXP51A";
-  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // The public site (same origin) keeps an anonymous session under supabase-js's
+  // default storage key. Sharing that key let the public site's failed token
+  // refreshes wipe the admin session (and a fresh password-recovery session)
+  // via storage/BroadcastChannel sync, dropping the admin back to the login
+  // screen. A dedicated key keeps the two sessions independent.
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { storageKey: "pdmquest-admin-auth" }
+  });
 
   var loginScreen = document.getElementById("loginScreen");
   var deniedScreen = document.getElementById("deniedScreen");
