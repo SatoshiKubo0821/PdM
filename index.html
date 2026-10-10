@@ -6301,6 +6301,15 @@ function renderResults(){
       <a class="primary cta-btn" id="toryumonBtn" href="./toryumon.html?pdmType=${typeResult.key}&seniority=${seniorityKey}&hensachi=${hensachi}" target="_blank" rel="noopener">PdM登竜門を見る →</a>
     </div>
 
+    ${hensachi >= 60 ? `
+    <div class="cta-card" style="margin-top:16px;">
+      <div class="cta-text">
+        <h4>XProductのアドバイザーになりませんか</h4>
+        <p>PdM QUEST開発者が代表を務めるプロダクト専門ファーム「XProduct」では、稼働の約束なしで名前を連ねていただくアドバイザー／パートナーを募集しています。</p>
+      </div>
+      <a class="primary cta-btn" id="advisorBtn" href="https://product-consulting.xyz/recruit/?utm_source=pdmquest&utm_medium=result&utm_campaign=advisor#advisor" target="_blank" rel="noopener">関わり方を見る →</a>
+    </div>` : ""}
+
     ${state.viewingHistory ? `
     <div class="start-row" style="margin-top:44px;">
       <button class="ghost" id="toHistoryBtn">履歴一覧に戻る</button>
