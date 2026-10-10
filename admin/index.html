@@ -64,6 +64,9 @@
   a{ color: var(--focus); }
 
   /* ---------- Login screen ---------- */
+  /* .login-screen sets display:flex, which would otherwise override the hidden
+     attribute and leave the login card covering every other screen. */
+  [hidden]{ display: none !important; }
   .login-screen{
     min-height: calc(100dvh - 76px);
     display: flex;
