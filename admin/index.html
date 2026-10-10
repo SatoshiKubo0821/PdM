@@ -353,6 +353,7 @@
         <input id="resetPassword2" type="password" required autocomplete="new-password" placeholder="もう一度入力" minlength="8">
       </div>
       <button type="submit" class="primary" id="resetSubmit">パスワードを設定してログイン</button>
+      <div class="login-note" id="resetCancelNote" hidden><a href="#" id="resetCancelLink">変更せずに管理画面に戻る</a></div>
     </form>
   </div>
 
@@ -404,6 +405,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
           更新
         </button>
+        <button class="ghost" id="changePasswordBtn" type="button">パスワード変更</button>
         <button class="ghost" id="logoutBtn" type="button">ログアウト</button>
       </div>
     </header>
@@ -531,6 +533,17 @@
   var otpError = document.getElementById("otpError");
   var otpSubmit = document.getElementById("otpSubmit");
   var isPasswordRecovery = false;
+  // supabase-js strips the recovery tokens from the hash once it has verified
+  // them (after a network round trip), so note them now, synchronously. If that
+  // verification fails it does so silently; knowing a recovery link was used
+  // lets us say so instead of dropping back to a bare login screen.
+  var initialHash = parseParams(window.location.hash);
+  var urlHadRecoveryTokens = initialHash.type === "recovery" && !!initialHash.access_token;
+  if(urlHadRecoveryTokens) isPasswordRecovery = true;
+  // verifyOtp({type:"recovery"}) emits PASSWORD_RECOVERY; the code form sets the
+  // password itself, so that event must not switch screens mid-submit.
+  var otpInFlight = false;
+  var dashboardWired = false;
 
   function showError(msg){
     loginError.textContent = msg;
@@ -716,10 +729,16 @@
     document.getElementById("whoLabel").textContent = user.email;
     loginScreen.hidden = true;
     deniedScreen.hidden = true;
+    resetScreen.hidden = true;
+    otpScreen.hidden = true;
     dashboard.hidden = false;
-    wireTabs();
-    document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
-    document.getElementById("logoutBtn").addEventListener("click", function(){ sb.auth.signOut(); });
+    if(!dashboardWired){
+      dashboardWired = true;
+      wireTabs();
+      document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
+      document.getElementById("logoutBtn").addEventListener("click", function(){ sb.auth.signOut(); });
+      document.getElementById("changePasswordBtn").addEventListener("click", function(){ showReset(true); });
+    }
     await loadDashboard();
   }
 
@@ -732,7 +751,10 @@
     document.getElementById("deniedLogout").addEventListener("click", function(){ sb.auth.signOut(); }, { once:true });
   }
 
-  function showReset(){
+  function showReset(fromDashboard){
+    document.getElementById("resetCancelNote").hidden = !fromDashboard;
+    document.getElementById("resetSubmit").textContent = fromDashboard ? "パスワードを変更" : "パスワードを設定してログイン";
+    resetError.classList.remove("show");
     loginScreen.hidden = true;
     dashboard.hidden = true;
     deniedScreen.hidden = true;
@@ -794,7 +816,7 @@
     resetSubmit.textContent = "設定中…";
     var { data, error } = await sb.auth.updateUser({ password: p1 });
     resetSubmit.disabled = false;
-    resetSubmit.textContent = "パスワードを設定してログイン";
+    resetSubmit.textContent = document.getElementById("resetCancelNote").hidden ? "パスワードを設定してログイン" : "パスワードを変更";
     if(error){
       resetError.textContent = error.message;
       resetError.classList.add("show");
@@ -833,6 +855,11 @@
     }
   });
 
+  document.getElementById("resetCancelLink").addEventListener("click", async function(ev){
+    ev.preventDefault();
+    await checkAccess((await sb.auth.getSession()).data.session);
+  });
+
   document.getElementById("backToLoginLink").addEventListener("click", function(ev){
     ev.preventDefault();
     otpScreen.hidden = true;
@@ -864,8 +891,10 @@
     }
     otpSubmit.disabled = true;
     otpSubmit.textContent = "確認中…";
+    otpInFlight = true;
     var { data, error } = await sb.auth.verifyOtp({ email: email, token: code, type: "recovery" });
     if(error){
+      otpInFlight = false;
       otpSubmit.disabled = false;
       otpSubmit.textContent = "コードを確認してパスワードを設定";
       otpError.textContent = "コードが正しくないか、有効期限が切れています：" + error.message;
@@ -873,6 +902,7 @@
       return;
     }
     var { error: pwError } = await sb.auth.updateUser({ password: p1 });
+    otpInFlight = false;
     otpSubmit.disabled = false;
     otpSubmit.textContent = "コードを確認してパスワードを設定";
     if(pwError){
@@ -904,6 +934,7 @@
 
   sb.auth.onAuthStateChange(function(event, session){
     if(event === "PASSWORD_RECOVERY"){
+      if(otpInFlight) return;
       isPasswordRecovery = true;
       showReset();
       return;
@@ -973,6 +1004,17 @@
         showError("パスワード再設定リンクの検証に失敗しました。もう一度お試しください。");
         return true;
       }
+    }
+    if(urlHadRecoveryTokens){
+      var recSession = (await sb.auth.getSession()).data.session;
+      if(recSession){
+        showReset();
+        return true;
+      }
+      isPasswordRecovery = false;
+      history.replaceState(null, "", window.location.pathname);
+      showError("パスワード再設定リンクを確認できませんでした。お手数ですが下の「パスワードを忘れた場合はこちら」から、メールに届く確認コードで再設定してください。");
+      return true;
     }
     return false;
   }

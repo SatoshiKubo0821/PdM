@@ -2,6 +2,17 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<script>
+// Admin password-recovery links land here instead of /admin/ when Supabase
+// falls back to the Site URL. Forward them before this page's Supabase client
+// consumes the one-time token as an ordinary sign-in.
+(function(){
+  var h = location.hash || "", q = location.search || "";
+  if(/(^#|&)type=recovery(&|$)/.test(h) || (/[?&]type=recovery(&|$)/.test(q) && /[?&]code=/.test(q))){
+    location.replace("/admin/" + q + h);
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
