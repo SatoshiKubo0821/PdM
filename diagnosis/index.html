@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="プロダクト開発の現状（As-Is）を11の観点で記入し、AIが症状・根本原因・矛盾・見落としを診断します。">
+<title>AI プロダクト開発診断</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@600;700&display=swap">
+<style>
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+
+/* Layout: カルテ型。左に観点インデックス（充足メーター）、右に観点別の問診票、下に診断所見 */
+:root{
+  --bg:#EDF0F2; --paper:#FFFFFF; --ink:#17202B; --muted:#5A6571; --line:#D4DAE0; --line-strong:#B9C2CB;
+  --accent:#145C55; --accent-ink:#FFFFFF; --accent-soft:#DDEBE8;
+  --ok:#2C7A4D; --warn:#A8701A; --bad:#B23838; --na:#808A94;
+  --ok-soft:#E1F0E7; --warn-soft:#F6EBD8; --bad-soft:#F5E0E0; --na-soft:#E7EAED;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"IBM Plex Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161B; --paper:#192027; --ink:#E5EAEE; --muted:#9AA5B0; --line:#2B343E; --line-strong:#3D4854;
+  --accent:#62C3B6; --accent-ink:#0D1F1D; --accent-soft:#1D3835;
+  --ok:#62BF89; --warn:#E2AC4E; --bad:#EB7676; --na:#7E8994;
+  --ok-soft:#1C3326; --warn-soft:#382D18; --bad-soft:#3A1F21; --na-soft:#232B33; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161B; --paper:#192027; --ink:#E5EAEE; --muted:#9AA5B0; --line:#2B343E; --line-strong:#3D4854;
+  --accent:#62C3B6; --accent-ink:#0D1F1D; --accent-soft:#1D3835;
+  --ok:#62BF89; --warn:#E2AC4E; --bad:#EB7676; --na:#7E8994;
+  --ok-soft:#1C3326; --warn-soft:#382D18; --bad-soft:#3A1F21; --na-soft:#232B33; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.75}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);letter-spacing:.06em}
+
+/* header */
+.head{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;padding-bottom:22px;border-bottom:1px solid var(--line-strong)}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4.4vw,42px);line-height:1.25;margin:6px 0 8px;text-wrap:balance}
+.lead{color:var(--muted);max-width:60ch;margin:0}
+.overall{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.gauge{display:flex;align-items:baseline;gap:6px}
+.gauge b{font-family:var(--f-mono);font-size:34px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+.gauge span{color:var(--muted);font-size:12.5px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{border:1px solid var(--line-strong);background:var(--paper);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.5;cursor:default}
+
+.notice{margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 14px;border:1px dashed var(--accent);border-radius:6px;background:var(--accent-soft);font-size:13.5px}
+.notice .tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;background:var(--accent);color:var(--accent-ink);padding:1px 7px;border-radius:3px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px;margin-top:28px;align-items:start}
+.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px)}
+.index h2{font-size:12px;font-family:var(--f-mono);letter-spacing:.12em;color:var(--muted);margin:0 0 8px;font-weight:500}
+.index ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.index a{display:grid;grid-template-columns:28px 1fr;gap:2px 8px;padding:7px 8px;border-radius:5px;color:inherit;text-decoration:none}
+.index a:hover{background:var(--paper)}
+.index a.active{background:var(--paper);box-shadow:inset 2px 0 0 var(--accent)}
+.index .c{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);padding-top:2px}
+.index .n{font-size:13.5px;font-weight:500}
+.index .m{grid-column:2;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.index .m i{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+/* sections */
+.sheet{display:flex;flex-direction:column;gap:20px;min-width:0}
+.sec{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:22px 24px 24px;scroll-margin-top:16px}
+.sec-head{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:18px}
+.sec-code{font-family:var(--f-mono);font-size:12px;color:var(--accent);letter-spacing:.08em}
+.sec-head h3{font-family:var(--f-display);font-size:21px;margin:0;font-weight:700}
+.sec-head p{grid-column:2/4;margin:0;color:var(--muted);font-size:13.5px}
+.sec-fill{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fields{display:grid;gap:18px}
+.field label.l{display:block;font-weight:700;font-size:14px}
+.field .q{display:block;color:var(--muted);font-size:12.8px;margin:1px 0 7px}
+textarea,input[type=text]{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 11px;line-height:1.65;resize:vertical}
+textarea{min-height:72px}
+textarea:focus,input[type=text]:focus{border-color:var(--accent);outline:none;background:var(--paper)}
+::placeholder{color:var(--na)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line-strong);background:transparent;border-radius:99px;padding:4px 12px;font-size:13px;cursor:pointer;line-height:1.5}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+.field{grid-column:1/-1;min-width:0}.field.half{grid-column:auto}
+.inline{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.inline input{width:auto;max-width:200px}
+input[type=month],input[type=number]{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-variant-numeric:tabular-nums}
+input[type=number]{width:88px}
+input[type=month]:focus,input[type=number]:focus,select:focus{border-color:var(--accent);outline:none;background:var(--paper)}
+select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 8px}
+.unit{font-size:13px;color:var(--muted)}
+.calc{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums}
+.mtable{overflow-x:auto}
+.mgrid{display:grid;grid-template-columns:minmax(170px,1fr) 84px 108px 120px 34px;gap:6px 8px;align-items:center;min-width:560px}
+.mgrid .h{font-size:11.5px;font-family:var(--f-mono);letter-spacing:.06em;color:var(--muted)}
+.mgrid input[type=text]{padding:7px 10px}
+.mgrid input[type=number]{width:100%}
+.mgrid .pc{display:flex;align-items:center;gap:4px}
+.del{border:1px solid var(--line);background:transparent;border-radius:6px;height:34px;cursor:pointer;color:var(--muted)}
+.del:hover{border-color:var(--bad);color:var(--bad)}
+.mfoot{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:10px}
+.split{display:grid;gap:8px}
+.split-row{display:grid;grid-template-columns:minmax(0,1fr) 88px 20px;gap:8px;align-items:center;font-size:13.5px}
+.split-row i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;vertical-align:-1px}
+.split-bar{display:flex;height:12px;border-radius:3px;overflow:hidden;background:var(--line);margin-top:4px}
+.split-bar span{height:100%}
+.calc.warn{color:var(--warn)}
+@media (max-width:620px){.fields{grid-template-columns:1fr}.field.half{grid-column:1/-1}}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.import{display:grid;gap:10px}
+.drop{display:grid;gap:2px;place-items:center;text-align:center;padding:22px 16px;border:1.5px dashed var(--line-strong);border-radius:8px;cursor:pointer;background:var(--bg);font-size:14px}
+.drop small{color:var(--muted);font-size:12px}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+#rmFile:focus-visible + .files,.drop:focus-within{outline:2px solid var(--accent)}
+.files{display:flex;flex-wrap:wrap;gap:8px}
+.file{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:6px;padding:5px 6px 5px 8px;font-size:12.5px;max-width:100%;background:var(--paper)}
+.file img{width:44px;height:32px;object-fit:cover;border-radius:3px;border:1px solid var(--line)}
+.file .fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.file .k{font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.file button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px}
+.file button:hover{color:var(--bad)}
+.l.sub{font-size:12.5px;font-weight:500;color:var(--muted)}
+.self{margin-top:20px;padding-top:14px;border-top:1px dashed var(--line);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.self .l{font-size:13px;font-weight:700}
+.self .l small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.scale{display:flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.scale button{border:0;border-right:1px solid var(--line-strong);background:transparent;padding:4px 0;width:38px;font-family:var(--f-mono);font-size:13px;cursor:pointer}
+.scale button:last-child{border-right:0;width:auto;padding:4px 10px;font-family:var(--f-body);font-size:12px}
+.scale button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.scale-legend{font-size:11.5px;color:var(--muted)}
+
+/* run bar */
+.run{position:sticky;bottom:0;z-index:5;margin-top:4px;background:var(--paper);border:1px solid var(--line-strong);border-radius:8px;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;box-shadow:0 -6px 20px -12px rgba(0,0,0,.25)}
+.run .status{flex:1 1 260px;min-width:0;font-size:13px;color:var(--muted)}
+.run .status b{color:var(--ink)}
+
+.api{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end;border-top:1px dashed var(--line);padding-top:12px}
+.api-f{display:grid;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+.api-f input{width:min(340px,100%);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-family:var(--f-mono);font-size:13px}
+.api-f input:focus{border-color:var(--accent);outline:none}
+.api-chk{display:flex;gap:6px;align-items:center;font-size:12.5px;padding-bottom:8px}
+.api-note{flex:1 1 100%;margin:0;font-size:12px;color:var(--muted)}
+.api-note a{color:var(--accent)}
+/* result */
+.result{margin-top:44px}
+.res-head{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.res-head h2{font-family:var(--f-display);font-size:28px;margin:0}
+.res-tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;padding:2px 8px;border-radius:3px;border:1px solid var(--line-strong);color:var(--muted)}
+.res-tag.sample{border-color:var(--accent);color:var(--accent)}
+.empty{padding:40px 24px;text-align:center;color:var(--muted);border:1px dashed var(--line-strong);border-radius:8px;margin-top:20px}
+.verdict{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;margin-top:24px;align-items:start}
+.headline{font-family:var(--f-display);font-size:clamp(20px,2.6vw,26px);line-height:1.55;margin:0 0 14px;text-wrap:balance}
+.summary{margin:0;max-width:62ch}
+.maturity{display:flex;align-items:center;gap:12px;margin-top:18px;font-size:13px;color:var(--muted)}
+.dots{display:flex;gap:4px}.dots i{width:22px;height:8px;border-radius:2px;background:var(--line)}.dots i.on{background:var(--accent)}
+.radar-box{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px}
+.radar-box svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:16px;height:0;border-top:2px solid var(--accent)}.sw.self{border-top:2px dashed var(--muted)}
+
+.block{margin-top:40px}
+.block h3{display:flex;align-items:baseline;gap:12px;font-size:18px;margin:0 0 14px;font-weight:700}
+.block h3 .mono{font-size:11.5px;color:var(--muted);font-weight:500}
+
+.core{background:var(--ink);color:var(--paper);border-radius:8px;padding:22px 26px}
+.core .eyebrow{color:inherit;opacity:.7}
+.core h4{font-family:var(--f-display);font-size:22px;margin:6px 0 8px;line-height:1.5}
+.core p{margin:0;opacity:.9;max-width:70ch}
+
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-size:11.5px;font-family:var(--f-mono);letter-spacing:.08em;color:var(--muted);font-weight:500;background:var(--bg)}
+td.p{white-space:nowrap;font-weight:700}
+td.p small{display:block;font-family:var(--f-mono);font-weight:500;color:var(--muted);font-size:11px}
+td.sc{white-space:nowrap;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+td.sc .gap{display:block;font-size:11px;color:var(--warn)}
+.ev{margin:6px 0 0;padding:0;list-style:none;color:var(--muted);font-size:12.5px}
+.ev li::before{content:"— "}
+.selfgap{margin-top:6px;font-size:12.5px;color:var(--warn)}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 9px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.na{background:var(--na-soft);color:var(--na)}
+
+.issues{display:grid;gap:14px}
+.issue{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px 20px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:18px 28px}
+.issue-top{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline}
+.issue-top h4{margin:0;font-size:16.5px}
+.sev{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;padding:1px 8px;border-radius:3px}
+.sev.高{background:var(--bad-soft);color:var(--bad)}.sev.中{background:var(--warn-soft);color:var(--warn)}.sev.低{background:var(--na-soft);color:var(--na)}
+.ptags{display:flex;gap:6px;flex-wrap:wrap}.ptags span{font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 6px}
+.issue .k{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:4px}
+.issue p{margin:0}
+.roots{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.roots li{padding-left:18px;position:relative}
+.roots li::before{content:"↳";position:absolute;left:0;color:var(--accent)}
+.issue .why{grid-column:1/-1;font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.contra{display:grid;gap:12px}
+.contra-item{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.contra-item .pair{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;font-size:13px}
+.contra-item .pair div{background:var(--bg);border-radius:5px;padding:7px 10px}
+.contra-item .vs{font-family:var(--f-mono);font-size:11px;color:var(--bad)}
+.contra-item p{margin:10px 0 0;font-size:13.5px}
+.plain{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.plain li{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:13.5px}
+.qs li{display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
+.qs .qp{font-family:var(--f-mono);font-size:11px;color:var(--accent);padding-top:3px;white-space:nowrap}
+.qs .qw{grid-column:2;color:var(--muted);font-size:12.5px}
+.impl{counter-reset:i}
+.impl li{display:grid;grid-template-columns:auto 1fr;gap:12px}
+.impl li::before{counter-increment:i;content:counter(i,decimal-leading-zero);font-family:var(--f-mono);font-size:12px;color:var(--accent);padding-top:2px}
+
+.foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.toast{font-size:12.5px;color:var(--ok);align-self:center}
+.err{color:var(--bad)}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  .index{min-width:0}
+  .index{position:static}
+  .index ol{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .index a{grid-template-columns:auto;min-width:96px;white-space:nowrap}
+  .index .m{grid-column:1}
+  .verdict,.two{grid-template-columns:1fr}
+  .issue{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .head{grid-template-columns:1fr}
+  .overall{align-items:flex-start}
+  .btns{justify-content:flex-start}
+  .sec{padding:18px 16px}
+  .sec-head{grid-template-columns:auto 1fr}
+  .sec-head p,.sec-fill{grid-column:1/-1}
+  .contra-item .pair{grid-template-columns:1fr}
+  .contra-item .vs{text-align:center}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div>
+      <div class="eyebrow">As-Is Diagnosis · 現状分析</div>
+      <h1>AI プロダクト開発診断</h1>
+      <p class="lead">プロダクト開発の現状を 11 の観点で記入し、ロードマップを取り込むと、AI が症状と根本原因を切り分け、観点をまたぐ矛盾や見落としまで分析します。分からない欄は空欄のままで構いません。空欄も「情報不足」として診断に使います。</p>
+    </div>
+    <div class="overall">
+      <div class="gauge"><b id="totalPct">0</b><span>% 記入済み</span></div>
+      <div class="btns">
+        <button class="btn" id="loadSample" type="button">サンプルを読み込む</button>
+        <button class="btn" id="clearAll" type="button">入力をクリア</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="notice" id="sampleNotice">
+    <span class="tag">SAMPLE</span>
+    <span>架空の飲食店向けシフト管理 SaaS「シフトリンク」の記入例と診断結果を表示しています。「入力をクリア」で自分のプロダクトに置き換えてください。</span>
+  </div>
+
+  <div class="layout">
+    <nav class="index" aria-label="観点">
+      <h2>INDEX · 観点</h2>
+      <ol id="indexList"></ol>
+    </nav>
+    <div class="sheet">
+      <form id="sheet" class="sheet" autocomplete="off"></form>
+      <div class="run">
+        <button class="btn primary" id="runBtn" type="button">現状を診断する</button>
+        <button class="btn" id="stopBtn" type="button" hidden>止める</button>
+        <div class="status" id="runStatus">記入が多いほど所見は具体的になります。目安は 60% 以上です。</div>
+        <button class="btn" id="copyPrompt" type="button" hidden>診断用プロンプトをコピー</button>
+        <div class="api" id="apiBox" hidden>
+          <label class="api-f" for="apiKey"><span>Anthropic API キー</span><input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false"></label>
+          <label class="api-f" for="apiModel"><span>モデル</span><select id="apiModel"><option value="claude-opus-5-5">Claude Opus（深い分析）</option><option value="claude-sonnet-5-5">Claude Sonnet（速い・安い）</option></select></label>
+          <label class="api-chk"><input type="checkbox" id="apiRemember"> このブラウザにキーを保存</label>
+          <p class="api-note">キーはこのブラウザから Anthropic の API に直接送られ、サイトのサーバーには送られません。共有 PC では保存しないでください。キーは <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Anthropic Console</a> で発行できます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="result" id="result" aria-live="polite"></section>
+</div>
+
+<script>
+const P = [
+ {id:'basic',code:'00',name:'基本情報',lead:'診断の前提になる情報です。フェーズによって「健全」の基準が変わります。',self:false,fields:[
+  {id:'name',label:'プロダクト名',type:'text',ph:'例：シフトリンク'},
+  {id:'phase',label:'現在のフェーズ',type:'one',opts:['構想・検証前','MVP開発中','PMF探索','グロース','成熟・改善']},
+  {id:'model',label:'事業形態',type:'one',opts:['BtoB SaaS','BtoC アプリ','マーケットプレイス','社内システム','受託・その他']}]},
+ {id:'customer',code:'01',name:'顧客と課題',lead:'誰のどんな課題を解いているか。課題をどう把握しているか。',fields:[
+  {id:'target',label:'主なターゲット顧客',q:'誰が使い、誰が導入を決め、誰がお金を払っていますか？',ph:'例：首都圏の飲食チェーン（5〜30店舗）。使うのは店長、決めるのはオーナー。'},
+  {id:'problem',label:'解いている課題',q:'顧客はその課題を今どう解決していますか？どのくらい困っていますか？',ph:'例：紙とLINEでのシフト調整に店長が週5時間以上かけている。'},
+  {id:'evidence',label:'課題を把握している方法',type:'multi',opts:['定期的な顧客インタビュー','たまにヒアリング','営業・CS経由の声','利用データの分析','アンケート','ほぼ仮説のまま']},
+  {id:'evidenceNote',label:'最近の顧客接点で分かったこと',q:'直近で顧客と話した時期と、そこで分かったこと',ph:'例：最近は大型チェーンの商談で出た要望を聞くことが多い。'}]},
+ {id:'value',code:'02',name:'価値とプロダクト',lead:'提供している価値が、実際の使われ方に表れているか。',fields:[
+  {id:'core',label:'提供している価値と主な機能',ph:'例：シフト希望の回収、自動作成、欠勤時の代打募集、勤怠打刻。'},
+  {id:'usage',label:'よく使われる機能・使われない機能',q:'定着している機能と、試されても使われなくなる機能',ph:'例：自動作成は導入時に試されるが、3ヶ月後には3割しか使っていない。'},
+  {id:'diff',label:'選ばれている理由・選ばれない理由',q:'受注や失注のときに顧客が口にする理由',ph:'例：アプリなしでLINEから使える手軽さ。大手より安い。'}]},
+ {id:'market',code:'03',name:'市場と競合',lead:'顧客にとっての選択肢の中で、どこに立っているか。',fields:[
+  {id:'competitors',label:'主な競合・代替手段',q:'他社製品だけでなく、Excel・紙・何もしない、も含めて',ph:'例：大手シフト管理SaaS 2社、勤怠システム付属のシフト機能、Excel＋LINE'},
+  {id:'position',label:'競合との関係',type:'one',opts:['明確な優位がある','一部で優位','ほぼ同等','劣後している','把握できていない']},
+  {id:'marketNote',label:'市場の変化で気になっていること',ph:'例：勤怠・給与一体型の大手がシフト機能を無料で付け始めた。'}]},
+ {id:'business',code:'04',name:'ビジネスと指標',lead:'事業の健康状態を、どの数字でどう見ているか。',fields:[
+  {id:'kpi',label:'追っている指標と現在値',q:'分かる範囲で数字を入れてください。分析の精度が大きく上がります',ph:'例：MRR 420万円、有料店舗 1,150、月次解約率 3.4%、新規 月80店舗'},
+  {id:'northstar',label:'チームが最も重視している指標',type:'one',opts:['売上・MRR','ユーザー数・登録数','継続率・解約率','利用頻度・アクティブ率','特に決まっていない']},
+  {id:'trend',label:'最近の推移と、その理由の見立て',ph:'例：MRRは伸びているが、解約率が半年で2.1%→3.4%に上昇。'}]},
+ {id:'strategy',code:'05',name:'戦略と優先順位',lead:'目指す姿と、何を作るかの決め方がつながっているか。',fields:[
+  {id:'vision',label:'1年後に目指している状態',ph:'例：50店舗以上のチェーンを獲得し、MRR 1億円。'},
+  {id:'priority',label:'開発テーマの主な決め方',type:'one',opts:['戦略・仮説から決める','要望の多い順','大口顧客・営業の要望','経営者の判断','明確な基準がない']},
+  {id:'roadmap',label:'直近3ヶ月の開発テーマ',ph:'例：多店舗の権限管理、本部向けレポート、人件費予測。'},
+  {id:'roadmapData',label:'ロードマップの取り込み',type:'import',q:'今使っているロードマップや開発計画をそのまま取り込めます。テーマ・対象顧客・期間・見積工数・依頼元が入っていると、計画と体制の釣り合いまで分析します'}]},
+ {id:'org',code:'06',name:'組織とチーム',lead:'誰が何を決め、情報がどう流れているか。',fields:[
+  {id:'roles',label:'意思決定と役割分担',q:'何を作るか決めているのは誰？エンジニアは顧客の課題をどこまで知っている？',ph:'例：CTOと営業責任者が週次会議で決め、エンジニアには仕様書で降りてくる。'},
+  {id:'teamState',label:'当てはまるもの',type:'multi',opts:['目的が共有されている','職種間の連携がスムーズ','特定の人に依存している','採用が追いついていない','発言しにくい雰囲気がある','離職・入れ替わりが多い']},
+  {id:'orgNote',label:'組織で気になっていること',ph:'例：CTOがPdMも兼ねていて、仕様決めが詰まりがち。'}]},
+ {id:'team',code:'07',name:'開発体制と工数',lead:'どんな型で、誰が、どれだけの工数を何に使っているか。数字があるほど分析が具体的になります。',fields:[
+  {id:'devType',label:'開発タイプ',type:'one',opts:['ウォーターフォール','スクラム','カンバン','アジャイル（自己流）','ハイブリッド（WF＋アジャイル）','決まった型はない']},
+  {id:'devPractice',label:'運用の実態',type:'one',opts:['型どおり運用できている','一部が形骸化している','ほぼ形骸化している']},
+  {id:'sprint',label:'スプリント・イテレーションの長さ',type:'one',opts:['1週間','2週間','3〜4週間','区切りはない']},
+  {id:'devStart',label:'開発開始の時期',type:'month',calc:'since',half:true},
+  {id:'planEnd',label:'次の大きな節目（リリース・期限）',type:'month',calc:'until',half:true},
+  {id:'members',label:'メンバー構成',type:'members',q:'職種ごとに人数・稼働率・雇用形態を入れてください。兼務は稼働率で表します（例：PdM を兼ねる CTO は「PdM 1名 50%」）'},
+  {id:'effortPlan',label:'直近3ヶ月の計画工数',type:'number',unit:'人月',half:true,ph:'18'},
+  {id:'effortActual',label:'直近3ヶ月の実績工数',type:'number',unit:'人月',half:true,ph:'17.4'},
+  {id:'split',label:'工数の使い道（直近3ヶ月の割合）',type:'split',q:'感覚値で構いません。合計 100% になるように入れてください'},
+  {id:'teamNote',label:'体制・工数で気になっていること',ph:'例：業務委託は週3日稼働で、引き継ぎに時間がかかる。'}]},
+ {id:'process',code:'08',name:'開発プロセス',lead:'アイデアがリリースされるまでの流れと、その詰まり。',fields:[
+  {id:'release',label:'リリース頻度',type:'one',opts:['毎日〜週数回','週1回程度','月1〜2回','数ヶ月に1回']},
+  {id:'spec',label:'要件・仕様が決まるまでの流れ',ph:'例：営業が聞いた要望をCTOが仕様に起こし、見積もってから着手。'},
+  {id:'processNote',label:'流れが滞っている所',ph:'例：大口向けの割り込みで、スプリント計画がほぼ毎回崩れる。'}]},
+ {id:'tech',code:'09',name:'技術と品質',lead:'技術基盤が開発スピードと品質の足かせになっていないか。',fields:[
+  {id:'stack',label:'技術構成と開発基盤',ph:'例：Rails + React、AWS。モノリス。テストカバレッジは3割程度。'},
+  {id:'debt',label:'当てはまるもの',type:'multi',opts:['技術的負債で開発が遅い','障害・不具合が多い','テスト自動化が不十分','属人化したコードがある','インフラコストが重い','特に問題はない']},
+  {id:'techNote',label:'技術面で気になっていること',ph:'例：自動作成のロジックは初期メンバーが書き、今は誰も触りたがらない。'}]},
+ {id:'data',code:'10',name:'データと検証',lead:'作ったものから学べているか。',fields:[
+  {id:'measure',label:'計測・分析の状況',type:'multi',opts:['主要な操作を計測している','ダッシュボードを定期的に見ている','A/Bテストを実施している','リリース後に効果を検証している','計測はほぼしていない']},
+  {id:'learn',label:'直近の施策と、結果から学んだこと',ph:'例：代打募集の通知を改善したが、効果は測っていない。'}]},
+ {id:'pain',code:'11',name:'自覚している困りごと',lead:'チームが感じている痛み。診断はこの「訴え」と他の観点の記述を突き合わせます。',self:false,fields:[
+  {id:'pains',label:'いま一番困っていること（3つまで）',ph:'例：1. 解約率が上がっている 2. 開発が遅い 3. 大口向け機能を作っても受注が増えない'},
+  {id:'tried',label:'これまでに試した対策と結果',ph:'例：価格プランを見直し、年契約割引を導入。解約率は変わらなかった。'},
+  {id:'expect',label:'この診断で特に知りたいこと',ph:'例：解約率上昇の本当の原因と、開発の遅さとのつながり。'}]}
+];
+const SCORED = P.filter(p=>p.self!==false);
+const SPLIT=[{id:'new',label:'新規機能の開発',c:'var(--accent)'},{id:'improve',label:'既存機能の改善',c:'var(--ok)'},{id:'ops',label:'保守・運用',c:'var(--na)'},{id:'bug',label:'障害・不具合対応',c:'var(--bad)'},{id:'interrupt',label:'割り込み・個別要望',c:'var(--warn)'}];
+const ROLES=['PdM','PM・プロジェクトマネージャー','エンジニア（バックエンド）','エンジニア（フロントエンド）','エンジニア（モバイル）','エンジニア（インフラ・SRE）','エンジニア（業務委託）','QA・テスト','デザイナー','データアナリスト','CS・サポート'];
+const PNAME = Object.fromEntries(P.map(p=>[p.id,p.name]));
+
+const SAMPLE_VALUES = {
+ name:'シフトリンク',phase:'グロース',model:'BtoB SaaS',
+ devType:'スクラム',devPractice:'一部が形骸化している',sprint:'2週間',devStart:'2023-04',planEnd:'2027-01',
+ members:[{role:'PdM（CTO兼務）',count:'1',alloc:'50',emp:'社員'},{role:'エンジニア（バックエンド）',count:'2',alloc:'100',emp:'社員'},{role:'エンジニア（フロントエンド）',count:'1',alloc:'100',emp:'社員'},{role:'エンジニア（業務委託）',count:'3',alloc:'60',emp:'業務委託'},{role:'デザイナー',count:'1',alloc:'50',emp:'社員'}],
+ effortPlan:'18',effortActual:'17.4',
+ split:{new:'35',improve:'10',ops:'15',bug:'10',interrupt:'30'},
+ teamNote:'業務委託の3名は週3日稼働で、仕様の引き継ぎに時間がかかる。デザイナーはマーケ業務と兼務。',
+ target:'首都圏の飲食チェーン（5〜30店舗）と個人店。毎日使うのは店長とアルバイト、導入を決めるのはオーナーやエリアマネージャー。',
+ problem:'紙やLINEでのシフト調整に、店長が週5時間以上かけている。急な欠勤の穴埋めが一番のストレス。',
+ evidence:['営業・CS経由の声','たまにヒアリング'],
+ evidenceNote:'最近は大型チェーンの商談で出た要望を聞くことが多い。個人店の店長とは半年ほど話していない。',
+ core:'シフト希望の回収、自動作成、欠勤時の代打募集、勤怠打刻。給与計算ソフトへのCSV連携。',
+ usage:'希望回収と代打募集はよく使われる。自動作成は導入時に試されるが、3ヶ月後には3割程度の店舗しか使っていない。',
+ diff:'アルバイトがアプリなしでLINEから使える手軽さ。大手競合より安い。',
+ competitors:'大手シフト管理SaaS 2社、勤怠システム付属のシフト機能、Excel＋LINEグループ',
+ position:'一部で優位',
+ marketNote:'勤怠・給与一体型の大手が、シフト機能を無料で付け始めている。',
+ kpi:'MRR 420万円、有料店舗 1,150、店舗あたり月額 3,650円、月次解約率 3.4%、新規店舗 月80',
+ northstar:'売上・MRR',
+ trend:'MRRは伸びているが、解約率が半年で2.1%→3.4%に上昇。解約理由は「価格」と言われることが多い。',
+ vision:'50店舗以上のチェーンを獲得し、MRR 1億円を目指す。',
+ priority:'大口顧客・営業の要望',
+ roadmap:'多店舗の権限管理、本部向けレポート、人件費予測。',
+ roadmapData:'### roadmap_2026Q4.csv\nテーマ,対象顧客,開始,終了,見積(人月),依頼元,状態\n多店舗の権限管理,大型チェーン,2026-10,2026-11,6,営業（A社商談）,開発中\n本部向けレポート,大型チェーン,2026-11,2026-12,5,営業（B社商談）,未着手\n人件費予測,大型チェーン,2026-12,2027-01,7,経営,未着手\nLINE通知の安定化,全店舗,2026-10,2026-10,1,開発,開発中\n自動作成の改善,既存店舗,未定,未定,4,CS,保留',
+ roadmapFiles:[{name:'roadmap_2026Q4.csv',kind:'データ'}],
+ roles:'何を作るかはCTOと営業責任者が週次会議で決める。エンジニアには仕様書の形で降りてくる。',
+ teamState:['特定の人に依存している','採用が追いついていない'],
+ orgNote:'CTOがPdMも兼ねていて、技術判断と仕様決めが詰まりがち。',
+ release:'月1〜2回',
+ spec:'営業が商談で聞いた要望をCTOが仕様に起こし、見積もってから着手。デザインは実装後に整えることが多い。',
+ processNote:'大口向け機能の割り込みで、スプリント計画がほぼ毎回崩れる。',
+ stack:'Rails + React、AWS。モノリス。テストカバレッジは3割程度。',
+ debt:['技術的負債で開発が遅い','テスト自動化が不十分','属人化したコードがある'],
+ techNote:'シフト自動作成のロジックは初期メンバーが書き、今は誰も触りたがらない。',
+ measure:['ダッシュボードを定期的に見ている'],
+ learn:'代打募集の通知改善を出したが、効果は測っていない。CSの体感では問い合わせが減った。',
+ pains:'1. 解約率が上がっている　2. 開発が遅い　3. 大口向け機能を作っても受注が増えない',
+ tried:'価格プランを見直し、年契約割引を導入した。解約率は変わらなかった。',
+ expect:'解約率上昇の本当の原因と、開発スピードの問題がどうつながっているか。'
+};
+const SAMPLE_SELF = {customer:4,value:4,market:3,business:3,strategy:3,org:2,team:3,process:2,tech:2,data:3};
+const SAMPLE_RESULT = {
+ headline:'顧客の声が大口の商談経由に偏り、売上の土台である小〜中規模店の離反が見えていない状態です。',
+ summary:'解約率の上昇は「価格」ではなく、毎日使う店長の価値実感が落ちていることが主因の可能性が高いと見ます。価格改定後も解約率が変わっていないこと、中核機能の自動作成が3ヶ月で3割まで使われなくなることが根拠です。一方で開発リソースは、まだ実績の乏しい大型チェーン向け機能に割り込みで流れ、既存顧客の改善と技術負債の返済が後回しになっています。解約と開発の遅さは別の問題ではなく、同じ意思決定の偏りから生じています。',
+ maturity:2,
+ perspectives:[
+  {id:'customer',score:2,state:'危険',finding:'課題そのものの理解は具体的ですが、情報源が営業・CS経由に偏り、主要顧客層である個人店の店長とは半年接点がありません。',evidence:['個人店の店長とは半年ほど話していない','課題の把握は営業・CS経由とたまのヒアリング'],selfGap:'自己評価 4 に対し 2。導入初期の顧客理解が今も有効だと見なしている可能性があります。'},
+  {id:'value',score:3,state:'注意',finding:'希望回収と代打募集は定着していますが、工数削減の中心であるはずの自動作成が定着していません。',evidence:['自動作成は3ヶ月後に3割の店舗しか使っていない'],selfGap:'自己評価 4 に対し 3。中核機能の離脱が価値評価に織り込まれていません。'},
+  {id:'market',score:3,state:'注意',finding:'差別化が「安さ」と「手軽さ」に依存しており、大手のシフト機能無料化で両方が崩れる恐れがあります。',evidence:['大手がシフト機能を無料で付け始めている','選ばれる理由は手軽さと安さ'],selfGap:null},
+  {id:'business',score:2,state:'危険',finding:'MRR を最重視しているため、解約率の悪化が成長の数字に隠れています。現在の数値では新規 80 店舗に対し毎月およそ 39 店舗が解約しています（1,150 × 3.4% の概算）。',evidence:['解約率 2.1%→3.4%','重視指標は売上・MRR'],selfGap:'自己評価 3 に対し 2。'},
+  {id:'strategy',score:2,state:'危険',finding:'1年後のビジョン（50店舗以上のチェーン）と、現在の顧客の中心（5〜30店舗と個人店）がずれています。ロードマップに日程が入っている 19 人月のうち 18 人月が大型チェーン向けで、既存店舗向けの「自動作成の改善」だけが保留です。さらに、新規開発に回せる工数は 3 ヶ月で約 6 人月（17.4 人月 × 35%）しかなく、計画は実際の能力の 3 倍に膨らんでいます（概算）。',evidence:['ロードマップ：大型チェーン向け 18 人月、自動作成の改善は保留','開発テーマは大口顧客・営業の要望で決まる'],selfGap:'自己評価 3 に対し 2。'},
+  {id:'org',score:2,state:'注意',finding:'CTO が PdM を兼務し、技術判断と仕様決めが一人に集中しています。エンジニアは顧客の課題を仕様書経由でしか知りません。',evidence:['CTOがPdM兼務で詰まりがち','エンジニアには仕様書で降りてくる'],selfGap:null},
+  {id:'team',score:2,state:'危険',finding:'実働は約 5.8 人月/月で、うち 3 割が週3日稼働の業務委託です。工数の 30% が割り込み、10% が障害対応に使われ、既存機能の改善に回っているのは 10% だけです。解約が増えている既存顧客への投資がほとんどできていません。',evidence:['工数内訳：割り込み 30%・障害対応 10%・改善 10%','業務委託 3 名は稼働 60%、引き継ぎに時間がかかる'],selfGap:'自己評価 3 に対し 2。人数は足りていても、工数の使い道が価値につながっていません。'},
+  {id:'process',score:2,state:'危険',finding:'2週間のスクラムを採用していますが、大口向けの割り込みでスプリント計画が毎回崩れ、型が機能していません。デザインが実装後になる流れも手戻りを生みやすい構造です。',evidence:['スプリント計画がほぼ毎回崩れる','デザインは実装後に整える'],selfGap:null},
+  {id:'tech',score:2,state:'注意',finding:'定着していない自動作成のロジックが属人化しており、改善したくても手を入れにくい状態です。',evidence:['自動作成ロジックは誰も触りたがらない','テストカバレッジ3割程度'],selfGap:null},
+  {id:'data',score:2,state:'危険',finding:'施策の効果を検証しておらず、解約理由も聞き取りの印象にとどまっています。ダッシュボードはあっても意思決定に使われていません。',evidence:['通知改善の効果は測っていない','解約理由は「価格と言われることが多い」'],selfGap:'自己評価 3 に対し 2。'}
+ ],
+ coreIssue:{title:'何を作るかを決める入力が、大口の商談に一本化されている',explanation:'顧客の声を集める経路が営業経由に偏り、その声がそのまま開発テーマになる構造です。その結果、既存顧客の離反は見えにくくなり、開発は実績のない市場向けの割り込みに追われ、技術負債の返済も後回しになっています。解約率、開発の遅さ、受注につながらない機能開発の3つは、この1点から説明できます。'},
+ issues:[
+  {title:'解約率の上昇',severity:'高',symptom:'半年で月次解約率が 2.1% から 3.4% に上昇。価格改定後も変化なし。',rootCauses:['中核機能の自動作成が定着せず、店長の工数削減という約束が果たされていない可能性','既存顧客向けの改善が、大口向け開発に押し出されている','解約理由を「価格」と受け取り、利用データと照らし合わせていない'],perspectives:['business','value','data'],why:'価格を下げても解約が止まらなかったことは、価格以外の要因を強く示唆します。'},
+  {title:'開発スピードの低下',severity:'高',symptom:'リリースは月1〜2回。スプリント計画がほぼ毎回崩れ、工数の 3 割が割り込みに消えている。',rootCauses:['営業要望が優先順位の基準になっており、割り込みを断る根拠がない','CTO の PdM 兼務（稼働 50%）で、仕様決めと技術判断が一人に詰まっている','週3日稼働の業務委託への引き継ぎコストと、属人化したロジック・テスト不足が重なっている'],perspectives:['team','process','org','tech'],why:'チームは「開発が遅い」と感じていますが、遅さの多くは実装速度ではなく、計画の崩壊と判断待ちから来ていると考えられます。'},
+  {title:'大口向け機能が受注につながらない',severity:'中',symptom:'多店舗・本部向け機能を作っても受注が増えない。',rootCauses:['商談で出た個別要望をそのまま仕様にしており、市場全体の課題として検証していない','大型チェーンが重視するもの（連携・管理機能）と、自社の強み（安さ・手軽さ）が合っていない'],perspectives:['strategy','market','customer'],why:'50店舗以上のチェーンでの受注実績や勝ちパターンが入力に見当たりません。'}
+ ],
+ contradictions:[
+  {a:'1年後のビジョン：50店舗以上のチェーンを獲得',b:'選ばれている理由：安さとLINEで使える手軽さ',insight:'大型チェーンは価格や手軽さより、管理機能や既存システムとの連携を重視しやすい市場です。今の強みが効きにくい方向に進もうとしています。'},
+  {a:'ロードマップ：3ヶ月で 19 人月の新規開発を予定',b:'体制：新規開発に使えるのは約 6 人月（割り込み・保守を除く）',insight:'計画が能力を大きく超えているため、遅れが常態化し、さらに割り込みを受け入れやすくなる悪循環が起きていると考えられます。'},
+  {a:'自己評価：顧客と課題は 4',b:'個人店の店長とは半年話していない',insight:'過去の理解を前提に判断している可能性があります。解約が増えている層の今の声を誰も持っていません。'},
+  {a:'解約理由は「価格」と言われる',b:'価格を見直しても解約率は不変',insight:'価格は顧客が言いやすい表向きの理由で、本当の理由は別にある可能性が高いです。'}
+ ],
+ blindSpots:['毎日アプリに触れるアルバイトの体験や継続意向が、入力に一度も出てきません。','解約した店舗の規模・導入時期・利用機能に偏りがあるかが不明です。','解約した店舗が、無料化した大手に移っているのかどうかが確認されていません。'],
+ questions:[
+  {perspective:'business',question:'解約した店舗は、規模・導入時期・使っていた機能でどう偏っていますか？',why:'解約の主因が価格か価値実感かを切り分けられます。'},
+  {perspective:'value',question:'自動作成をやめた店舗は、代わりにどうやってシフトを作っていますか？',why:'中核機能のどこでつまずいているかが分かります。'},
+  {perspective:'customer',question:'解約した店舗の店長に、直接話を聞いたことはありますか？',why:'営業経由ではない一次情報の有無を確認します。'},
+  {perspective:'strategy',question:'50店舗以上のチェーンで受注した実績は何件ありますか？',why:'ビジョンの市場で勝てる根拠があるかを確認します。'},
+  {perspective:'team',question:'割り込み 30% のうち、受注や継続につながった案件はどれくらいありますか？',why:'割り込みに使った工数の回収状況が分かります。'}
+ ],
+ implications:['主要顧客を既存の小〜中規模店に置くのか、大型チェーンに置くのかを先に決め直す必要があります。この選択がロードマップ、営業、開発プロセスのすべてを左右します。','機能開発より先に、解約店舗の分析と店長への直接インタビューを置くべきかが論点になります。','PdM の役割を CTO から切り出すかどうかは、開発スピードと顧客学習の両方に効く論点です。']
+};
+
+const KEY='aipd-asis-v1';
+let S = {values:{},self:{},result:null,isSample:false,resultSample:false};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function loadStore(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.values)return o}}catch(e){}return null}
+function useSample(){S={values:JSON.parse(JSON.stringify(SAMPLE_VALUES)),self:{...SAMPLE_SELF},result:SAMPLE_RESULT,isSample:true,resultSample:true}}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const filled=v=>Array.isArray(v)?v.some(x=>typeof x==='string'?x:x&&String(x.role||'').trim()):(v&&typeof v==='object')?Object.values(v).some(n=>Number(n)>0):!!(v&&String(v).trim());
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+function monthDiff(v){if(!v||!/^\d{4}-\d{2}$/.test(v))return null;const [y,m]=v.split('-').map(Number),d=new Date();return (d.getFullYear()-y)*12+(d.getMonth()+1-m)}
+const ym=n=>`${Math.floor(n/12)?Math.floor(n/12)+'年':''}${n%12}ヶ月`;
+function calcText(f,v){const d=monthDiff(v);if(d==null)return'';if(f.calc==='since')return d<0?'これから開始':'開始から '+ym(d);return d>0?'期限を '+ym(d)+' 過ぎています':d===0?'今月':'残り '+ym(-d)}
+function memberStats(){
+  const rows=(S.values.members||[]).filter(r=>String(r.role||'').trim()&&num(r.count)>0);
+  let total=0,fte=0,ext=0;
+  for(const r of rows){const c=num(r.count),a=r.alloc===''||r.alloc==null?100:num(r.alloc),f=c*a/100;total+=c;fte+=f;if(r.emp!=='社員')ext+=f}
+  return {rows,total,fte,ext:fte?Math.round(ext/fte*100):0};
+}
+function effortText(){
+  const st=memberStats(),p=num(S.values.effortPlan),a=num(S.values.effortActual),out=[];
+  if(p&&a)out.push(`予実 ${Math.round(a/p*100)}%`);
+  if(st.fte)out.push(`体制から見た3ヶ月の上限 ≈ ${(st.fte*3).toFixed(1)} 人月`);
+  return out.join(' · ');
+}
+function splitSum(){const s=S.values.split||{};return SPLIT.reduce((t,k)=>t+num(s[k.id]),0)}
+
+function buildForm(){
+  const form=$('#sheet');form.innerHTML='';
+  $('#indexList').innerHTML=P.map(p=>`<li><a href="#sec-${p.id}" data-p="${p.id}"><span class="c">${p.code}</span><span class="n">${p.name}</span><span class="m"><i style="width:0"></i></span></a></li>`).join('');
+  for(const p of P){
+    const sec=document.createElement('section');sec.className='sec';sec.id='sec-'+p.id;
+    let h=`<div class="sec-head"><span class="sec-code">観点 ${p.code}</span><h3>${p.name}</h3><span class="sec-fill" data-fill="${p.id}"></span><p>${p.lead}</p></div><div class="fields">`;
+    for(const f of p.fields){
+      const fid='f-'+f.id;
+      const noFor=['one','multi','members','split','import'].includes(f.type);
+      h+=`<div class="field${f.half?' half':''}"><label class="l" ${noFor?'':`for="${fid}"`}>${f.label}</label>${f.q?`<span class="q">${f.q}</span>`:'<span class="q"></span>'}`;
+      if(f.type==='one'||f.type==='multi'){
+        h+=`<div class="chips" role="group" aria-label="${f.label}">${f.opts.map(o=>`<button type="button" class="chip" data-f="${f.id}" data-kind="${f.type}" data-v="${esc(o)}" aria-pressed="false">${o}</button>`).join('')}</div>`;
+      }else if(f.type==='month'){
+        h+=`<div class="inline"><input type="month" id="${fid}" data-f="${f.id}"><span class="calc" data-calc="${f.id}"></span></div>`;
+      }else if(f.type==='number'){
+        h+=`<div class="inline"><input type="number" min="0" step="any" inputmode="decimal" id="${fid}" data-f="${f.id}" placeholder="${esc(f.ph||'')}"><span class="unit">${f.unit}</span>${f.id==='effortActual'?'<span class="calc" id="effortCalc"></span>':''}</div>`;
+      }else if(f.type==='members'){
+        h+=`<div class="mtable"><div class="mgrid" id="memberGrid"></div></div><div class="mfoot"><button type="button" class="btn" id="addMember">＋ 行を追加</button><span class="calc" id="memberSum"></span></div><datalist id="roleList">${ROLES.map(r=>`<option value="${r}"></option>`).join('')}</datalist>`;
+      }else if(f.type==='split'){
+        h+=`<div class="split">${SPLIT.map(k=>`<div class="split-row"><label for="sp-${k.id}"><i style="background:${k.c}"></i>${k.label}</label><input type="number" min="0" max="100" step="5" inputmode="numeric" id="sp-${k.id}" data-split="${k.id}"><span class="unit">%</span></div>`).join('')}<div class="split-bar" id="splitBar"></div><span class="calc" id="splitSum"></span></div>`;
+      }else if(f.type==='import'){
+        h+=`<div class="import"><label class="drop" id="rmDrop" for="rmFile"><b>ファイルをドロップ、またはクリックして選択</b><small>CSV・Excel・テキスト・Markdown・JSON・画像（スクリーンショット可）。画像はここに貼り付けもできます</small></label>
+        <input type="file" id="rmFile" class="vh" multiple accept=".csv,.tsv,.txt,.md,.json,.xlsx,.xls,image/png,image/jpeg,image/webp,image/gif">
+        <div class="files" id="rmFiles"></div>
+        <label class="l sub" for="rmText">取り込んだデータ（そのまま編集・貼り付けもできます）</label>
+        <textarea id="rmText" data-f="roadmapData" rows="6" placeholder="Excel・スプレッドシート・Notion の表をコピーして、ここに貼り付けても構いません"></textarea>
+        <span class="calc" id="rmMsg"></span></div>`;
+      }else if(f.type==='text'){
+        h+=`<input type="text" id="${fid}" data-f="${f.id}" placeholder="${esc(f.ph||'')}">`;
+      }else{
+        h+=`<textarea id="${fid}" data-f="${f.id}" rows="3" placeholder="${esc(f.ph||'')}"></textarea>`;
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+    if(p.self!==false){
+      h+=`<div class="self"><span class="l">自己評価<small>この観点は、今どのくらいできていると感じますか？</small></span><div class="scale" role="group" aria-label="${p.name}の自己評価">${[1,2,3,4,5].map(n=>`<button type="button" data-self="${p.id}" data-n="${n}" aria-pressed="false">${n}</button>`).join('')}<button type="button" data-self="${p.id}" data-n="0" aria-pressed="false">わからない</button></div><span class="scale-legend">1 できていない　5 十分できている</span></div>`;
+    }
+    sec.innerHTML=h;form.appendChild(sec);
+  }
+}
+
+function paintForm(){
+  document.querySelectorAll('#sheet [data-f]').forEach(el=>{
+    const v=S.values[el.dataset.f];
+    if(el.classList.contains('chip')){
+      const on=el.dataset.kind==='multi'?(Array.isArray(v)&&v.includes(el.dataset.v)):v===el.dataset.v;
+      el.setAttribute('aria-pressed',on);
+    }else el.value=v||'';
+  });
+  document.querySelectorAll('[data-self]').forEach(b=>{
+    const v=S.self[b.dataset.self];b.setAttribute('aria-pressed',String(v!=null&&Number(b.dataset.n)===v));
+  });
+  renderMembers();
+  document.querySelectorAll('[data-split]').forEach(i=>{i.value=(S.values.split||{})[i.dataset.split]||''});
+  renderFiles();calcs();
+  meters();
+  $('#sampleNotice').hidden=!S.isSample;
+}
+
+function secFill(p){
+  let n=p.fields.length,d=p.fields.filter(f=>filled(S.values[f.id])||(f.type==='import'&&IMGS.length>0)).length;
+  if(p.self!==false){n++;if(S.self[p.id]!=null)d++}
+  return {d,n};
+}
+function meters(){
+  let D=0,N=0;
+  for(const p of P){
+    const {d,n}=secFill(p);D+=d;N+=n;
+    const a=document.querySelector(`.index a[data-p="${p.id}"] i`);if(a)a.style.width=(d/n*100)+'%';
+    const t=document.querySelector(`[data-fill="${p.id}"]`);if(t)t.textContent=`${d} / ${n}`;
+  }
+  $('#totalPct').textContent=Math.round(D/N*100);
+}
+
+// ---------- 体制・工数 ----------
+const blankRow=()=>({role:'',count:'',alloc:'100',emp:'社員'});
+function renderMembers(){
+  const g=$('#memberGrid');if(!g)return;
+  if(!Array.isArray(S.values.members)||!S.values.members.length)S.values.members=[blankRow()];
+  let h='<span class="h">職種・役割</span><span class="h">人数</span><span class="h">稼働率</span><span class="h">雇用形態</span><span></span>';
+  S.values.members.forEach((r,i)=>{
+    h+=`<input type="text" id="m-${i}-role" data-m="${i}" data-k="role" list="roleList" placeholder="例：エンジニア（バックエンド）" value="${esc(r.role)}" aria-label="職種">
+    <input type="number" id="m-${i}-count" data-m="${i}" data-k="count" min="0" step="0.5" inputmode="decimal" placeholder="1" value="${esc(r.count)}" aria-label="人数">
+    <span class="pc"><input type="number" id="m-${i}-alloc" data-m="${i}" data-k="alloc" min="0" max="100" step="10" inputmode="numeric" value="${esc(r.alloc)}" aria-label="稼働率"><span class="unit">%</span></span>
+    <select id="m-${i}-emp" data-m="${i}" data-k="emp" aria-label="雇用形態">${['社員','業務委託','外注・受託'].map(o=>`<option${r.emp===o?' selected':''}>${o}</option>`).join('')}</select>
+    <button type="button" class="del" data-del="${i}" aria-label="この行を削除">×</button>`;
+  });
+  g.innerHTML=h;
+}
+function calcs(){
+  document.querySelectorAll('[data-calc]').forEach(el=>{const f=P.flatMap(p=>p.fields).find(x=>x.id===el.dataset.calc);el.textContent=calcText(f,S.values[f.id])});
+  const st=memberStats();
+  const ms=$('#memberSum');if(ms)ms.textContent=st.total?`合計 ${+st.total.toFixed(1)} 名 · 実働 ${st.fte.toFixed(1)} 人月/月 · 社外比率 ${st.ext}%`:'';
+  const ec=$('#effortCalc');if(ec)ec.textContent=effortText();
+  const sum=splitSum(),bar=$('#splitBar'),ss=$('#splitSum');
+  if(bar)bar.innerHTML=SPLIT.map(k=>{const v=num((S.values.split||{})[k.id]);return v?`<span title="${k.label} ${v}%" style="width:${sum?v/Math.max(sum,100)*100:0}%;background:${k.c}"></span>`:''}).join('');
+  if(ss){ss.textContent=sum?`合計 ${sum}%${sum!==100?'（100% になるように調整してください）':''}`:'';ss.classList.toggle('warn',!!sum&&sum!==100)}
+}
+
+// ---------- ロードマップ取り込み ----------
+let IMGS=[];let imgLimit=null;
+const MAX_DATA=24000;
+function renderFiles(){
+  const box=$('#rmFiles');if(!box)return;
+  const data=(S.values.roadmapFiles||[]).map((f,i)=>`<span class="file"><span class="k">${esc(f.kind)}</span><span class="fn">${esc(f.name)}</span><button type="button" data-rmdata="${i}" aria-label="${esc(f.name)}を一覧から外す">×</button></span>`);
+  const imgs=IMGS.map((f,i)=>`<span class="file"><img src="${f.url}" alt=""><span class="k">画像</span><span class="fn">${esc(f.name)}</span><button type="button" data-rmimg="${i}" aria-label="${esc(f.name)}を外す">×</button></span>`);
+  box.innerHTML=data.concat(imgs).join('');
+}
+function rmMsg(t,warn){const m=$('#rmMsg');if(m){m.textContent=t;m.classList.toggle('warn',!!warn)}}
+function loadXLSX(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,ng)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=()=>ok(window.XLSX);s.onerror=ng;document.head.appendChild(s)})}
+async function readFile(file){
+  const name=file.name||'貼り付けた画像',ext=(name.split('.').pop()||'').toLowerCase();
+  if(file.type.startsWith('image/')){
+    if(imgLimit===false)throw new Error('この表示では画像を AI に送れません。表データかテキストで取り込んでください');
+    const max=imgLimit?imgLimit.maxCount:5;
+    if(IMGS.length>=max)throw new Error(`画像は ${max} 枚まで取り込めます`);
+    IMGS.push({name,blob:file,url:URL.createObjectURL(file)});return '画像';
+  }
+  let text;
+  if(ext==='xlsx'||ext==='xls'){
+    const X=await loadXLSX().catch(()=>{throw new Error('Excel の読み込み機能を準備できませんでした。CSV で保存して取り込んでください')});
+    const wb=X.read(await file.arrayBuffer(),{type:'array',cellDates:true});
+    text=wb.SheetNames.map(n=>`[シート: ${n}]\n`+X.utils.sheet_to_csv(wb.Sheets[n],{blankrows:false,dateNF:'yyyy-mm-dd'})).join('\n\n');
+  }else if(['csv','tsv','txt','md','json'].includes(ext)||file.type.startsWith('text/')){
+    text=await file.text();
+  }else throw new Error(`${name} は取り込めない形式です`);
+  text=text.trim();if(!text)throw new Error(`${name} は中身が空でした`);
+  const cur=S.values.roadmapData?S.values.roadmapData.trim()+'\n\n':'';
+  S.values.roadmapData=(cur+`### ${name}\n${text}`).slice(0,MAX_DATA);
+  S.values.roadmapFiles=[...(S.values.roadmapFiles||[]),{name,kind:ext==='xlsx'||ext==='xls'?'Excel':'データ'}];
+  return 'データ';
+}
+async function addFiles(list){
+  let n=0,err='';
+  for(const f of list){try{await readFile(f);n++}catch(e){err=e.message||String(e)}}
+  const t=$('#rmText');if(t)t.value=S.values.roadmapData||'';
+  renderFiles();touched();
+  if(err)rmMsg(err,true);else if(n)rmMsg(`${n} 件を取り込みました${(S.values.roadmapData||'').length>=MAX_DATA?'（長いため先頭の 24,000 字までを使います）':''}`);
+}
+function wireImport(){
+  const inp=$('#rmFile'),drop=$('#rmDrop');if(!inp)return;
+  inp.addEventListener('change',()=>{addFiles([...inp.files]);inp.value=''});
+  ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
+  ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
+  drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files.length)addFiles([...e.dataTransfer.files])});
+  document.addEventListener('paste',e=>{
+    const files=[...(e.clipboardData?.files||[])].filter(f=>f.type.startsWith('image/'));
+    const inImport=e.target.closest&&e.target.closest('.import');
+    if(files.length&&(inImport||document.activeElement===document.body)){e.preventDefault();addFiles(files)}
+  });
+}
+
+function touched(){if(S.isSample){S.isSample=false;$('#sampleNotice').hidden=true}meters();save()}
+document.addEventListener('input',e=>{
+  const t=e.target,d=t.dataset||{};
+  if(d.m!=null&&S.values.members&&S.values.members[d.m]){S.values.members[d.m][d.k]=t.value;calcs();touched();return}
+  if(d.split){S.values.split={...(S.values.split||{}),[d.split]:t.value};calcs();touched();return}
+  if(!d.f)return;S.values[d.f]=t.value;calcs();touched();
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('#addMember')){S.values.members=[...(S.values.members||[]),blankRow()];renderMembers();const i=S.values.members.length-1;document.getElementById(`m-${i}-role`)?.focus();touched();return}
+  const del=e.target.closest('[data-del]');
+  if(del){S.values.members.splice(Number(del.dataset.del),1);renderMembers();calcs();touched();return}
+  const rd=e.target.closest('[data-rmdata]');
+  if(rd){const f=S.values.roadmapFiles.splice(Number(rd.dataset.rmdata),1)[0];
+    if(f&&S.values.roadmapData){const re=new RegExp('### '+f.name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\n[\\s\\S]*?(?=\\n\\n### |$)');S.values.roadmapData=S.values.roadmapData.replace(re,'').trim();$('#rmText').value=S.values.roadmapData}
+    renderFiles();touched();rmMsg('');return}
+  const ri=e.target.closest('[data-rmimg]');
+  if(ri){const f=IMGS.splice(Number(ri.dataset.rmimg),1)[0];if(f)URL.revokeObjectURL(f.url);renderFiles();rmMsg('');return}
+  const c=e.target.closest('.chip');
+  if(c){const f=c.dataset.f,v=c.dataset.v;
+    if(c.dataset.kind==='multi'){const a=Array.isArray(S.values[f])?S.values[f]:[];S.values[f]=a.includes(v)?a.filter(x=>x!==v):[...a,v]}
+    else S.values[f]=S.values[f]===v?'':v;
+    paintForm();touched();return}
+  const s=e.target.closest('[data-self]');
+  if(s){const id=s.dataset.self,n=Number(s.dataset.n);S.self[id]=S.self[id]===n?null:n;paintForm();touched()}
+});
+$('#loadSample').onclick=()=>{useSample();paintForm();renderResult();save()};
+let clearArmed=false;
+$('#clearAll').onclick=e=>{
+  if(!clearArmed){clearArmed=true;e.target.textContent='もう一度押すとクリア';setTimeout(()=>{clearArmed=false;e.target.textContent='入力をクリア'},3000);return}
+  clearArmed=false;e.target.textContent='入力をクリア';
+  S={values:{},self:{},result:null,isSample:false,resultSample:false};IMGS.forEach(f=>URL.revokeObjectURL(f.url));IMGS=[];rmMsg('');paintForm();renderResult();save();scrollTo({top:0,behavior:'smooth'});
+};
+
+// active index
+const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){document.querySelectorAll('.index a').forEach(a=>a.classList.toggle('active',a.dataset.p===en.target.id.slice(4)))}})},{rootMargin:'-30% 0px -60% 0px'});
+
+// ---------- prompt ----------
+function dump(){
+  const out=[];
+  for(const p of P){
+    out.push(`## 観点${p.code} ${p.name}（id: ${p.id}）`);
+    for(const f of p.fields)out.push(fmtField(f));
+    if(p.self!==false){const s=S.self[p.id];out.push(`- 自己評価(1-5): ${s==null?'（未記入）':s===0?'わからない':s}`)}
+    out.push('');
+  }
+  return out.join('\n');
+}
+function fmtField(f){
+  const v=S.values[f.id],NA=`- ${f.label}: （未記入）`;
+  if(f.type==='members'){
+    const st=memberStats();if(!st.rows.length)return NA;
+    return [`- ${f.label}:`,...st.rows.map(r=>`  - ${r.role}: ${r.count}名 / 稼働率 ${r.alloc||100}% / ${r.emp}`),`  - （集計）合計 ${+st.total.toFixed(1)}名、実働 ${st.fte.toFixed(1)}人月/月、社外比率 ${st.ext}%`].join('\n');
+  }
+  if(f.type==='split'){
+    if(!filled(v))return NA;
+    return `- ${f.label}: `+SPLIT.map(k=>`${k.label} ${num(v[k.id])}%`).join(' / ')+`（合計 ${splitSum()}%）`;
+  }
+  if(f.type==='number'){
+    if(!filled(v))return NA;
+    return `- ${f.label}: ${v} ${f.unit}`+(f.id==='effortActual'&&effortText()?`（${effortText()}）`:'');
+  }
+  if(f.type==='month'){if(!filled(v))return NA;const c=calcText(f,v);return `- ${f.label}: ${v}${c?`（${c}、本日 ${new Date().toISOString().slice(0,10)} 時点）`:''}`}
+  if(f.type==='import'){
+    const parts=[];
+    if(filled(v))parts.push(`- ${f.label}（取り込んだデータ）:\n\`\`\`\n${String(v).slice(0,MAX_DATA)}\n\`\`\``);
+    if(IMGS.length)parts.push(`- ${f.label}（画像）: ${IMGS.length}枚を添付（${IMGS.map(i=>i.name).join('、')}）。画像はロードマップ・開発計画の資料として読み取ってください。`);
+    return parts.length?parts.join('\n'):NA;
+  }
+  return filled(v)?`- ${f.label}: ${Array.isArray(v)?v.join(' / '):v}`:NA;
+}
+function buildPrompt(){
+return `あなたはプロダクトマネジメントと開発組織の診断を専門とするシニアコンサルタントです。
+以下は、あるプロダクトチームが記入した「現状（As-Is）」の情報です。解決策や To-Be の提案ではなく、現状を深く分析することが目的です。
+
+分析のルール:
+- 記入にない事実を作らない。推測するときは「可能性」「と考えられる」と明示する。
+- 観察できる「症状」と、その奥にある「根本原因」を区別する。根本原因は複数の観点をまたいで探す。
+- 観点同士の矛盾（例: ビジョンと強み、自己評価と記述内容、訴えと事実）を探す。
+- 自己評価と、記述から読み取れる実態とのずれを指摘する。
+- フェーズと事業形態に照らして健全かどうかを判断する。
+- 数値があれば簡単な計算で含意を示す（概算と明記）。
+- 開発体制と工数（開発タイプと運用実態、期間、メンバー構成、実働人月、社外比率、予実、工数の使い道）から、開発タイプがフェーズに合っているか、工数が価値を生む仕事に使われているかを評価する。
+- ロードマップが取り込まれていれば、テーマごとの対象顧客・見積・依頼元を読み、①ビジョンや主要顧客との整合、②見積合計と体制の実働能力（新規開発に回せる割合を考慮）の釣り合い、③既存顧客向けと新規向けの配分、④期限と残り期間を確認する。画像のロードマップも同様に読み取る。読み取れない部分は推測しない。
+- 記入がほとんどない観点は score を null、state を「情報不足」にする。
+- 「自覚している困りごと」と「この診断で知りたいこと」に必ず答える形で所見をまとめる。
+- 日本語。専門用語は必要最小限。です・ます調。
+
+返答は次の形の JSON オブジェクトだけにしてください:
+{
+ "headline": "現状を一文で言い表す診断（60字以内）",
+ "summary": "総合所見（3〜5文）",
+ "maturity": 1〜5の整数（プロダクト開発全体の成熟度）,
+ "perspectives": [ { "id": "${SCORED.map(p=>p.id).join('|')}", "score": 1〜5 または null, "state": "良好|注意|危険|情報不足", "finding": "所見（1〜2文）", "evidence": ["根拠にした記入内容の要約（1〜2個）"], "selfGap": "自己評価と差がある場合の解釈。差がなければ null" } ]  ← ${SCORED.length}観点すべて,
+ "coreIssue": { "title": "複数の課題の根っこにある核心課題（40字以内）", "explanation": "それが他の課題をどう生んでいるか（3〜4文）" },
+ "issues": [ { "title": "課題名", "severity": "高|中|低", "symptom": "観察される症状", "rootCauses": ["根本原因（2〜3個）"], "perspectives": ["関係する観点id"], "why": "なぜそう言えるか（1〜2文）" } ]  ← 3〜5個,
+ "contradictions": [ { "a": "記述A", "b": "記述B", "insight": "この矛盾が意味すること" } ]  ← 0〜3個,
+ "blindSpots": ["記入から抜け落ちている、見落としの可能性がある点"]  ← 2〜4個,
+ "questions": [ { "perspective": "観点id", "question": "診断精度を上げるために次に確認すべき問い", "why": "それで何が分かるか" } ]  ← 4〜6個,
+ "implications": ["To-Be を検討する前に決めるべき論点"]  ← 2〜4個
+}
+
+# 記入内容
+${dump()}`;
+}
+
+// ---------- run ----------
+let sampleFn=null,ctl=null,engine=null;
+const ERR={image_rejected:'取り込んだ画像の一部を読み取れませんでした。枚数を減らすか、別の画像に差し替えてください。',images_unavailable:'この表示では画像を送れません。画像を外すか、表データで取り込んでください。',not_granted:'AI の利用が許可されませんでした。下のボタンからプロンプトをコピーして Claude に貼り付けても診断できます。',sampling_disabled:'このアカウントでは AI 分析を使えません。プロンプトをコピーして Claude に貼り付けてください。',rate_limited:'利用が集中しています。少し時間をおいてから、もう一度押してください。',session_expired:'ログインし直してから、もう一度押してください。',refused:'この内容では分析できませんでした。記入内容を見直してください。',invalid_json:'結果の形式を読み取れませんでした。もう一度押してください。',empty_completion:'結果が空でした。もう一度押してください。',prompt_too_large:'記入量が多すぎます。長い欄を短くしてください。',no_key:'API キーを入力してください。',auth:'API キーが正しくないか、無効になっています。キーを確認してください。',credit:'API の利用枠が足りません。Anthropic Console で残高を確認してください。',overloaded:'API が混み合っています。少し時間をおいて、もう一度押してください。',model:'選んだモデルを使えませんでした。別のモデルを選んでください。'};
+
+// ---------- API キー方式（claude.ai の外で開いたとき） ----------
+const KEY_STORE='aipd-api-key';
+function apiKey(){return ($('#apiKey')?.value||'').trim()}
+function wireApi(){
+  $('#apiBox').hidden=false;
+  try{const k=localStorage.getItem(KEY_STORE);if(k){$('#apiKey').value=k;$('#apiRemember').checked=true}}catch(e){}
+  const persist=()=>{try{if($('#apiRemember').checked&&apiKey())localStorage.setItem(KEY_STORE,apiKey());else localStorage.removeItem(KEY_STORE)}catch(e){}};
+  $('#apiKey').addEventListener('change',persist);$('#apiRemember').addEventListener('change',persist);
+  try{const m=localStorage.getItem('aipd-model');if(m)$('#apiModel').value=m}catch(e){}
+  $('#apiModel').addEventListener('change',()=>{try{localStorage.setItem('aipd-model',$('#apiModel').value)}catch(e){}});
+}
+async function toImageBlock(blob){
+  const bmp=await createImageBitmap(blob);
+  const scale=Math.min(1,1568/Math.max(bmp.width,bmp.height));
+  const c=document.createElement('canvas');c.width=Math.round(bmp.width*scale);c.height=Math.round(bmp.height*scale);
+  const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(bmp,0,0,c.width,c.height);
+  const data=c.toDataURL('image/jpeg',.88).split(',')[1];
+  return {type:'image',source:{type:'base64',media_type:'image/jpeg',data}};
+}
+function parseJSON(text){
+  const t=text.trim();
+  try{return JSON.parse(t)}catch(e){}
+  const fence=t.match(/```(?:json)?\s*([\s\S]*?)```/);if(fence){try{return JSON.parse(fence[1])}catch(e){}}
+  const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a>=0&&b>a){try{return JSON.parse(t.slice(a,b+1))}catch(e){}}
+  throw {code:'invalid_json'};
+}
+async function apiJSON(prompt,{images=[],signal,onText}){
+  const key=apiKey();if(!key)throw {code:'no_key'};
+  const content=[];
+  for(const b of images){try{content.push(await toImageBlock(b))}catch(e){throw {code:'image_rejected'}}}
+  content.push({type:'text',text:prompt+'\n\nJSON オブジェクト以外は何も出力しないでください。'});
+  let res;
+  try{
+    res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal,headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:$('#apiModel').value,max_tokens:16000,stream:true,messages:[{role:'user',content}]})});
+  }catch(e){if(e&&e.name==='AbortError')throw {code:'cancelled'};throw {code:'upstream_error'}}
+  if(!res.ok){
+    let body={};try{body=await res.json()}catch(e){}
+    const msg=(body.error&&body.error.message)||'';
+    if(res.status===401||res.status===403)throw {code:'auth'};
+    if(res.status===429)throw {code:'rate_limited'};
+    if(res.status===529)throw {code:'overloaded'};
+    if(/credit|balance/i.test(msg))throw {code:'credit'};
+    if(res.status===404||/model/i.test(msg))throw {code:'model'};
+    if(res.status===413||/too long|too large/i.test(msg))throw {code:'prompt_too_large'};
+    throw {code:'upstream_error',message:msg};
+  }
+  const reader=res.body.getReader(),dec=new TextDecoder();let buf='',text='',stop='';
+  try{
+    for(;;){
+      const {done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      let i;while((i=buf.indexOf('\n\n'))>=0){
+        const chunk=buf.slice(0,i);buf=buf.slice(i+2);
+        const line=chunk.split('\n').find(l=>l.startsWith('data:'));if(!line)continue;
+        let ev;try{ev=JSON.parse(line.slice(5))}catch(e){continue}
+        if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){text+=ev.delta.text;onText&&onText({text})}
+        else if(ev.type==='message_delta'&&ev.delta)stop=ev.delta.stop_reason||stop;
+        else if(ev.type==='error')throw {code:ev.error&&ev.error.type==='overloaded_error'?'overloaded':'upstream_error'};
+      }
+    }
+  }catch(e){if(e&&e.name==='AbortError')throw {code:'cancelled'};throw e.code?e:{code:'upstream_error'}}
+  if(stop==='refusal')throw {code:'refused'};
+  if(!text.trim())throw {code:'empty_completion'};
+  return parseJSON(text);
+}
+
+(async()=>{
+  try{sampleFn=window.claude?await window.claude.use('sample'):null}catch(e){sampleFn=null}
+  if(sampleFn){engine='artifact';try{const l=await sampleFn.limits();imgLimit=l&&l.images?l.images:false}catch(e){imgLimit=false}}
+  else{engine='api';imgLimit={maxCount:5};wireApi();$('#copyPrompt').hidden=false;
+    $('#runStatus').textContent='Anthropic の API キーを入れると、このページで直接診断できます。キーがなければ、プロンプトをコピーして Claude に貼り付けても同じ診断ができます。'}
+})();
+
+$('#runBtn').onclick=async()=>{
+  if(!engine)return;
+  if(engine==='api'&&!apiKey()){$('#runStatus').innerHTML=`<span class="err">${ERR.no_key}</span>`;$('#apiKey').focus();return}
+  const pct=Number($('#totalPct').textContent);
+  ctl=new AbortController();
+  const run=$('#runBtn'),stop=$('#stopBtn'),st=$('#runStatus');
+  run.disabled=true;stop.hidden=false;
+  st.innerHTML=`<b>考えています…</b> 深く分析するため、1〜2 分かかることがあります。${pct<40?'（記入が少ないため、情報不足の観点が多くなります）':''}`;
+  const onText=({text})=>{st.innerHTML=`<b>所見を書き出しています…</b> ${text.length.toLocaleString()} 字`};
+  try{
+    let r;
+    if(engine==='artifact'){
+      const opts={modelTier:'complex',signal:ctl.signal,cache:false,onText};
+      if(IMGS.length&&imgLimit)opts.images=IMGS.map(i=>i.blob);
+      r=await sampleFn.json(buildPrompt(),opts);
+    }else{
+      r=await apiJSON(buildPrompt(),{images:IMGS.map(i=>i.blob),signal:ctl.signal,onText});
+    }
+    if(!r||!Array.isArray(r.perspectives))throw {code:'invalid_json'};
+    S.result=r;S.resultSample=false;save();renderResult();
+    st.innerHTML='<b>診断が完了しました。</b> 記入を変えて、もう一度診断することもできます。';
+    $('#result').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    const code=e&&e.code;
+    if(code==='cancelled')st.textContent='止めました。';
+    else{st.innerHTML=`<span class="err">${esc(ERR[code]||'通信が途切れました。もう一度押してください。')}</span>`;
+      if(engine==='artifact'&&['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'].includes(code)){$('#copyPrompt').hidden=false;engine=null}}
+  }finally{run.disabled=!engine;stop.hidden=true}
+};
+$('#stopBtn').onclick=()=>ctl&&ctl.abort();
+$('#copyPrompt').onclick=async e=>{
+  const t=buildPrompt();
+  if(IMGS.length)rmMsg('画像はプロンプトに含まれません。Claude に貼り付けるときに画像も一緒に添付してください',true);
+  try{await navigator.clipboard.writeText(t);e.target.textContent='コピーしました'}catch(_){fallbackCopy(t);e.target.textContent='選択しました。コピーしてください'}
+  setTimeout(()=>e.target.textContent='診断用プロンプトをコピー',2500);
+};
+function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(_){}setTimeout(()=>ta.remove(),100)}
+
+// ---------- render ----------
+const stateCls=s=>({'良好':'ok','注意':'warn','危険':'bad'}[s]||'na');
+function radar(r){
+  const ax=SCORED,N=ax.length,cx=200,cy=200,R=128;
+  const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/N;return [cx+Math.cos(a)*R*v/5,cy+Math.sin(a)*R*v/5]};
+  let g='';
+  for(let k=1;k<=5;k++){g+=`<polygon points="${ax.map((_,i)=>pt(i,k).join(',')).join(' ')}" fill="none" stroke="var(--line)" stroke-width="${k===5?1.2:.8}"/>`}
+  ax.forEach((_,i)=>{const [x,y]=pt(i,5);g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width=".8"/>`});
+  for(let k=1;k<=5;k++){const [x,y]=pt(0,k);g+=`<text x="${x+5}" y="${y+4}" font-size="9.5" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${k}</text>`}
+  const by=Object.fromEntries((r.perspectives||[]).map(p=>[p.id,p]));
+  const ai=ax.map((p,i)=>pt(i,Number(by[p.id]?.score)||0));
+  const sv=ax.map((p,i)=>pt(i,S.resultSample?(SAMPLE_SELF[p.id]||0):(S.self[p.id]||0)));
+  if(sv.some(([x,y])=>x!==cx||y!==cy))g+=`<polygon points="${sv.map(p=>p.join(',')).join(' ')}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  g+=`<polygon points="${ai.map(p=>p.join(',')).join(' ')}" fill="var(--accent)" fill-opacity=".18" stroke="var(--accent)" stroke-width="2"/>`;
+  ai.forEach(([x,y],i)=>{const s=by[ax[i].id];g+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${s&&s.score!=null?'var(--accent)':'var(--na)'}"/>`});
+  ax.forEach((p,i)=>{const a=-Math.PI/2+i*2*Math.PI/N,x=cx+Math.cos(a)*(R+20),y=cy+Math.sin(a)*(R+20);const c=Math.cos(a);const anc=Math.abs(c)<.2?'middle':c>0?'start':'end';const s=by[p.id];
+    g+=`<text x="${x}" y="${y+4}" text-anchor="${anc}" font-size="12" fill="var(--ink)">${p.name}</text><text x="${x}" y="${y+18}" text-anchor="${anc}" font-size="10.5" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${s&&s.score!=null?s.score+' / 5':'—'}</text>`});
+  return `<svg viewBox="-70 0 540 410" role="img" aria-label="観点別スコアのレーダーチャート">${g}</svg>`;
+}
+function renderResult(){
+  const el=$('#result'),r=S.result;
+  if(!r){el.innerHTML=`<div class="res-head"><h2>診断所見</h2></div><div class="empty">ここに診断結果が表示されます。<br>上の問診票を記入して「現状を診断する」を押してください。</div>`;return}
+  const by=Object.fromEntries((r.perspectives||[]).map(p=>[p.id,p]));
+  const selfOf=id=>S.resultSample?SAMPLE_SELF[id]:S.self[id];
+  const m=Math.max(0,Math.min(5,Number(r.maturity)||0));
+  let h=`<div class="res-head"><h2>診断所見</h2><span class="res-tag ${S.resultSample?'sample':''}">${S.resultSample?'SAMPLE · シフトリンクの診断例':'AS-IS · '+esc(S.values.name||'あなたのプロダクト')}</span></div>
+  <div class="verdict"><div><p class="headline">${esc(r.headline)}</p><p class="summary">${esc(r.summary)}</p>
+  <div class="maturity"><span>開発全体の成熟度</span><span class="dots">${[1,2,3,4,5].map(i=>`<i class="${i<=m?'on':''}"></i>`).join('')}</span><span class="mono">${m} / 5</span></div></div>
+  <div class="radar-box">${radar(r)}<div class="legend"><span><i class="sw"></i>診断スコア</span><span><i class="sw self"></i>自己評価</span></div></div></div>`;
+  if(r.coreIssue)h+=`<div class="block"><div class="core"><div class="eyebrow">CORE ISSUE · 核心課題</div><h4>${esc(r.coreIssue.title)}</h4><p>${esc(r.coreIssue.explanation)}</p></div></div>`;
+  h+=`<div class="block"><h3>観点別の所見<span class="mono">BY PERSPECTIVE</span></h3><div class="table-scroll"><table><thead><tr><th>観点</th><th>状態</th><th>スコア</th><th>所見と根拠</th></tr></thead><tbody>`;
+  for(const p of SCORED){const x=by[p.id]||{state:'情報不足'};const sv=selfOf(p.id);
+    h+=`<tr><td class="p"><small>${p.code}</small>${p.name}</td><td><span class="pill ${stateCls(x.state)}">${esc(x.state||'情報不足')}</span></td><td class="sc">${x.score!=null?x.score:'—'}${sv?`<span class="gap">自己 ${sv}</span>`:''}</td><td>${esc(x.finding||'')}${(x.evidence||[]).length?`<ul class="ev">${x.evidence.map(e=>`<li>${esc(e)}</li>`).join('')}</ul>`:''}${x.selfGap?`<div class="selfgap">${esc(x.selfGap)}</div>`:''}</td></tr>`}
+  h+=`</tbody></table></div></div>`;
+  if((r.issues||[]).length){h+=`<div class="block"><h3>課題の構造<span class="mono">SYMPTOM → ROOT CAUSE</span></h3><div class="issues">`;
+    for(const i of r.issues){h+=`<article class="issue"><div class="issue-top"><span class="sev ${esc(i.severity)}">重要度 ${esc(i.severity)}</span><h4>${esc(i.title)}</h4><div class="ptags">${(i.perspectives||[]).map(id=>`<span>${esc(PNAME[id]||id)}</span>`).join('')}</div></div>
+      <div><span class="k">SYMPTOM · 症状</span><p>${esc(i.symptom)}</p></div><div><span class="k">ROOT CAUSES · 根本原因</span><ul class="roots">${(i.rootCauses||[]).map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>${i.why?`<div class="why">${esc(i.why)}</div>`:''}</article>`}
+    h+=`</div></div>`}
+  h+=`<div class="block two">`;
+  h+=`<div><h3>観点間の矛盾<span class="mono">CONTRADICTIONS</span></h3>${(r.contradictions||[]).length?`<div class="contra">${r.contradictions.map(c=>`<div class="contra-item"><div class="pair"><div>${esc(c.a)}</div><span class="vs">VS</span><div>${esc(c.b)}</div></div><p>${esc(c.insight)}</p></div>`).join('')}</div>`:'<p class="lead">目立った矛盾は見つかりませんでした。</p>'}</div>`;
+  h+=`<div><h3>見落としの可能性<span class="mono">BLIND SPOTS</span></h3><ul class="plain">${(r.blindSpots||[]).map(b=>`<li>${esc(b)}</li>`).join('')}</ul></div></div>`;
+  h+=`<div class="block two"><div><h3>次に確かめたい問い<span class="mono">OPEN QUESTIONS</span></h3><ul class="plain qs">${(r.questions||[]).map(q=>`<li><span class="qp">${esc(PNAME[q.perspective]||q.perspective||'')}</span><span>${esc(q.question)}</span><span class="qw">${esc(q.why)}</span></li>`).join('')}</ul></div>
+  <div><h3>To-Be 検討の前に決める論点<span class="mono">IMPLICATIONS</span></h3><ul class="plain impl">${(r.implications||[]).map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ul></div></div>`;
+  h+=`<div class="foot"><button class="btn" type="button" id="copyMd">結果を Markdown でコピー</button><span class="toast" id="mdToast"></span></div>`;
+  el.innerHTML=h;
+  $('#copyMd').onclick=async()=>{const t=toMd(r);try{await navigator.clipboard.writeText(t);$('#mdToast').textContent='コピーしました'}catch(_){fallbackCopy(t);$('#mdToast').textContent='コピーしました'}setTimeout(()=>$('#mdToast').textContent='',2500)};
+}
+function toMd(r){
+  const L=[`# ${S.resultSample?'シフトリンク（サンプル）':(S.values.name||'プロダクト')} 現状診断`,'',`**${r.headline}**`,'',r.summary,'',`成熟度: ${r.maturity}/5`,''];
+  if(r.coreIssue)L.push('## 核心課題',`**${r.coreIssue.title}**`,r.coreIssue.explanation,'');
+  L.push('## 観点別の所見','| 観点 | 状態 | スコア | 所見 |','|---|---|---|---|');
+  for(const p of SCORED){const x=(r.perspectives||[]).find(y=>y.id===p.id)||{};L.push(`| ${p.name} | ${x.state||'情報不足'} | ${x.score??'—'} | ${(x.finding||'').replace(/\|/g,'／')} |`)}
+  L.push('','## 課題の構造');for(const i of r.issues||[]){L.push(`### ${i.title}（重要度 ${i.severity}）`,`- 症状: ${i.symptom}`,...(i.rootCauses||[]).map(c=>`- 根本原因: ${c}`),i.why?`- 根拠: ${i.why}`:'','')}
+  if((r.contradictions||[]).length){L.push('## 観点間の矛盾');for(const c of r.contradictions)L.push(`- ${c.a} ⇔ ${c.b}：${c.insight}`);L.push('')}
+  L.push('## 見落としの可能性',...(r.blindSpots||[]).map(b=>`- ${b}`),'','## 次に確かめたい問い',...(r.questions||[]).map(q=>`- [${PNAME[q.perspective]||q.perspective}] ${q.question}（${q.why}）`),'','## To-Be 検討の前に決める論点',...(r.implications||[]).map(x=>`- ${x}`));
+  return L.filter(x=>x!==undefined).join('\n');
+}
+
+// ---------- boot ----------
+buildForm();wireImport();
+const stored=loadStore();
+if(stored&&(Object.keys(stored.values).length||stored.result))S=Object.assign(S,stored);else useSample();
+paintForm();renderResult();
+document.querySelectorAll('.sec').forEach(s=>io.observe(s));
+</script>
+</body>
+</html>
